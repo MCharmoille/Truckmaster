@@ -5,12 +5,14 @@ class Commande {
     return new Promise((resolve, reject) => {
       db.query("SELECT * FROM commandes", (err, commandes) =>{
           if(err) reject(err)
-          
+          console.log(commandes);
           const commandes_ids = commandes.map((commandes) => commandes.id_commande);
           
           const q2 = "SELECT * FROM produits_commandes pc JOIN produits p ON pc.id_produit=p.id_produit WHERE pc.id_commande IN (?)";
+          console.log(q2);
           db.query(q2, [commandes_ids], (err, produits_commandes) => {
               if (err) return res.json(err);
+              console.log(produits_commandes);
               const commandes_map = new Map();
 
               commandes.forEach((commandes) => {
