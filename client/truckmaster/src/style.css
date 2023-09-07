@@ -1,0 +1,127 @@
+.tranche{
+    width: 100%;
+    height: 300px;
+    border-bottom: solid white 1px;
+}
+
+.tranche h2 {
+  font-size: 30px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.commandes {
+  display: flex;
+  gap: 20px;
+}
+
+.commande {
+    background-color: #444;
+    border: 1px solid #555;
+    padding: 10px;
+    width: 300px;
+    height: 200px;
+    font-size: 25px;
+}
+
+.commande h2 {
+  font-size: 30px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-bottom: solid white 1px;
+}
+
+.paye {
+    background-color:green;
+}
+
+/* Styles pour le conteneur principal */
+.form {
+    display: flex;
+    height: 90vh; /* Prend toute la hauteur de la page */
+  }
+  
+  /* Styles pour la partie gauche */
+  .zone_gauche {
+    flex: 1; /* Occupe tout l'espace disponible */
+    display: flex;
+    flex-wrap: wrap; /* Pour que les cases aient 2 par ligne */
+  }
+  
+  .bt_produit {
+    width: 48%; /* 2 cases par ligne */
+    box-sizing: border-box; 
+    border: 1px solid #ccc;
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    margin: 1%;
+    background-color: #444;
+  }
+  
+  /* Styles pour la partie droite */
+  .zone_droite {
+    flex: 1; /* Occupe tout l'espace disponible */
+    display: flex;
+    flex-direction: column; /* Empile les éléments verticalement */
+  }
+  
+  .recap {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 2%;
+    height: 78%;
+    border: solid #555 5px;
+    border-radius: 20px;
+  }
+
+  .contenu_commande {
+    font-size: 25px;
+    padding: 5px;
+    line-height: 35px;
+  }
+  
+  /* Style pour le texte "TOTAL" */
+  .total {
+    font-size: 24px;
+    font-weight: bold;
+    height: 10%;
+  }
+
+  .bt_frite, .bt_boisson {
+    width: 100% !important;
+  }
+
+#input_libelle {
+    font-size: 30px;
+    margin: 10px;
+    background-color: #555;
+    color: white;
+    height: 40px;
+    width: 300px;
+    border-radius: 10px;
+}
+#input_time {
+    font-size: 30px;
+}
+
+.ajouter {
+    height: 10%;
+    font-size: 50px;
+    background-color: green;
+    border: solid white 1px;
+    border-radius: 20px;
+    margin: 0px 10px 0px 10px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.devis{
+    margin-top: 10px;
+    line-height: 25px;
+}
