@@ -7,7 +7,7 @@ const Commandes = () => {
   useEffect(() => {
     const fetchAllCommandes = async () => {
       try {
-        const res = await axios.get('http://localhost:8800/commandes');
+        const res = await axios.get('http://37.187.55.12:8800/commandes');
         setCommandes(res.data);
       } catch (err) {
         console.log(err);
