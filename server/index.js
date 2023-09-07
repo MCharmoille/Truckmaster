@@ -8,7 +8,7 @@ import commandesRoutes from './routes/commandes.js';
 const app = express()
 
 app.use(express.json())
-app.use(cors())
+app.use(cors({ origin: 'http://37.187.55.12' }));
 
 const db = mysql.createConnection({
   host: '37.187.55.12',
