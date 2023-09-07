@@ -22,11 +22,11 @@ const Add = () => {
             const today = new Date();
             const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-            const dateCreation = formattedDate + " "+`${commande.time}` + ':00';
+            const dateCreation = `${formattedDate} ${commande.time}:00`;
             const updatedCommande = { ...commande, date_creation: dateCreation, produits: produits_commandes};
 
-            await axios.post("http://localhost:8800/commandes", updatedCommande)
-            navigate("/commandes")
+            await axios.post("http://37.187.55.12:8800/commandes", updatedCommande);
+            navigate("/commandes");
         }catch(err){
             console.log(err)
         }
