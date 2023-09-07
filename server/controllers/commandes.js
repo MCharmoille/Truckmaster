@@ -2,6 +2,7 @@ import Commande from '../models/Commande.js';
 
 export const getCommandes = async (req, res) => {
     try {
+        console.log("demande recu par le controller");
         const commandes = await Commande.find();
         res.status(200).json(commandes);
     } catch (error) {
