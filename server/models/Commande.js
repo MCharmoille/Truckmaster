@@ -3,7 +3,6 @@ import { db } from '../index.js';
 class Commande {
   static async find() {
     return new Promise((resolve, reject) => {
-      console.log("Demande recu par le modele");
       db.query("SELECT * FROM commandes", (err, commandes) =>{
           if(err) reject(err)
           console.log(commandes);
@@ -72,6 +71,8 @@ class Commande {
                     }
                   });
                 });
+
+                return resolve(true);
               }
             }
         });

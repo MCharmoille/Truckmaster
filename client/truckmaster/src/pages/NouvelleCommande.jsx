@@ -25,8 +25,12 @@ const Add = () => {
             const dateCreation = `${formattedDate} ${commande.time}:00`;
             const updatedCommande = { ...commande, date_creation: dateCreation, produits: produits_commandes};
 
-            await axios.post("http://37.187.55.12:8800/commandes", updatedCommande);
-            navigate("/commandes");
+            try {
+              await axios.post("http://localhost:8800/commandes", updatedCommande);
+              navigate("/commandes");
+            } catch (error) {
+              console.error("Une erreur s'est produite lors de la requête POST :", error);
+            }
         }catch(err){
             console.log(err)
         }

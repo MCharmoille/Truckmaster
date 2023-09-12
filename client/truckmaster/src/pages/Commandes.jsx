@@ -7,11 +7,7 @@ const Commandes = () => {
   useEffect(() => {
     const fetchAllCommandes = async () => {
       try {
-        console.log("Avant de chercher les data");
-        console.log("recherche vers http://37.187.55.12:8800/commandes");
         const res = await axios.get('http://37.187.55.12:8800/commandes');
-        console.log("apres data");
-        console.log(res);
         setCommandes(res.data);
       } catch (err) {
         console.log(err);
@@ -39,19 +35,19 @@ const Commandes = () => {
       minute = 0;
     }
   }
-  console.log(tranches);
 
   // Ajoute la commande à la tranche horaire correspondante
   commandes.forEach((commande) => {
     const timeCommande = new Date(commande.date_creation).getHours()+":"+new Date(commande.date_creation).getMinutes().toString().padStart(2, '0');;
-    console.log(timeCommande);
-    tranches.find(
-      (tranche) =>
-        tranche.time === timeCommande
-    ).content.push(commande);
-  });
 
-console.log(commandes);
+    const foundTranche = tranches.find((tranche) => tranche.time === timeCommande);
+
+    if (foundTranche) {
+      foundTranche.content.push(commande);
+    } else {
+      console.log("Tranche interdite ! Heure impossible : "+timeCommande);
+    }
+  });
 
   return (
     <div>
