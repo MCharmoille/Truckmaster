@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 
 const Add = () => {
@@ -9,6 +9,20 @@ const Add = () => {
         time:"18:00",
         produits:[]
     })
+
+    // TO DO : remplacer par une requête à l'API
+    const produits_affiches = [
+        {id : 1, nom : "Campagnard", prix : 10},
+        {id : 2, nom : "Pouly", prix : 10},
+        {id : 5, nom : "Classique", prix : 10},
+        {id : 6, nom : "Lo'cale", prix : 11},
+        {id : 7, nom : "Végé", prix : 10},
+        {id : 8, nom : "Menu enfant", prix : 7},
+        {id : 9, nom : "Spécial mois", prix : 11},
+        {id : 10, nom : "Autre", prix : 0},
+        {id : 3, nom : "Frite", prix : 3},
+        {id : 12, nom : "Boisson", prix : 2}
+    ];
 
     const navigate = useNavigate()
 
@@ -26,7 +40,7 @@ const Add = () => {
             const updatedCommande = { ...commande, date_commande: dateCreation, produits: produits_commandes};
 
             try {
-              await axios.post("http://localhost:8800/commandes", updatedCommande);
+              await axios.post("http://37.187.55.12:8800/commandes", updatedCommande);
               navigate("/commandes");
             } catch (error) {
               console.error("Une erreur s'est produite lors de la requête POST :", error);
@@ -40,45 +54,37 @@ const Add = () => {
     const [produits_commandes, setProduitsCommandes] = useState([]);
     const [total, setTotal] = useState(0);
 
-    const handleProductClick = (nomProduit, prix) => {
-        const existingProductIndex = produits_commandes.findIndex((produit) => produit.nom === nomProduit);
-    
-        if (existingProductIndex !== -1) {
-            const updatedProduits = [...produits_commandes];
-            updatedProduits[existingProductIndex].qte += 1;
-            setProduitsCommandes(updatedProduits);
+    const modifier_commande = (id, qte) => {
+        const id_pc = produits_commandes.findIndex((p) => p.id === id);
+
+        if (id_pc !== -1) {
+            const pc_clone = [...produits_commandes];
+            pc_clone[id_pc].qte += qte;
+            if(pc_clone[id_pc].qte < 1) pc_clone.splice(id_pc, 1);
+            setProduitsCommandes(pc_clone);
         } else {
-            setProduitsCommandes([...produits_commandes, { nom: nomProduit, qte: 1, prix: prix }]);
+            var produit = produits_affiches[produits_affiches.findIndex((p) => p.id === id)];
+            setProduitsCommandes([...produits_commandes, { id: produit.id, nom: produit.nom, prix: produit.prix, qte: 1 }]);
         }
-    
-        Recalcul_total();
     };
 
-    const Recalcul_total = () => {
+    useEffect(() => {
         var new_total = 0;
         console.log(produits_commandes);
         for(var i in produits_commandes){
             new_total += produits_commandes[i].qte * produits_commandes[i].prix;
         }
-
-        console.log(new_total);
         setTotal(new_total);
-    }
+    }, [produits_commandes]);
 
     return (
         <div className='form'>
             {/* Partie gauche (liste des produits) */}
             <div className='zone_gauche'>
-                <div className='bt_produit' onClick={() => handleProductClick("Campagnard", 10)}> Campagnard </div> 
-                <div className='bt_produit' onClick={() => handleProductClick("Pouly", 10)}> Pouly </div>
-                <div className='bt_produit' onClick={() => handleProductClick("Classique", 10)}> Classique </div> 
-                <div className='bt_produit' onClick={() => handleProductClick("Lo'cale", 11)}> Lo'cale </div>
-                <div className='bt_produit' onClick={() => handleProductClick("Végé", 10)}> Végé </div> 
-                <div className='bt_produit' onClick={() => handleProductClick("Menu enfant", 7)}> Menu enfant </div>
-                <div className='bt_produit' onClick={() => handleProductClick("Burger du mois", 11)}> Spécial mois </div> 
-                <div className='bt_produit'> Autre </div>
-                <div className='bt_produit bt_frite' onClick={() => handleProductClick("Frite", 3)}> Frite </div> 
-                <div className='bt_produit bt_boisson' onClick={() => handleProductClick("Boisson", 2)}> Boisson </div>
+                {produits_affiches.map((produit, index) => (
+                    <div className={`bt_produit ${produit.id === 3 || produit.id === 12 ? 'bt_large' : ''}`} 
+                         onClick={() => modifier_commande(produit.id, 1)}> {produit.nom} </div>
+                ))}
             </div>
             {/* Partie droite (récap + total) */}
             <div className='zone_droite'>
@@ -96,7 +102,10 @@ const Add = () => {
                     <div className='contenu_commande'>
                         {produits_commandes.map((produit, index) => (
                             <div key={index} style={{ display: 'flex', justifyContent: 'space-between' }}> 
-                                <div>{produit.qte} x {produit.nom}</div> 
+                                <div> 
+                                    <span className='enlever_article' onClick={() => modifier_commande(produit.id, -1)}> - </span> 
+                                    {produit.qte} x {produit.nom}
+                                </div> 
                                 <div>{produit.prix} €</div> 
                             </div>
                         ))}

@@ -57,7 +57,7 @@ class Commande {
                   const q = "INSERT INTO produits_commandes(`id_commande`, `id_produit`, `qte`, `custom`) VALUES (?)";
                   const values = [
                     data.insertId,
-                    1,
+                    produit.id,
                     produit.qte,
                     0
                   ];

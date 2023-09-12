@@ -71,8 +71,6 @@
   }
   
   .recap {
-    font-size: 18px;
-    font-weight: bold;
     margin-bottom: 2%;
     height: 78%;
     border: solid #555 5px;
@@ -80,9 +78,18 @@
   }
 
   .contenu_commande {
-    font-size: 25px;
+    font-size: 22px;
     padding: 5px;
     line-height: 35px;
+  }
+
+  .enlever_article {
+    background-color: red;
+    border: solid white 0.5px;
+    border-radius: 16px;
+    padding: 0px 5px;
+    margin-right: 5px;
+    font-weight: bold;
   }
   
   /* Style pour le texte "TOTAL" */
@@ -92,7 +99,7 @@
     height: 10%;
   }
 
-  .bt_frite, .bt_boisson {
+  .bt_large {
     width: 100% !important;
   }
 
