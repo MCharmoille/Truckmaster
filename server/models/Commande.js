@@ -39,11 +39,10 @@ class Commande {
 
   static async addCommande(req, res){
     return new Promise((resolve, reject) => {
-        const q = "INSERT INTO commandes(`libelle`, `date_creation`, `date_prevu`) VALUES (?)";
+        const q = "INSERT INTO commandes(`libelle`, `date_commande`) VALUES (?)";
         const values = [
             req.body.libelle,
-            req.body.date_creation,
-            req.body.date_prevu
+            req.body.date_commande
         ];
         
         db.query(q, [values], (err, data) =>{

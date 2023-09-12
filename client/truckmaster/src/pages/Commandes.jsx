@@ -38,7 +38,7 @@ const Commandes = () => {
 
   // Ajoute la commande à la tranche horaire correspondante
   commandes.forEach((commande) => {
-    const timeCommande = new Date(commande.date_creation).getHours()+":"+new Date(commande.date_creation).getMinutes().toString().padStart(2, '0');;
+    const timeCommande = new Date(commande.date_commande).getHours()+":"+new Date(commande.date_commande).getMinutes().toString().padStart(2, '0');;
 
     const foundTranche = tranches.find((tranche) => tranche.time === timeCommande);
 

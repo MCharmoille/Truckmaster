@@ -3,16 +3,19 @@ import Accueil from "./pages/Accueil";
 import Commandes from "./pages/Commandes";
 import Devis from "./pages/Devis";
 import NouvelleCommande from "./pages/NouvelleCommande";
-import "./style.css"
+import "./style.css";
+import home from './img/home.png';
+import list from './img/list.png';
+import plus from './img/plus.png';
 
 function App() {
   return (
     <div className="App">
       <BrowserRouter>
         <div className="accueil">
-           <Link to="/"> Accueil </Link>
-           <Link to="/commandes"> Commandes </Link>
-           <Link to="/add"> Nouvelle commande </Link>
+           <Link to="/"> <img src={home} alt="home" className="header_icons" /> </Link>
+           <Link to="/commandes"> <img src={list} alt="list" className="header_icons" /> </Link>
+           <Link to="/add"> <img src={plus} alt="plus" className="header_icons" /> </Link>
         </div>
         <div className="corps">
           <Routes>

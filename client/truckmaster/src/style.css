@@ -39,7 +39,7 @@
 /* Styles pour le conteneur principal */
 .form {
     display: flex;
-    height: 90vh; /* Prend toute la hauteur de la page */
+    height: 92vh; /* Prend toute la hauteur de la page */
   }
   
   /* Styles pour la partie gauche */
@@ -53,13 +53,14 @@
     width: 48%; /* 2 cases par ligne */
     box-sizing: border-box; 
     border: 1px solid #ccc;
-    font-size: 30px;
+    font-size: 23px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 10px;
     margin: 1%;
     background-color: #444;
+    height: 16%;
   }
   
   /* Styles pour la partie droite */
@@ -96,16 +97,16 @@
   }
 
 #input_libelle {
-    font-size: 30px;
+    font-size: 19px;
     margin: 10px;
     background-color: #555;
     color: white;
     height: 40px;
-    width: 300px;
+    width: 180px;
     border-radius: 10px;
 }
 #input_time {
-    font-size: 30px;
+    font-size: 20px;
 }
 
 .ajouter {
@@ -115,7 +116,6 @@
     border: solid white 1px;
     border-radius: 20px;
     margin: 0px 10px 0px 10px;
-    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;

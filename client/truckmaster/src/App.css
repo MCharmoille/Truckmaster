@@ -1,9 +1,8 @@
 .App{
-  color:white;
-  background-color: #333; /* Couleur d'arrière-plan sombre pour le mode sombre */
-  color: #fff; /* Couleur du texte en mode sombre */
+  background-color: #333;
+  color: #fff;
   font-family: Arial, sans-serif;
-  padding: 20px;
+  padding: 10px 5px;
 }
 
 .accueil{
@@ -14,6 +13,11 @@
   left: 0;
   width: 100%;
   background-color: white;
+}
+
+.header_icons {
+  width: 50px;
+  margin-left: 20px;;
 }
 
 .corps{

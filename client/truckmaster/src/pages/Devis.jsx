@@ -110,7 +110,7 @@ const Devis = () => {
                     </View>
                     <View>
                         <Text style={styles.infoText}>Devis N° {devis.id.toString().padStart(4, '0')}</Text>
-                        <Text style={styles.infoText}>Date : {format(new Date(devis.date_creation), 'dd/MM/yyyy')}</Text>
+                        <Text style={styles.infoText}>Date : {format(new Date(devis.date_commande), 'dd/MM/yyyy')}</Text>
                     </View>
                 </View>
             </View>
@@ -149,11 +149,11 @@ const Devis = () => {
                 {devis.map(devis=>(
                     <div className='devis' key={devis.id}>
                         <div className={`devis-header ${selectedDevis === devis.id ? 'active' : ''}`}>
-                            Devis {devis.id.toString().padStart(4, '0')} pour {devis.nom} ({format(new Date(devis.date_creation), 'dd/MM/yyyy')})
+                            Devis {devis.id.toString().padStart(4, '0')} pour {devis.nom} ({format(new Date(devis.date_commande), 'dd/MM/yyyy')})
                             {selectedDevis === devis.id && (
                             <div className="devis-details">
                                 <input type="text" value={devis.nom} onChange={(e) => {/* Mettre à jour la valeur du nom du devis */}} />
-                                <input type="text" value={format(new Date(devis.date_creation), 'dd/MM/yyyy')} onChange={(e) => {/* Mettre à jour la valeur de la date du devis */}} />
+                                <input type="text" value={format(new Date(devis.date_commande), 'dd/MM/yyyy')} onChange={(e) => {/* Mettre à jour la valeur de la date du devis */}} />
                                 {/* Autres champs du formulaire */}
                             </div>
                             )}

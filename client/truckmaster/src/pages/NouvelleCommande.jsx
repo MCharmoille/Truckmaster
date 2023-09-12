@@ -23,7 +23,7 @@ const Add = () => {
             const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
             const dateCreation = `${formattedDate} ${commande.time}:00`;
-            const updatedCommande = { ...commande, date_creation: dateCreation, produits: produits_commandes};
+            const updatedCommande = { ...commande, date_commande: dateCreation, produits: produits_commandes};
 
             try {
               await axios.post("http://localhost:8800/commandes", updatedCommande);
@@ -75,8 +75,8 @@ const Add = () => {
                 <div className='bt_produit' onClick={() => handleProductClick("Lo'cale", 11)}> Lo'cale </div>
                 <div className='bt_produit' onClick={() => handleProductClick("Végé", 10)}> Végé </div> 
                 <div className='bt_produit' onClick={() => handleProductClick("Menu enfant", 7)}> Menu enfant </div>
-                <div className='bt_produit' onClick={() => handleProductClick("Burger du mois", 11)}> Burger du mois </div> 
-                <div className='bt_produit'>  </div>
+                <div className='bt_produit' onClick={() => handleProductClick("Burger du mois", 11)}> Spécial mois </div> 
+                <div className='bt_produit'> Autre </div>
                 <div className='bt_produit bt_frite' onClick={() => handleProductClick("Frite", 3)}> Frite </div> 
                 <div className='bt_produit bt_boisson' onClick={() => handleProductClick("Boisson", 2)}> Boisson </div>
             </div>
