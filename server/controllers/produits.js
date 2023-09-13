@@ -8,3 +8,12 @@ export const getProduits = async (req, res) => {
         res.status(404).json({ message: error.message });
     }
 }
+
+export const get_recette = async (req, res) => {
+    try {
+        const recette = await Produit.get_recette(req, res);
+        res.status(200).json(recette);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}

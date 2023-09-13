@@ -1,6 +1,5 @@
 .tranche{
     width: 100%;
-    height: 300px;
     border-bottom: solid white 1px;
 }
 
@@ -19,9 +18,9 @@
     background-color: #444;
     border: 1px solid #555;
     padding: 10px;
-    width: 300px;
-    height: 200px;
+    width: 250px;
     font-size: 25px;
+    margin-bottom: 10px;
 }
 
 .commande h2 {
@@ -85,11 +84,16 @@
 
   .enlever_article {
     background-color: red;
-    border: solid white 0.5px;
-    border-radius: 16px;
-    padding: 0px 5px;
-    margin-right: 5px;
-    font-weight: bold;
+    padding: 2px 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    margin-right: 6px;
+  }
+
+  .modification {
+      font-size: 18px;
+      padding-left: 30px;
+      line-height: 22px;
   }
   
   /* Style pour le texte "TOTAL" */
@@ -126,6 +130,75 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* Style de l'arrière-plan obscurci */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Assure que la modal est au-dessus de tout le reste */
+}
+
+/* Style de la fenêtre modale */
+.modal-content {
+  background-color: #333;
+  padding: 20px;
+  border-radius: 5px;
+  border: solid #555 5px;
+}
+
+.recette {
+  text-align: left;
+  margin-top: 20px;
+  font-size: 20px;
+}
+
+.recette div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.nom_ingredient{
+  width: 200px;
+}
+
+.nom_ingredient[modification=1]{
+  color:red;
+}
+
+.modificateur_1{
+  color:green;
+}
+
+.modificateur_-1{
+  color:red;
+}
+.moins,
+.plus {
+  font-size: 1.2em;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+.moins {
+  background-color: red;
+}
+.plus{
+  background-color: green;
+}
+
+.bt_custom{
+  margin-left: 38%;
+  font-size: 20px;
 }
 
 .devis{

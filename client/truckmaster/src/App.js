@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom"
-import Accueil from "./pages/Accueil";
-import Commandes from "./pages/Commandes";
-import Devis from "./pages/Devis";
-import NouvelleCommande from "./pages/NouvelleCommande";
+import Accueil from "./components/Accueil";
+import Commandes from "./components/Commandes";
+import Devis from "./components/Devis";
+import NouvelleCommande from "./components/NouvelleCommande";
 import "./style.css";
 import home from './img/home.png';
 import list from './img/list.png';
