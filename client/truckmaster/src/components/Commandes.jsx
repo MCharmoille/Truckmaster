@@ -9,7 +9,7 @@ const Commandes = () => {
   useEffect(() => {
     const fetchAllCommandes = async () => {
       try {
-        const res = await axios.get('http://truckmaster.ovh:8800/commandes');
+        const res = await axios.get('https://truckmaster.ovh:8800/commandes');
         setCommandes(res.data);
       } catch (err) {
         console.log(err);
