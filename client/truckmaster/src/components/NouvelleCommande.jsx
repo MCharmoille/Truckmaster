@@ -41,7 +41,7 @@ const Add = () => {
             const updatedCommande = { ...commande, date_commande: dateCreation, produits: produits_commandes};
             console.log(updatedCommande);
             try {
-              await axios.post("http://37.187.55.12:8800/commandes", updatedCommande);
+              await axios.post("https://truckmaster.ovh:8800/commandes", updatedCommande);
               navigate("/commandes");
             } catch (error) {
               console.error("Une erreur s'est produite lors de la requête POST :", error);
