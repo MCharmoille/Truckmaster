@@ -9,7 +9,15 @@ const app = express()
 
 app.use(express.json())
 // app.use(cors());
-app.use(cors({ origin: 'http://truckmaster.ovh' }));
+const corsOptions = {
+  origin: 'http://truckmaster.ovh', // Remplacez par votre nom de domaine réel
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
+// app.use(cors({ origin: 'http://truckmaster.ovh' }));
 
 const db = mysql.createConnection({
   host: '37.187.55.12',
