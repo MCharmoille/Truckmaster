@@ -5,7 +5,20 @@ import cors from "cors"
 import produitsRoutes from './routes/produits.js';
 import commandesRoutes from './routes/commandes.js';
 
-const app = express()
+const https = require('https');
+const fs = require('fs');
+const app = express();
+
+// Chemin vers les fichiers de certificat SSL
+const privateKey = fs.readFileSync('/etc/letsencrypt/live/truckmaster.ovh/privkey.pem', 'utf8');
+const certificate = fs.readFileSync('/etc/letsencrypt/live/truckmaster.ovh/fullchain.pem', 'utf8');
+
+const credentials = {
+  key: privateKey,
+  cert: certificate,
+};
+
+
 
 app.use(express.json())
 // app.use(cors());
@@ -16,6 +29,10 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+// Utilisez les certificats SSL pour créer un serveur HTTPS
+const httpsServer = https.createServer(credentials, app);
+
 
 const db = mysql.createConnection({
   host: '37.187.55.12',
@@ -32,6 +49,10 @@ app.use('/commandes', commandesRoutes);
 app.get("/", (req, res) => {
     res.json("Index Truckmaster")
 })
+
+httpsServer.listen(8800, () => {
+    console.log("Le serveur HTTPS est correctement démarré sur le port 8800.");
+  });
 
 // devis
 app.get("/devis", (req, res) => {
@@ -67,6 +88,5 @@ app.get("/devis", (req, res) => {
     })
 })
 
-app.listen(8800, () =>{
-    console.log("Le serveur Truckmaster est correctement démarré.")
-})
+
+
