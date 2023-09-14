@@ -10,7 +10,7 @@ const app = express()
 app.use(express.json())
 // app.use(cors());
 const corsOptions = {
-  origin: 'http://truckmaster.ovh', // Remplacez par votre nom de domaine réel
+  origin: ['http://truckmaster.ovh', 'http://www.truckmaster.ovh'],
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
 };
