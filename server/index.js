@@ -5,8 +5,9 @@ import cors from "cors"
 import produitsRoutes from './routes/produits.js';
 import commandesRoutes from './routes/commandes.js';
 
-const https = require('https');
-const fs = require('fs');
+import https from 'https';
+import fs from 'fs';
+
 const app = express();
 
 // Chemin vers les fichiers de certificat SSL
