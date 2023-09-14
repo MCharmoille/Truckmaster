@@ -10,7 +10,7 @@ const app = express()
 app.use(express.json())
 // app.use(cors());
 const corsOptions = {
-  origin: ['https://truckmaster.ovh', 'https://www.truckmaster.ovh'],
+  origin: ['http://truckmaster.ovh', 'http://www.truckmaster.ovh', 'https://truckmaster.ovh', 'https://www.truckmaster.ovh'],
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
 };
