@@ -132,6 +132,16 @@
     justify-content: center;
 }
 
+.paiement{
+  font-size: 20px;
+  background-color: green;
+  border: solid white 1px;
+  border-radius: 20px;
+  margin: 0px 10px 0px 10px;
+  display: flex;
+  justify-content: center;
+}
+
 /* Style de l'arrière-plan obscurci */
 .modal-overlay {
   position: fixed;
@@ -175,7 +185,7 @@
 }
 
 .modificateur_1{
-  color:green;
+  color:purple;
 }
 
 .modificateur_-1{
@@ -199,6 +209,18 @@
 .bt_custom{
   margin-left: 38%;
   font-size: 20px;
+}
+
+.bt_paiement {
+  font-size: 20px;
+  margin: 5px;
+  padding: 10px 20px;
+  background-color: #007bff; /* Couleur de fond du bouton */
+  color: white; /* Couleur du texte du bouton */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  outline: none;
 }
 
 .devis{

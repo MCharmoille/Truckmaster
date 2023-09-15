@@ -3,6 +3,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Modal from "./modals/CustomProduit";
+import ModalBoissons from "./modals/Boissons";
 
 const Add = () => {
     const [commande, set_commande] = useState({
@@ -13,16 +14,23 @@ const Add = () => {
     
     // TO DO : remplacer par une requête à l'API
     const produits_affiches = [
-        {id : 1, nom : "Campagnard", prix : 10},
-        {id : 2, nom : "Pouly", prix : 10},
-        {id : 5, nom : "Classique", prix : 10},
-        {id : 6, nom : "Lo'cale", prix : 11},
-        {id : 7, nom : "Végé", prix : 10},
-        {id : 8, nom : "Menu enfant", prix : 7},
-        {id : 9, nom : "Spécial mois", prix : 11},
-        {id : 10, nom : "Autre", prix : 0},
-        {id : 3, nom : "Frite", prix : 3},
-        {id : 12, nom : "Boisson", prix : 2}
+        {id : 1, display : true, onclick : () => modifier_commande(1, 1), nom : "Campagnard", prix : 10},
+        {id : 2, display : true, onclick : () => modifier_commande(2, 1), nom : "Pouly", prix : 10},
+        {id : 5, display : true, onclick : () => modifier_commande(5, 1), nom : "Classique", prix : 10},
+        {id : 6, display : true, onclick : () => modifier_commande(6, 1), nom : "Lo'cale", prix : 11},
+        {id : 7, display : true, onclick : () => modifier_commande(7, 1), nom : "Végé", prix : 10},
+        {id : 8, display : true, onclick : () => modifier_commande(8, 1), nom : "Menu enfant", prix : 7},
+        {id : 9, display : true, onclick : () => modifier_commande(9, 1), nom : "Spécial mois", prix : 11},
+        {id : 99, display : true, onclick : () => modifier_commande(10, 1),  nom : "Autre", prix : 0},
+        {id : 3, display : true, onclick : () => modifier_commande(3, 1), nom : "Frite", prix : 3},
+        {id : 98, display : true, onclick : () => handleClickBoissons(),  nom : "Boisson", prix : 2},
+        {id : 10, display : false, nom : "Coca", prix : 2},
+        {id : 11, display : false, nom : "Fanta", prix : 2},
+        {id : 12, display : false, nom : "Sprite", prix : 2},
+        {id : 13, display : false, nom : "Ice Tea", prix : 2},
+        {id : 14, display : false, nom : "Caprisun", prix : 1},
+        {id : 15, display : false, nom : "Bière", prix : 2},
+        {id : 16, display : false, nom : "Bière locale", prix : 3}
     ];
 
     const navigate = useNavigate()
@@ -98,13 +106,24 @@ const Add = () => {
         console.log(produits_commandes);
     };
 
+    const [showModalBoissons, setShowModalBoissons] = useState(false);
+
+    const handleClickBoissons = (produit) => {
+        setShowModalBoissons(true);
+    };
+
+    const handleCloseModalBoissons = (id) => {
+        setShowModalBoissons(false);
+        modifier_commande(id, 1)
+    };
+
     return (
         <div className='form'>
             {/* Partie gauche (liste des produits) */}
             <div className='zone_gauche'>
-                {produits_affiches.map((produit, index) => (
-                    <div className={`bt_produit ${produit.id === 3 || produit.id === 12 ? 'bt_large' : ''}`} 
-                         onClick={() => modifier_commande(produit.id, 1)}
+                {produits_affiches.filter((produit) => produit.display === true).map((produit, index) => (
+                    <div className={`bt_produit ${produit.id === 3 || produit.id === 98 ? 'bt_large' : ''}`} 
+                         onClick={produit.onclick}
                          key={index}> {produit.nom} </div>
                 ))}
             </div>
@@ -154,7 +173,9 @@ const Add = () => {
             {showModal && (
                 <Modal produit={selectedProduct} onClose={handleCloseModal} />
             )}
-
+            {showModalBoissons && (
+                <ModalBoissons onClose={handleCloseModalBoissons} />
+            )}
         </div>
     )
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import moment from 'moment';
+import Modal from "./modals/Paiement";
 
 const Commandes = () => {
   const [commandes, setCommandes] = useState([]);
@@ -40,12 +41,7 @@ const Commandes = () => {
   console.log(commandes);
   // Ajoute la commande à la tranche horaire correspondante
   commandes.forEach((commande) => {
-    console.log("date recu :");
-    console.log(commande.date_commande);
     const timeCommande = moment(commande.date_commande).format('HH:mm');
-
-    console.log("date retenu :");
-    console.log(timeCommande);
 
     const foundTranche = tranches.find((tranche) => tranche.time === timeCommande);
 
@@ -55,6 +51,28 @@ const Commandes = () => {
       console.log("Tranche interdite ! Heure impossible : "+timeCommande);
     }
   });
+
+  const [showModal, setShowModal] = useState(false);
+  const [selectedCommande, setselectedCommande] = useState(null);
+
+  const handleCloseModal = (moyen_paiement) => {
+      setShowModal(false);
+
+      if(moyen_paiement !== 0){
+        const id_c = commandes.findIndex((c) => (c.id_commande === selectedCommande.id_commande));
+
+        if (id_c !== -1) {
+            const c_clone = [...commandes];
+            c_clone[id_c].moyen_paiement = moyen_paiement;
+            setCommandes(c_clone);
+        }
+      }
+  };
+
+  const paiement_commande = (commande) => {
+    setselectedCommande(commande);
+    setShowModal(true);
+  };
   
   return (
     <div>
@@ -64,7 +82,7 @@ const Commandes = () => {
           <div className="commandes">
             {tranche.content.length !== 0 ? (
               tranche.content.map((commande, c_index) => (
-                <div className={`commande ${commande.paye === 1 ? 'paye' : ''}`} key={c_index}>
+                <div className={`commande ${commande.moyen_paiement !== null ? 'paye' : ''}`} key={c_index}>
                   <h2>{commande.libelle}</h2>
                   <div className='produits'>
                     {commande.produits.length !== 0 ? (
@@ -84,11 +102,24 @@ const Commandes = () => {
                     ) : ""
                     }
                   </div>
+                  {commande.moyen_paiement !== null ? (
+                    null 
+                  ) : (
+                    <div className='paiement' onClick={() => paiement_commande(commande)}>
+                      Paiement
+                    </div>
+                  )}
                 </div>
               ))
             ) : ""
             }
           </div>
+
+          {/* Afficher la fenêtre modale si showModal est true */}
+          {showModal && (
+              <Modal commande={selectedCommande} onClose={handleCloseModal} />
+          )}
+
         </div>
       ))}
     </div>

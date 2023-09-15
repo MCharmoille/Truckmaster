@@ -17,6 +17,7 @@ class Commande {
               commandes.forEach((commandes) => {
                 commandes_map.set(commandes.id_commande, {
                       ...commandes,
+                      total: 0,
                       produits: [],
                   });
               });
@@ -24,6 +25,7 @@ class Commande {
               produits_commandes.forEach((produit_commande) => {
                   const id_commande = produit_commande.id_commande;
                   if (commandes_map.has(id_commande)) {
+                    commandes_map.get(id_commande).total += (produit_commande.prix * produit_commande.qte);
                     commandes_map.get(id_commande).produits.push({
                       ...produit_commande,
                       modifications: [], // Initialisez le tableau de modifications ici
@@ -124,6 +126,25 @@ class Commande {
             }
         });
     });
+  }
+
+  static async paiementCommande(req, res){
+    return new Promise((resolve, reject) => {
+      const q = "UPDATE commandes SET moyen_paiement = ? WHERE id_commande = ?";
+      const values = [
+          req.body.moyen_paiement,
+          req.body.id_commande
+      ];
+
+      db.query(db.format(q, values), (err, data) =>{
+          if(err) reject(err)
+          else{ 
+            console.log("La commande "+req.body.id_commande+" à correctement été payée");
+            
+            return resolve(true);
+          }
+      });
+  });
   }
 }
 

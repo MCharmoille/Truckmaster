@@ -17,3 +17,12 @@ export const addCommande = async (req, res) => {
         res.status(404).json({ message: error.message });
     }
 }
+
+export const paiementCommande = async (req, res) => {
+    try {
+        const commande = await Commande.paiementCommande(req, res);
+        res.status(200).json(commande);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
