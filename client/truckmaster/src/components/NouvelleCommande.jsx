@@ -25,12 +25,12 @@ const Add = () => {
         {id : 3, display : true, onclick : () => modifier_commande(3, 1), nom : "Frite", prix : 3},
         {id : 98, display : true, onclick : () => handleClickBoissons(),  nom : "Boisson", prix : 2},
         {id : 10, display : false, nom : "Coca", prix : 2},
-        {id : 11, display : false, nom : "Fanta", prix : 2},
-        {id : 12, display : false, nom : "Sprite", prix : 2},
+        {id : 11, display : false, nom : "Orangina", prix : 2},
+        {id : 12, display : false, nom : "Schweppes", prix : 2},
         {id : 13, display : false, nom : "Ice Tea", prix : 2},
         {id : 14, display : false, nom : "Caprisun", prix : 1},
         {id : 15, display : false, nom : "Bière", prix : 2},
-        {id : 16, display : false, nom : "Bière locale", prix : 3}
+        {id : 16, display : false, nom : "Bière locale", prix : 3.5}
     ];
 
     const navigate = useNavigate()
