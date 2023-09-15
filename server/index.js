@@ -10,30 +10,36 @@ import fs from 'fs';
 
 const app = express();
 
-// Chemin vers les fichiers de certificat SSL
-const privateKey = fs.readFileSync('/etc/letsencrypt/live/truckmaster.ovh/privkey.pem', 'utf8');
-const certificate = fs.readFileSync('/etc/letsencrypt/live/truckmaster.ovh/fullchain.pem', 'utf8');
+app.use(express.json());
 
-const credentials = {
-  key: privateKey,
-  cert: certificate,
-};
+console.log(process.env.NODE_ENV);
 
+if (process.env.NODE_ENV === 'dev') {
+    app.use(cors());
 
+    app.listen(8800, () =>{
+        console.log("Le serveur Truckmaster est correctement démarré en local.")
+    })
+} else {
+    const credentials = {
+        key: fs.readFileSync('/etc/letsencrypt/live/truckmaster.ovh/privkey.pem', 'utf8'),
+        cert: fs.readFileSync('/etc/letsencrypt/live/truckmaster.ovh/fullchain.pem', 'utf8'),
+    };
 
-app.use(express.json())
-// app.use(cors());
-const corsOptions = {
-  origin: ['http://truckmaster.ovh', 'http://www.truckmaster.ovh', 'https://truckmaster.ovh', 'https://www.truckmaster.ovh'],
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
-};
+    const corsOptions = {
+      origin: ['http://truckmaster.ovh', 'http://www.truckmaster.ovh', 'https://truckmaster.ovh', 'https://www.truckmaster.ovh'],
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+      credentials: true,
+    };
+    
+    app.use(cors(corsOptions));
 
-app.use(cors(corsOptions));
+    const httpsServer = https.createServer(credentials, app);
 
-// Utilisez les certificats SSL pour créer un serveur HTTPS
-const httpsServer = https.createServer(credentials, app);
-
+    httpsServer.listen(8800, () => {
+        console.log("Le serveur HTTPS Truckmaster est correctement démarré en production.")
+    });
+}
 
 const db = mysql.createConnection({
   host: '37.187.55.12',
@@ -50,10 +56,6 @@ app.use('/commandes', commandesRoutes);
 app.get("/", (req, res) => {
     res.json("Index Truckmaster")
 })
-
-httpsServer.listen(8800, () => {
-    console.log("Le serveur HTTPS est correctement démarré sur le port 8800.");
-  });
 
 // devis
 app.get("/devis", (req, res) => {
