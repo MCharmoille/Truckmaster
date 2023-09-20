@@ -66,6 +66,62 @@ class Commande {
     });
   }
 
+  static async getCommandeParId(id_commande){
+    return new Promise((resolve, reject) => {
+      db.query("SELECT * FROM commandes WHERE id_commande = "+id_commande, (err, commande) =>{
+          if(err) reject(err)
+          
+          if(commande.length == 0) reject(new Error("Aucune commande correspondant à l'id "+id_commande));
+
+          commande = {
+            ...commande[0],
+            total : 0,
+            produits : []
+          };
+
+          const q2 = "SELECT * FROM produits_commandes pc JOIN produits p ON pc.id_produit=p.id_produit WHERE pc.id_commande = ?";
+          db.query(q2, [commande.id_commande], (err, produits_commandes) => {
+              if (err) reject(err);
+              
+              var temp_id = 0;
+
+              produits_commandes.forEach((produit_commande) => {
+                commande.total += (produit_commande.prix * produit_commande.qte);
+                commande.produits.push({
+                  ...produit_commande,
+                  temp_id : temp_id,
+                  modifications: [], // Initialisez le tableau de modifications ici
+                });
+                temp_id ++;
+              });
+
+              const pc_ids = produits_commandes.map((produits_commandes) => produits_commandes.id_pc);
+              
+              const q3 = "SELECT * FROM modifications m JOIN ingredients i ON m.id_ingredient=i.id_ingredient WHERE m.id_pc IN (?)";
+              db.query(q3, [pc_ids], (err, modifications) => {
+                  if (err) reject(err);
+                  
+                  modifications.forEach((modification) => {
+                    const id_pc = modification.id_pc;
+
+                    produits_commandes.forEach((produit_commande) => {
+                      if (produit_commande.id_pc === id_pc) {
+                          commande.produits.find((p) => p.id_pc === id_pc).modifications.push(modification);
+                      }
+                    });
+
+                  });
+
+                  return resolve(commande);
+              });
+
+              
+          });
+      })
+
+    });
+  }
+
   static async addCommande(req, res){
     return new Promise((resolve, reject) => {
         const q = "INSERT INTO commandes(`libelle`, `date_commande`) VALUES (?)";
@@ -86,7 +142,7 @@ class Commande {
                   const q = "INSERT INTO produits_commandes(`id_commande`, `id_produit`, `qte`, `custom`) VALUES (?)";
                   const values = [
                     data.insertId,
-                    produit.id,
+                    produit.id_produit,
                     produit.qte,
                     produit.modifications && produit.modifications.length > 0 ? 1 : 0
                   ];
@@ -125,6 +181,72 @@ class Commande {
               }
             }
         });
+    });
+  }
+
+  static async updateCommande(req, res, id_commande){
+    return new Promise((resolve, reject) => {
+        const q = "UPDATE commandes SET libelle = '"+req.body.libelle+"', date_commande = '"+req.body.date_commande+"' WHERE id_commande = "+id_commande;
+        
+        db.query(q, (err, data) =>{
+            if(err) reject(err)
+            else{ 
+              console.log("La commande "+id_commande+" à été modifiée");
+              
+              db.query("DELETE pc, m FROM produits_commandes pc LEFT JOIN modifications m ON pc.id_pc=m.id_pc WHERE id_commande = "+id_commande, (err, data) => {
+                if(err) reject(err)
+                else{
+                  console.log("suppression des anciens pc effectuée");
+
+                  // Ajout des lignes dans produits_commandes
+                  const produits = req.body.produits;
+                  
+                  if (produits && produits.length > 0) {
+                    produits.forEach((produit) => {
+                      const q = "INSERT INTO produits_commandes(`id_commande`, `id_produit`, `qte`, `custom`) VALUES (?)";
+                      const values = [
+                        id_commande,
+                        produit.id_produit,
+                        produit.qte,
+                        produit.modifications && produit.modifications.length > 0 ? 1 : 0
+                      ];
+                      
+                      db.query(q, [values], (err, pc_data) => {
+                        if (err) {
+                          console.error("Erreur lors de l'ajout d'une ligne dans produits_commandes : ", err);
+                        } else {
+                          console.log("Une nouvelle ligne a été ajoutée dans produits_commandes");
+
+                          if(produit.modifications && produit.modifications.length > 0){
+                            console.log("ajout de modification pour le produit "+produit.nom);
+
+                            produit.modifications.forEach((modification) => {
+                              const q = "INSERT INTO modifications(`id_pc`, `id_ingredient`, `modificateur`) VALUES (?)";
+                              const values = [
+                                pc_data.insertId,
+                                modification.id_ingredient,
+                                modification.modificateur
+                              ];
+                              
+                              db.query(q, [values], (err, modif_data) => {
+                                if (err) {
+                                  console.error("Erreur lors de l'ajout d'une ligne dans modification : ", err);
+                                } else {
+                                  console.log("Une nouvelle ligne a été ajoutée dans modification");
+                                }
+                              });
+                            });
+                          }
+                        }
+                      });
+                    });
+
+                    return resolve(true);
+                  }
+                }
+              })
+            }
+        })
     });
   }
 

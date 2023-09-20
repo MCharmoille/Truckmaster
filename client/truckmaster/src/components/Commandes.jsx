@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import moment from 'moment';
 import Modal from "./modals/Paiement";
+import { useNavigate } from 'react-router-dom';
 
 const Commandes = () => {
   const [commandes, setCommandes] = useState([]);
+  const navigate = useNavigate();
 
   // vérifier l'utilité de mettre ce code dans useEffect, fait que ça se recharge souvent
   useEffect(() => {
@@ -38,7 +40,7 @@ const Commandes = () => {
       minute = 0;
     }
   }
-  console.log(commandes);
+  
   // Ajoute la commande à la tranche horaire correspondante
   commandes.forEach((commande) => {
     const timeCommande = moment(commande.date_commande).format('HH:mm');
@@ -82,8 +84,8 @@ const Commandes = () => {
           <div className="commandes">
             {tranche.content.length !== 0 ? (
               tranche.content.map((commande, c_index) => (
-                <div className={`commande ${commande.moyen_paiement !== null ? 'paye' : ''}`} key={c_index}>
-                  <h2>{commande.libelle}</h2>
+                <div className={`commande ${commande.moyen_paiement !== null ? 'paye' : ''}`} key={c_index} onClick={() => navigate("/add/"+commande.id_commande)}>
+                  <h2>{commande.libelle} - {commande.total} €</h2>
                   <div className='produits'>
                     {commande.produits.length !== 0 ? (
                         commande.produits.map((produit, p_index) => (

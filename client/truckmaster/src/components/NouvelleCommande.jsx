@@ -1,17 +1,17 @@
 import axios from 'axios';
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Modal from "./modals/CustomProduit";
 import ModalBoissons from "./modals/Boissons";
+import moment from 'moment';
 
 const Add = () => {
+    const { commandeId } = useParams();
     const [commande, set_commande] = useState({
-        libelle:"Nouvelle commande",
-        time:"18:00",
-        produits:[]
-    })
-    
+        libelle:"",
+        time:""
+    });
     // TO DO : remplacer par une requête à l'API
     const produits_affiches = [
         {id : 1, display : true, onclick : () => modifier_commande(1, 1), nom : "Campagnard", prix : 10},
@@ -32,39 +32,45 @@ const Add = () => {
         {id : 15, display : false, nom : "Bière", prix : 2},
         {id : 16, display : false, nom : "Bière locale", prix : 3.5}
     ];
-
-    const navigate = useNavigate()
-
-    const handleChange = (e) => {
-        set_commande((prev) => ({...prev, [e.target.name]: e.target.value }));
-    };
-
-    const handleClick = async e => {
-        e.preventDefault()
-        try{
-            const today = new Date();
-            const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-
-            const dateCreation = `${formattedDate} ${commande.time}:00`;
-            const updatedCommande = { ...commande, date_commande: dateCreation, produits: produits_commandes};
-            console.log(updatedCommande);
-            try {
-              await axios.post("https://truckmaster.ovh:8800/commandes", updatedCommande);
-              navigate("/commandes");
-            } catch (error) {
-              console.error("Une erreur s'est produite lors de la requête POST :", error);
-            }
-        }catch(err){
-            console.log(err)
-        }
-    };
-
     const [produits_commandes, set_produits_commandes] = useState([]);
     const [temp_id, set_temp_id] = useState(0);
     const [total, set_total] = useState(0);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (commandeId) {
+            axios.get(`https://truckmaster.ovh:8800/commandes/${commandeId}`)
+                .then((response) => {
+                    set_commande(({
+                        libelle: response.data.libelle,
+                        time: moment(response.data.date_commande).format('HH:mm')
+                    }));
+                    set_produits_commandes(response.data.produits);
+                    set_temp_id(response.data.produits.length);
+                })
+                .catch((error) => {
+                    console.error("Erreur lors de la récupération de la commande existante :", error);
+                });
+        }
+    }, [commandeId]);
+
+    const handleClick = async () => {
+        const today = new Date();
+        const updatedCommande = {  libelle: document.querySelector('#input_libelle').value, 
+                                   date_commande: `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')} ${document.querySelector('#input_time').value}:00`, 
+                                   produits: produits_commandes
+                                };
+        try {
+            if (commandeId) await axios.post("https://truckmaster.ovh:8800/commandes/update/"+commandeId, updatedCommande);
+            else await axios.post("https://truckmaster.ovh:8800/commandes", updatedCommande);
+            navigate("/commandes");
+        } catch (error) {
+            console.error("Une erreur s'est produite lors de la requête POST :", error);
+        }
+    };
 
     const modifier_commande = (id, qte) => {
-        const id_pc = produits_commandes.findIndex((p) => (p.id === id) && (!p.modifications || p.modifications.length === 0));
+        const id_pc = produits_commandes.findIndex((p) => (p.id_produit === id) && (!p.modifications || p.modifications.length === 0));
 
         if (id_pc !== -1) {
             const pc_clone = [...produits_commandes];
@@ -73,7 +79,7 @@ const Add = () => {
             set_produits_commandes(pc_clone);
         } else {
             var produit = produits_affiches[produits_affiches.findIndex((p) => p.id === id)];
-            set_produits_commandes([...produits_commandes, { id: produit.id, nom: produit.nom, prix: produit.prix, qte: 1, temp_id: temp_id}]);
+            set_produits_commandes([...produits_commandes, { id_produit: produit.id, nom: produit.nom, prix: produit.prix, qte: 1, temp_id: temp_id}]);
             set_temp_id(temp_id + 1);
         }
     };
@@ -108,7 +114,7 @@ const Add = () => {
 
     const [showModalBoissons, setShowModalBoissons] = useState(false);
 
-    const handleClickBoissons = (produit) => {
+    const handleClickBoissons = () => {
         setShowModalBoissons(true);
     };
 
@@ -130,8 +136,8 @@ const Add = () => {
             {/* Partie droite (récap + total) */}
             <div className='zone_droite'>
                 <div className='recap'> 
-                    <input type='text' id='input_libelle' placeholder='Nouvelle Commande' name='libelle' onChange={handleChange}/>
-                    <select id='input_time' name='time' onChange={handleChange}>
+                    <input type='text' id='input_libelle' placeholder='Nouvelle Commande' name='libelle' defaultValue={commande.libelle}/>
+                    <select id='input_time' name='time' value={commande.time}onChange={(e) => {set_commande((prevCommande) => ({ ...prevCommande, time: e.target.value }));}}>
                         <option> 18:00 </option><option> 18:15 </option><option> 18:30 </option><option> 18:45 </option>
                         <option> 19:00 </option><option> 19:15 </option><option> 19:30 </option><option> 19:45 </option>
                         <option> 20:00 </option><option> 20:15 </option><option> 20:30 </option><option> 20:45 </option>
@@ -145,7 +151,7 @@ const Add = () => {
                         <div key={index}> 
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}> 
                                 <div> 
-                                    <span className='enlever_article' onClick={() => modifier_commande(produit.id, -1)}> - </span> 
+                                    <span className='enlever_article' onClick={() => modifier_commande(produit.id_produit, -1)}> - </span> 
                                     <span onClick={() => handleClickProduit(produit)}>
                                         {produit.qte} x {produit.nom}
                                     </span>
@@ -166,7 +172,7 @@ const Add = () => {
                     </div>
                 </div>
                 <div className='total'>{total} €</div>
-                <div className='ajouter' onClick={handleClick}>Ajouter</div>
+                <div className='ajouter' onClick={handleClick}>{commandeId ? "Modifier" : "Ajouter"}</div>
             </div>
 
             {/* Afficher la fenêtre modale si showModal est true */}

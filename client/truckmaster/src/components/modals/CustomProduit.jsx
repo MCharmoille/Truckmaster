@@ -7,7 +7,7 @@ const Modal = ({ produit, onClose }) => {
   useEffect(() => {
     const get_recette = async () => {
       try {
-        const res = await axios.get('https://truckmaster.ovh:8800/produits/recette?id_produit='+produit.id);
+        const res = await axios.get('https://truckmaster.ovh:8800/produits/recette?id_produit='+produit.id_produit);
         
         res.data.forEach((ingredient) => {
           // vérification que le produit était déjà modifié
@@ -23,7 +23,7 @@ const Modal = ({ produit, onClose }) => {
       }
     };
     get_recette();
-  }, [produit.id, produit.modifications]);
+  }, [produit.id_produit, produit.modifications]);
 
   const modifier_recette = (id, action) => {
     const id_ingredient = recette.findIndex((p) => p.id_ingredient === id);

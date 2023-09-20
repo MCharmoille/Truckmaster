@@ -9,6 +9,7 @@ import https from 'https';
 import fs from 'fs';
 
 const app = express();
+var db = {};
 
 app.use(express.json());
 
@@ -18,8 +19,15 @@ if (process.env.NODE_ENV === 'dev') {
     app.use(cors());
 
     app.listen(8800, () =>{
-        console.log("Le serveur Truckmaster est correctement démarré en local.")
+        console.log("Le serveur Truckmaster est correctement démarré en local.");
     })
+
+    db = mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        password: '',
+        database: 'ohtruckdesesse'
+    }); 
 } else {
     const credentials = {
         key: fs.readFileSync('/etc/letsencrypt/live/truckmaster.ovh/privkey.pem', 'utf8'),
@@ -39,23 +47,19 @@ if (process.env.NODE_ENV === 'dev') {
     httpsServer.listen(8800, () => {
         console.log("Le serveur HTTPS Truckmaster est correctement démarré en production.")
     });
-}
 
-const db = mysql.createConnection({
-  host: '37.187.55.12',
-  user: 'maxime',
-  password: 'MotdS!',
-  database: 'ohtruckdesesse'
-}); 
+    db = mysql.createConnection({
+        host: '37.187.55.12',
+        user: 'maxime',
+        password: 'MotdS!',
+        database: 'ohtruckdesesse'
+    }); 
+}
 
 export { db }; // pour utiliser la connexion dans toute l'app
 
 app.use('/produits', produitsRoutes);
 app.use('/commandes', commandesRoutes);
-
-app.get("/", (req, res) => {
-    res.json("Index Truckmaster")
-})
 
 // devis
 app.get("/devis", (req, res) => {
