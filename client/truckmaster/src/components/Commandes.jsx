@@ -11,8 +11,9 @@ const Commandes = () => {
   // vérifier l'utilité de mettre ce code dans useEffect, fait que ça se recharge souvent
   useEffect(() => {
     const fetchAllCommandes = async () => {
+      console.log(process.env.REACT_APP_API_URL);
       try {
-        const res = await axios.get('https://truckmaster.ovh:8800/commandes');
+        const res = await axios.get(process.env.REACT_APP_API_URL+'commandes');
         setCommandes(res.data);
       } catch (err) {
         console.log(err);
