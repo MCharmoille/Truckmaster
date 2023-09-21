@@ -10,7 +10,8 @@ const Add = () => {
     const { commandeId } = useParams();
     const [commande, set_commande] = useState({
         libelle:"",
-        time:""
+        time:"",
+        paye:null
     });
     // TO DO : remplacer par une requête à l'API
     const produits_affiches = [
@@ -41,10 +42,10 @@ const Add = () => {
         if (commandeId) {
             axios.get(process.env.REACT_APP_API_URL+`commandes/id/${commandeId}`)
                 .then((response) => {
-                    console.log(response);
                     set_commande(({
                         libelle: response.data.libelle,
-                        time: moment(response.data.date_commande).format('HH:mm')
+                        time: moment(response.data.date_commande).format('HH:mm'),
+                        paye: response.data.moyen_paiement
                     }));
                     set_produits_commandes(response.data.produits);
                     set_temp_id(response.data.produits.length);
@@ -157,7 +158,7 @@ const Add = () => {
                                         {produit.qte} x {produit.nom}
                                     </span>
                                 </div> 
-                                <div>{produit.prix} €</div> 
+                                <div>{produit.prix} €</div>
                             </div>
                             {produit.modifications && produit.modifications.length > 0 ? (
                                 produit.modifications.map((modif, m_index) => (
@@ -173,6 +174,7 @@ const Add = () => {
                     </div>
                 </div>
                 <div className='total'>{total} €</div>
+                <div className='deja_paye'> { commande.paye !== null ? "Attention, cette commande à déjà été payée." :""} </div>
                 <div className='ajouter' onClick={handleClick}>{commandeId ? "Modifier" : "Ajouter"}</div>
             </div>
 
