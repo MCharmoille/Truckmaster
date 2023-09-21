@@ -6,7 +6,7 @@ const Modal = ({ commande, onClose }) => {
     const valider = async (moyen_paiement) => {
         if(moyen_paiement !== 0){
             try {
-              await axios.post("https://truckmaster.ovh:8800/commandes/paiement", {id_commande : commande.id_commande, moyen_paiement : moyen_paiement});
+              await axios.post(process.env.REACT_APP_API_URL+"commandes/paiement", {id_commande : commande.id_commande, moyen_paiement : moyen_paiement});
             } catch (error) {
               console.error("Une erreur s'est produite lors de la requête POST :", error);
             }

@@ -14,7 +14,7 @@ const Devis = () => {
     useEffect(()=>{
         const fetchAllDevis = async ()=>{
             try{
-                const res = await axios.get("http://37.187.55.12:8800/devis")
+                const res = await axios.get(process.env.REACT_APP_API_URL+"devis")
                 setDevis(res.data);
             }catch(err){
                 console.log(err)

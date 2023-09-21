@@ -39,7 +39,7 @@ const Add = () => {
 
     useEffect(() => {
         if (commandeId) {
-            axios.get(`https://truckmaster.ovh:8800/commandes/${commandeId}`)
+            axios.get(process.env.REACT_APP_API_URL+`commandes/${commandeId}`)
                 .then((response) => {
                     set_commande(({
                         libelle: response.data.libelle,
@@ -61,8 +61,8 @@ const Add = () => {
                                    produits: produits_commandes
                                 };
         try {
-            if (commandeId) await axios.post("https://truckmaster.ovh:8800/commandes/update/"+commandeId, updatedCommande);
-            else await axios.post("https://truckmaster.ovh:8800/commandes", updatedCommande);
+            if (commandeId) await axios.post(process.env.REACT_APP_API_URL+"commandes/update/"+commandeId, updatedCommande);
+            else await axios.post(process.env.REACT_APP_API_URL+"commandes", updatedCommande);
             navigate("/commandes");
         } catch (error) {
             console.error("Une erreur s'est produite lors de la requête POST :", error);

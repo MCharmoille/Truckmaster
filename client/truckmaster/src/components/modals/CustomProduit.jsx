@@ -7,7 +7,7 @@ const Modal = ({ produit, onClose }) => {
   useEffect(() => {
     const get_recette = async () => {
       try {
-        const res = await axios.get('https://truckmaster.ovh:8800/produits/recette?id_produit='+produit.id_produit);
+        const res = await axios.get(process.env.REACT_APP_API_URL+'produits/recette?id_produit='+produit.id_produit);
         
         res.data.forEach((ingredient) => {
           // vérification que le produit était déjà modifié
