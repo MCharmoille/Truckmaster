@@ -1,8 +1,8 @@
 import Commande from '../models/Commande.js';
 
-export const getCommandes = async (req, res) => {
+export const getCommandeparDate = async (req, res) => {
     try {
-        const commandes = await Commande.find();
+        const commandes = await Commande.getCommandeparDate(req.params.date);
         res.status(200).json(commandes);
     } catch (error) {
         res.status(404).json({ message: error.message });

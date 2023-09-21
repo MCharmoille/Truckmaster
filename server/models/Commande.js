@@ -1,68 +1,71 @@
 import { db } from '../index.js';
 
 class Commande {
-  static async find() {
+  static async getCommandeparDate(date) {
     return new Promise((resolve, reject) => {
-      db.query("SELECT * FROM commandes", (err, commandes) =>{
+      
+      db.query("SELECT * FROM commandes WHERE date_commande LIKE '"+date+"%'", (err, commandes) =>{
           if(err) reject(err)
+          if(commandes.length === 0) resolve([]);
+          else{
+            const commandes_ids = commandes.map((commandes) => commandes.id_commande);
           
-          const commandes_ids = commandes.map((commandes) => commandes.id_commande);
-          
-          const q2 = "SELECT * FROM produits_commandes pc JOIN produits p ON pc.id_produit=p.id_produit WHERE pc.id_commande IN (?)";
-          db.query(q2, [commandes_ids], (err, produits_commandes) => {
-              if (err) return res.json(err);
-              
-              const commandes_map = new Map();
+            const q2 = "SELECT * FROM produits_commandes pc JOIN produits p ON pc.id_produit=p.id_produit WHERE pc.id_commande IN (?)";
+            db.query(q2, [commandes_ids], (err, produits_commandes) => {
+                if (err) return res.json(err);
+                
+                const commandes_map = new Map();
 
-              commandes.forEach((commandes) => {
-                commandes_map.set(commandes.id_commande, {
-                      ...commandes,
-                      total: 0,
-                      produits: [],
-                  });
-              });
-              
-              produits_commandes.forEach((produit_commande) => {
-                  const id_commande = produit_commande.id_commande;
-                  if (commandes_map.has(id_commande)) {
-                    commandes_map.get(id_commande).total += (produit_commande.prix * produit_commande.qte);
-                    commandes_map.get(id_commande).produits.push({
-                      ...produit_commande,
-                      modifications: [], // Initialisez le tableau de modifications ici
+                commandes.forEach((commandes) => {
+                  commandes_map.set(commandes.id_commande, {
+                        ...commandes,
+                        total: 0,
+                        produits: [],
                     });
-                  }
-              });
+                });
+                
+                produits_commandes.forEach((produit_commande) => {
+                    const id_commande = produit_commande.id_commande;
+                    if (commandes_map.has(id_commande)) {
+                      commandes_map.get(id_commande).total += (produit_commande.prix * produit_commande.qte);
+                      commandes_map.get(id_commande).produits.push({
+                        ...produit_commande,
+                        modifications: [], // Initialisez le tableau de modifications ici
+                      });
+                    }
+                });
 
-              const pc_ids = produits_commandes.map((produits_commandes) => produits_commandes.id_pc);
+                const pc_ids = produits_commandes.map((produits_commandes) => produits_commandes.id_pc);
 
-              const q3 = "SELECT * FROM modifications m JOIN ingredients i ON m.id_ingredient=i.id_ingredient WHERE m.id_pc IN (?)";
-              db.query(q3, [pc_ids], (err, modifications) => {
-                  if (err) return res.json(err);
-                  
-                  modifications.forEach((modification) => {
-                    const id_pc = modification.id_pc;
+                const q3 = "SELECT * FROM modifications m JOIN ingredients i ON m.id_ingredient=i.id_ingredient WHERE m.id_pc IN (?)";
+                db.query(q3, [pc_ids], (err, modifications) => {
+                    if (err) return res.json(err);
+                    
+                    modifications.forEach((modification) => {
+                      const id_pc = modification.id_pc;
 
-                    produits_commandes.forEach((produit_commande) => {
-                      if (produit_commande.id_pc === id_pc) {
-                          const id_commande = produit_commande.id_commande;
-                          
-                          if (commandes_map.has(id_commande)) {
-                            commandes_map.get(id_commande).produits.find((p) => p.id_pc === id_pc).modifications.push(modification);
-                          }
-                      }
+                      produits_commandes.forEach((produit_commande) => {
+                        if (produit_commande.id_pc === id_pc) {
+                            const id_commande = produit_commande.id_commande;
+                            
+                            if (commandes_map.has(id_commande)) {
+                              commandes_map.get(id_commande).produits.find((p) => p.id_pc === id_pc).modifications.push(modification);
+                            }
+                        }
+                      });
+
                     });
 
-                  });
+                    const result = Array.from(commandes_map.values());
+                    return resolve(result);
+                    
+                });
 
-                  const result = Array.from(commandes_map.values());
-                  return resolve(result);
-                  
-              });
+                
+            });
 
-              
-          });
+          }
       })
-
     });
   }
 

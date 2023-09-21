@@ -39,8 +39,9 @@ const Add = () => {
 
     useEffect(() => {
         if (commandeId) {
-            axios.get(process.env.REACT_APP_API_URL+`commandes/${commandeId}`)
+            axios.get(process.env.REACT_APP_API_URL+`commandes/id/${commandeId}`)
                 .then((response) => {
+                    console.log(response);
                     set_commande(({
                         libelle: response.data.libelle,
                         time: moment(response.data.date_commande).format('HH:mm')

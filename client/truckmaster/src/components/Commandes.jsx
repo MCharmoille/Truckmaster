@@ -2,25 +2,30 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import moment from 'moment';
 import Modal from "./modals/Paiement";
+import Calendrier from './Calendrier';
 import { useNavigate } from 'react-router-dom';
 
 const Commandes = () => {
   const [commandes, setCommandes] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
   const navigate = useNavigate();
 
-  // vérifier l'utilité de mettre ce code dans useEffect, fait que ça se recharge souvent
   useEffect(() => {
-    const fetchAllCommandes = async () => {
-      console.log(process.env.REACT_APP_API_URL);
-      try {
-        const res = await axios.get(process.env.REACT_APP_API_URL+'commandes');
-        setCommandes(res.data);
-      } catch (err) {
-        console.log(err);
+    const fetchCommandesForDate = async () => {
+      if (selectedDate) {
+        try {
+          const formattedDate = moment(selectedDate).format('YYYY-MM-DD');
+          
+          const res = await axios.get(`${process.env.REACT_APP_API_URL}commandes/date/${formattedDate}`);
+          setCommandes(res.data);
+        } catch (err) {
+          console.log(err);
+        }
       }
     };
-    fetchAllCommandes();
-  }, []);
+
+    fetchCommandesForDate();
+  }, [selectedDate]);
 
   const tranches = [];
   
@@ -41,6 +46,10 @@ const Commandes = () => {
       minute = 0;
     }
   }
+
+  const handleDateChange = (newDate) => {
+    setSelectedDate(newDate);
+  };
   
   // Ajoute la commande à la tranche horaire correspondante
   commandes.forEach((commande) => {
@@ -79,6 +88,7 @@ const Commandes = () => {
   
   return (
     <div>
+      <Calendrier onDateChange={handleDateChange} />
       {tranches.map((tranche, t_index) => (
         <div className="tranche" key={t_index}>
           <h2>{tranche.time}</h2>
