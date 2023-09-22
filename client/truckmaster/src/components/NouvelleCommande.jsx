@@ -72,14 +72,21 @@ const Add = () => {
     };
 
     const modifier_commande = (id, qte) => {
-        const id_pc = produits_commandes.findIndex((p) => (p.id_produit === id) && (!p.modifications || p.modifications.length === 0));
+        var id_pc = -1;
+        
+        if(qte === -1){ // suppression d'un item, on cherche l'temp_id de la cible
+            id_pc = produits_commandes.findIndex((p) => (p.temp_id === id));
+        }
+        else { // ajout d'un item, on utilise l'id produit
+            id_pc = produits_commandes.findIndex((p) => (p.id_produit === id) && (!p.modifications || p.modifications.length === 0));
+        }
 
-        if (id_pc !== -1) {
+        if (id_pc !== -1) { // item trouvé dans la liste
             const pc_clone = [...produits_commandes];
             pc_clone[id_pc].qte += qte;
             if(pc_clone[id_pc].qte < 1) pc_clone.splice(id_pc, 1);
             set_produits_commandes(pc_clone);
-        } else {
+        } else { // nouvel item
             var produit = produits_affiches[produits_affiches.findIndex((p) => p.id === id)];
             set_produits_commandes([...produits_commandes, { id_produit: produit.id, nom: produit.nom, prix: produit.prix, qte: 1, temp_id: temp_id}]);
             set_temp_id(temp_id + 1);
@@ -110,8 +117,6 @@ const Add = () => {
         const pc_clone = [...produits_commandes];
         pc_clone[id_pc].modifications = modifications;
         set_produits_commandes(pc_clone);
-
-        console.log(produits_commandes);
     };
 
     const [showModalBoissons, setShowModalBoissons] = useState(false);
@@ -153,7 +158,7 @@ const Add = () => {
                         <div key={index}> 
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}> 
                                 <div> 
-                                    <span className='enlever_article' onClick={() => modifier_commande(produit.id_produit, -1)}> - </span> 
+                                    <span className='enlever_article' onClick={() => modifier_commande(produit.temp_id, -1)}> - </span> 
                                     <span onClick={() => handleClickProduit(produit)}>
                                         {produit.qte} x {produit.nom}
                                     </span>
