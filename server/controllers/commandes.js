@@ -18,6 +18,15 @@ export const getCommandeParId = async (req, res) => {
     }
 }
 
+export const getResumeparDate = async (req, res) => {
+    try {
+        const commandes = await Commande.getResumeparDate(req.params.date);
+        res.status(200).json(commandes);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
+
 export const addCommande = async (req, res) => {
     try {
         const commande = await Commande.addCommande(req, res);

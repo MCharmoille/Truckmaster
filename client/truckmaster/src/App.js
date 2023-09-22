@@ -3,6 +3,7 @@ import Accueil from "./components/Accueil";
 import Commandes from "./components/Commandes";
 import Devis from "./components/Devis";
 import NouvelleCommande from "./components/NouvelleCommande";
+import Resume from "./components/Resume";
 import "./style.css";
 import home from './img/home.png';
 import list from './img/list.png';
@@ -24,6 +25,7 @@ function App() {
             <Route path="/add" element={<NouvelleCommande />} />
             <Route path="/add/:commandeId" element={<NouvelleCommande />} />
             <Route path="/devis" element={<Devis/>}/>
+            <Route path="/resume" element={<Resume/>}/>
           </Routes>
         </div>
       </BrowserRouter>

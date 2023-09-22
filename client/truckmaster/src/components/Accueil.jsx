@@ -11,11 +11,9 @@ function App() {
         
         <div className='home_boutons'>
           <Link to="/commandes"> <button className="home_bouton">Commandes</button> </Link>
-          <Link to="/devis"> <button className="home_bouton">Devis</button> </Link>
-          
-          <button className="home_bouton">Facture</button>
-          <button className="home_bouton">Bouton 4</button>
-          
+          <Link to="/resume"> <button className="home_bouton">Résumé (BETA)</button> </Link>
+          <Link to="/devis"> <button className="home_bouton">Devis (BETA)</button> </Link>
+          <button className="home_bouton">Facture (TODO)</button>
           <button className="home_bouton">Bouton 5</button>
           <button className="home_bouton">Bouton 6</button>
         </div>

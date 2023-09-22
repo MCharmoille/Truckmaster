@@ -125,6 +125,54 @@ class Commande {
     });
   }
 
+  static async getResumeparDate(date) {
+    return new Promise((resolve, reject) => {
+      var query = "SELECT p.id_produit, p.nom, tp.id_type, sum(qte) as qte "+
+                  "FROM commandes c JOIN "+
+                  "  produits_commandes pc ON c.id_commande=pc.id_commande JOIN "+
+                  "    produits p ON pc.id_produit = p.id_produit JOIN "+
+                  "    type_produit tp ON tp.id_type = p.id_type "+
+                  "WHERE date_commande LIKE '"+date+"%' "+
+                  "GROUP BY p.id_produit, p.nom, tp.id_type";
+                  
+      db.query(query, (err, produits) =>{
+          if(err) reject(err)
+          if(produits.length === 0) resolve([]);
+          else{
+            const type_produit = [{id_type: 1, nom: "Burger / Tacos", produits: [], qte: 0},
+                                  {id_type: 2, nom: "Accompagnements", produits: [], qte: 0},
+                                  {id_type: 3, nom: "Boissons", produits: [], qte: 0}
+                                 ];
+                                 
+            produits.forEach((produit) => {
+              type_produit.find((p) => p.id_type === produit.id_type).produits.push(produit);
+              type_produit.find((p) => p.id_type === produit.id_type).qte += parseInt(produit.qte);
+            });
+            
+            var query = "SELECT c.moyen_paiement, sum(pc.qte * p.prix) as total "+
+                        "FROM commandes c JOIN "+
+                        "  produits_commandes pc ON c.id_commande=pc.id_commande JOIN "+
+                        "    produits p ON pc.id_produit = p.id_produit "+
+                        "WHERE date_commande LIKE '"+date+"%' and c.moyen_paiement IS NOT NULL "+
+                        "GROUP BY c.moyen_paiement ";
+                        
+            db.query(query, (err, totaux) =>{
+              if(err) reject(err)
+              const paiements = [{id: "c", nom: "Carte", valeur: 0},
+                                 {id: "m", nom: "Espèce", valeur: 0},
+                                 {id: "h", nom: "Chèque", valeur: 0}
+                                ];
+                                
+              totaux.forEach((t) => {
+                paiements.find((p) => p.id === t.moyen_paiement).valeur = parseInt(t.total);
+              });
+              resolve({type_produit: type_produit, paiements: paiements});
+            })
+          }
+      })
+    });
+  }
+
   static async addCommande(req, res){
     return new Promise((resolve, reject) => {
         const q = "INSERT INTO commandes(`libelle`, `date_commande`) VALUES (?)";

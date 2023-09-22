@@ -22,7 +22,7 @@ const Add = () => {
         {id : 7, display : true, onclick : () => modifier_commande(7, 1), nom : "Végé", prix : 9},
         {id : 8, display : true, onclick : () => modifier_commande(8, 1), nom : "Menu enfant", prix : 7},
         {id : 9, display : true, onclick : () => modifier_commande(9, 1), nom : "Spécial mois", prix : 11},
-        {id : 99, display : true, onclick : () => modifier_commande(10, 1),  nom : "Autre", prix : 0},
+        {id : 99, display : true, onclick : () => modifier_commande(99, 1),  nom : "Autre", prix : 0},
         {id : 3, display : true, onclick : () => modifier_commande(3, 1), nom : "Frite", prix : 3},
         {id : 98, display : true, onclick : () => handleClickBoissons(),  nom : "Boisson", prix : 2},
         {id : 10, display : false, nom : "Coca", prix : 2},
