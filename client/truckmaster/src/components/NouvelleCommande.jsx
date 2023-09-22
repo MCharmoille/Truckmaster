@@ -17,9 +17,9 @@ const Add = () => {
     const produits_affiches = [
         {id : 1, display : true, onclick : () => modifier_commande(1, 1), nom : "Campagnard", prix : 10},
         {id : 2, display : true, onclick : () => modifier_commande(2, 1), nom : "Pouly", prix : 10},
-        {id : 5, display : true, onclick : () => modifier_commande(5, 1), nom : "Classique", prix : 10},
+        {id : 5, display : true, onclick : () => modifier_commande(5, 1), nom : "Classique", prix : 9},
         {id : 6, display : true, onclick : () => modifier_commande(6, 1), nom : "Lo'cale", prix : 11},
-        {id : 7, display : true, onclick : () => modifier_commande(7, 1), nom : "Végé", prix : 10},
+        {id : 7, display : true, onclick : () => modifier_commande(7, 1), nom : "Végé", prix : 9},
         {id : 8, display : true, onclick : () => modifier_commande(8, 1), nom : "Menu enfant", prix : 7},
         {id : 9, display : true, onclick : () => modifier_commande(9, 1), nom : "Spécial mois", prix : 11},
         {id : 99, display : true, onclick : () => modifier_commande(10, 1),  nom : "Autre", prix : 0},
