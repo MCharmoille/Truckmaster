@@ -118,7 +118,10 @@ const Commandes = () => {
                   {commande.moyen_paiement !== null ? (
                     null 
                   ) : (
-                    <div className='paiement' onClick={() => paiement_commande(commande)}>
+                    <div className='paiement' onClick={(e) => {
+                      e.stopPropagation();
+                      paiement_commande(commande);
+                    }}>
                       Paiement
                     </div>
                   )}
