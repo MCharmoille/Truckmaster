@@ -145,6 +145,7 @@
     font-size: 24px;
     font-weight: bold;
     height: 4%;
+    text-align: center;
   }
 
   .deja_paye {
@@ -159,15 +160,30 @@
 
 #input_libelle {
     font-size: 19px;
-    margin: 10px;
+    margin: 10px 10px 0px 10px;
     background-color: #555;
     color: white;
     height: 40px;
-    width: 180px;
+    width: 90%;
     border-radius: 10px;
 }
+#input_date {
+  font-size: 19px;
+  margin: 10px 10px 0px 10px;
+  background-color: #555;
+  color: white;
+  height: 40px;
+  width: 60%;
+  border-radius: 10px;
+}
 #input_time {
-    font-size: 20px;
+    font-size: 19px;
+    margin: 10px 10px 0px 10px;
+    background-color: #555;
+    color: white;
+    height: 40px;
+    width: 25%;
+    border-radius: 10px;
 }
 
 .ajouter {

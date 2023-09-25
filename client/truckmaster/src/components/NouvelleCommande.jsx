@@ -10,6 +10,7 @@ const Add = () => {
     const { commandeId } = useParams();
     const [commande, set_commande] = useState({
         libelle:"",
+        date:moment(new Date()).format("YYYY-MM-DD"),
         time:"",
         paye:null
     });
@@ -44,6 +45,7 @@ const Add = () => {
                 .then((response) => {
                     set_commande(({
                         libelle: response.data.libelle,
+                        date: moment(response.data.date_commande).format('YYYY-MM-DD'),
                         time: moment(response.data.date_commande).format('HH:mm'),
                         paye: response.data.moyen_paiement
                     }));
@@ -59,7 +61,7 @@ const Add = () => {
     const handleClick = async () => {
         const today = new Date();
         const updatedCommande = {  libelle: document.querySelector('#input_libelle').value, 
-                                   date_commande: `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')} ${document.querySelector('#input_time').value}:00`, 
+                                   date_commande: `${document.querySelector('#input_date').value} ${document.querySelector('#input_time').value}:00`, 
                                    produits: produits_commandes
                                 };
         try {
@@ -144,13 +146,16 @@ const Add = () => {
             <div className='zone_droite'>
                 <div className='recap'> 
                     <input type='text' id='input_libelle' placeholder='Nouvelle Commande' name='libelle' defaultValue={commande.libelle}/>
-                    <select id='input_time' name='time' value={commande.time}onChange={(e) => {set_commande((prevCommande) => ({ ...prevCommande, time: e.target.value }));}}>
-                        <option> 18:00 </option><option> 18:15 </option><option> 18:30 </option><option> 18:45 </option>
-                        <option> 19:00 </option><option> 19:15 </option><option> 19:30 </option><option> 19:45 </option>
-                        <option> 20:00 </option><option> 20:15 </option><option> 20:30 </option><option> 20:45 </option>
-                        <option> 21:00 </option><option> 21:15 </option><option> 21:30 </option><option> 21:45 </option>
-                        <option> 22:00 </option><option> 22:15 </option><option> 22:30 </option><option> 22:45 </option>
-                    </select>
+                    <div> 
+                        <input id="input_date" type="date" value={commande.date} onChange={(e) => {set_commande((prevCommande) => ({ ...prevCommande, date: e.target.value }));}}/> 
+                        <select id='input_time' name='time' value={commande.time} onChange={(e) => {set_commande((prevCommande) => ({ ...prevCommande, time: e.target.value }));}}>
+                            <option> 18:00 </option><option> 18:15 </option><option> 18:30 </option><option> 18:45 </option>
+                            <option> 19:00 </option><option> 19:15 </option><option> 19:30 </option><option> 19:45 </option>
+                            <option> 20:00 </option><option> 20:15 </option><option> 20:30 </option><option> 20:45 </option>
+                            <option> 21:00 </option><option> 21:15 </option><option> 21:30 </option><option> 21:45 </option>
+                            <option> 22:00 </option><option> 22:15 </option><option> 22:30 </option><option> 22:45 </option>
+                        </select>
+                    </div>
                     <hr/>
 
                     <div className='contenu_commande'>
