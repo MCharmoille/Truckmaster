@@ -66,7 +66,7 @@ const PenseBete = () => {
   }
   
   return (
-    <div style={{height: "100vh"}}>
+    <div>
         <Calendrier onDateChange={handleDateChange} />
         <div>
             {ingredients.length !== 0 ? (
