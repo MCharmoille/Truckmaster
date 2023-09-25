@@ -4,6 +4,7 @@ import Commandes from "./components/Commandes";
 import Devis from "./components/Devis";
 import NouvelleCommande from "./components/NouvelleCommande";
 import Resume from "./components/Resume";
+import PenseBete from "./components/PenseBete";
 import "./style.css";
 import home from './img/home.png';
 import list from './img/list.png';
@@ -26,6 +27,7 @@ function App() {
             <Route path="/add/:commandeId" element={<NouvelleCommande />} />
             <Route path="/devis" element={<Devis/>}/>
             <Route path="/resume" element={<Resume/>}/>
+            <Route path="/pensebete" element={<PenseBete/>}/>
           </Routes>
         </div>
       </BrowserRouter>

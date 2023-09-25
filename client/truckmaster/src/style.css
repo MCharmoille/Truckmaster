@@ -289,6 +289,25 @@
   margin: 0;
 }
 
+.pense_bete {
+  font-size: 30px;
+  line-height: 45px;
+  margin: 10px;
+  padding: 10px;
+  background-color: #444;
+}
+
+.pense_bete input[type="checkbox"] {
+  width: 25px;
+  height: 25px;
+}
+
+.pense_bete input[type="number"] {
+  font-size: 25px;
+  width: 50px;
+}
+
+
 .devis{
     margin-top: 10px;
     line-height: 25px;

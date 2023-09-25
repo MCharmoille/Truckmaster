@@ -17,3 +17,30 @@ export const get_recette = async (req, res) => {
         res.status(404).json({ message: error.message });
     }
 }
+
+export const getIngredientsparDate = async (req, res) => {
+    try {
+        const ingredients = await Produit.getIngredientsparDate(req.params.date);
+        res.status(200).json(ingredients);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
+
+export const checkIngredient = async (req, res) => {
+    try {
+        const ing = await Produit.checkIngredient(req, res);
+        res.status(200).json(ing);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
+
+export const stockIngredient = async (req, res) => {
+    try {
+        const ing = await Produit.stockIngredient(req, res);
+        res.status(200).json(ing);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}

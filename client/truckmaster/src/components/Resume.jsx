@@ -3,7 +3,7 @@ import axios from 'axios';
 import moment from 'moment';
 import Calendrier from './Calendrier';
 
-const Commandes = () => {
+const Resume = () => {
   const [data, setData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
 
@@ -74,4 +74,4 @@ const Commandes = () => {
   );
 };
 
-export default Commandes;
+export default Resume;
