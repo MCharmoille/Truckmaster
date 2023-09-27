@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Modal from "./modals/CustomProduit";
 import ModalBoissons from "./modals/Boissons";
+import Confirm from "./modals/Confirm";
 import moment from 'moment';
 
 const Add = () => {
@@ -58,8 +59,12 @@ const Add = () => {
         }
     }, [commandeId]);
 
+    useEffect(() => {
+        console.log("code au changement de date");
+        // TO DO : aller chercher les stocks pour la date sélectionné
+    }, [commande.date]);
+
     const handleClick = async () => {
-        const today = new Date();
         const updatedCommande = {  libelle: document.querySelector('#input_libelle').value, 
                                    date_commande: `${document.querySelector('#input_date').value} ${document.querySelector('#input_time').value}:00`, 
                                    produits: produits_commandes
@@ -129,8 +134,18 @@ const Add = () => {
 
     const handleCloseModalBoissons = (id) => {
         setShowModalBoissons(false);
-        modifier_commande(id, 1)
+        modifier_commande(id, 1);
     };
+
+    const [showConfirm, setshowConfirm] = useState(false);
+
+    const supprimerCommande = async(confirm) => {
+        setshowConfirm(false);
+        if(confirm){
+            await axios.delete(process.env.REACT_APP_API_URL+"commandes/supprimer/"+commandeId);
+            navigate("/commandes");
+        }
+    }
 
     return (
         <div className='form'>
@@ -185,7 +200,14 @@ const Add = () => {
                 </div>
                 <div className='total'>{total} €</div>
                 <div className='deja_paye'> { commande.paye !== null ? "Attention, cette commande à déjà été payée." :""} </div>
-                <div className='ajouter' onClick={handleClick}>{commandeId ? "Modifier" : "Ajouter"}</div>
+                {commandeId ? 
+                    <div className='button-container'>
+                        <div className='ajouter_small' onClick={handleClick}> Modifier </div>
+                        <div className='suppr_small' onClick={() => setshowConfirm(true)}> X </div>
+                    </div>
+                            : 
+                    <div className='ajouter' onClick={handleClick}> Ajouter </div>
+                }
             </div>
 
             {/* Afficher la fenêtre modale si showModal est true */}
@@ -194,6 +216,9 @@ const Add = () => {
             )}
             {showModalBoissons && (
                 <ModalBoissons onClose={handleCloseModalBoissons} />
+            )}
+            {showConfirm && (
+                <Confirm message="Voulez vous vraiment supprimer cette commande ?" onClose={supprimerCommande} />
             )}
         </div>
     )

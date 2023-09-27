@@ -196,6 +196,31 @@
     display: flex;
     align-items: center;
     justify-content: center;
+} 
+
+.button-container {
+  height: 10%;
+  display: flex;
+}
+
+.ajouter_small, .suppr_small {
+  font-size: 50px;
+  border: solid white 1px;
+  border-radius: 20px;
+  margin: 0px 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ajouter_small {
+  width: 80%;
+  background-color: green;
+}
+
+.suppr_small {
+  width: 20%;
+  background-color: red;
 }
 
 .paiement{
@@ -208,7 +233,6 @@
   justify-content: center;
 }
 
-/* Style de l'arrière-plan obscurci */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -328,3 +352,40 @@
     margin-top: 10px;
     line-height: 25px;
 }
+
+.confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Assure que la modal est au-dessus de tout le reste */
+}
+
+.confirm-content {
+  background-color: #333;
+  padding: 20px;
+  border-radius: 5px;
+  border: solid #555 5px;
+  width: 80%;
+}
+
+.confirm-text{
+  font-size: 30px;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.confirm-valider, .confirm-annuler {
+  width: 200px;
+  font-size: 30px;
+  margin: 0 50px;
+  display: inline;
+  color: white;
+}
+
+.confirm-valider { background-color: green;}
+.confirm-annuler { background-color: red;}

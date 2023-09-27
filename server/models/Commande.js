@@ -301,6 +301,27 @@ class Commande {
     });
   }
 
+  static async supprimerCommande(id_commande){
+    return new Promise((resolve, reject) => {
+        console.log("suppression de la commande "+id_commande);
+        db.query("DELETE pc, m FROM produits_commandes pc LEFT JOIN modifications m ON pc.id_pc=m.id_pc WHERE id_commande = "+id_commande, (err, data) => {
+          if(err) reject(err)
+          else{
+            console.log("suppression des anciens pc effectuée");
+
+            db.query("DELETE FROM commandes WHERE id_commande = "+id_commande, (err, data) => {
+              if(err) reject(err)
+              else{
+                console.log("suppression de la commande effectuée");
+
+                return resolve(true);
+              }
+            })
+          }
+        })
+    });
+  }
+
   static async paiementCommande(req, res){
     return new Promise((resolve, reject) => {
       const q = "UPDATE commandes SET moyen_paiement = ? WHERE id_commande = ?";

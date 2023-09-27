@@ -57,6 +57,41 @@ class Produit {
     });
   }
 
+  static async getStocksRestantparDate(date) {
+    return new Promise((resolve, reject) => {
+      // 1 - Chercher les stocks de chaque ingrédients avec gestion stock == 1
+      // 2 - Chercher les produits associés 
+
+      // var query = "SELECT * FROM pense_bete pb join ingredients i on pb.id_ingredient=i.id_ingredient WHERE pb.date = '"+date+"'";
+                  
+      // db.query(query, (err, ingredients) =>{
+      //     if(err) reject(err)
+      //     if(ingredients.length === 0){
+      //       console.log("ajout dans les bd des entrées des ingrédients pour "+date);
+                  
+      //       db.query("SELECT * FROM ingredients", (err, ingredients) =>{
+      //           if(err) reject(err)
+                
+      //           var query = "INSERT INTO pense_bete (date, id_ingredient) VALUES ";
+      //           ingredients.forEach(ingredient => {
+      //             query += "('"+date+"', "+ingredient.id_ingredient+"),";
+      //           });
+
+      //           query = query.slice(0, -1);
+                
+      //           db.query(query, (err, ingredients) =>{
+      //             if(err) reject(err)
+      //             resolve(this.getIngredientsparDate(date));
+      //           });
+                
+      //       });
+
+      //     }
+      //     else resolve(ingredients);
+      // });
+    });
+  }
+
   static async checkIngredient(req, res) {
     return new Promise((resolve, reject) => {
       var query = "UPDATE pense_bete SET checked = "+req.body.checked+" WHERE date = '"+req.body.date+"' AND id_ingredient = "+req.body.id;
