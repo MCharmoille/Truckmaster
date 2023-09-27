@@ -16,6 +16,7 @@ const ModalBoissons = ({ onClose }) => {
         <button className='bt_paiement' onClick={() => valider(14)}>Caprisun</button>
         <button className='bt_paiement' onClick={() => valider(15)}>Bière (2€)</button>
         <button className='bt_paiement' onClick={() => valider(16)}>Bière locale (3.5€)</button>
+        <button className='bt_paiement' onClick={() => valider(0)}>Annuler</button>
       </div>
     </div>
   );

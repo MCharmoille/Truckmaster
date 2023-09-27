@@ -125,7 +125,7 @@ const Add = () => {
 
     const CloseModalBoisson = (id) => {
         setModalBoissons(false);
-        modifierCommande(id, 1);
+        if(id !== 0) modifierCommande(id, 1);
     };
 
     const [showConfirm, setshowConfirm] = useState(false);
