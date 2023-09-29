@@ -380,9 +380,9 @@
 }
 
 .confirm-valider, .confirm-annuler {
-  width: 200px;
+  width: 40%;
   font-size: 30px;
-  margin: 0 50px;
+  margin: 0 5%;
   display: inline;
   color: white;
 }
