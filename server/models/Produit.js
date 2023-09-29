@@ -25,6 +25,30 @@ class Produit {
     });
   }
 
+  static async getProduitsAffiches(type = null){
+      return new Promise((resolve, reject) => {
+      if(type == null) type = 1;
+
+      db.query("SELECT * FROM produits WHERE id_type IN ("+type+", 3)", (err, produits) =>{
+          if(err) reject(err)
+          else{
+            produits.forEach(produit => {
+              produit.action = "modifier";
+            })
+
+            // switch
+            produits.push({id_produit : 99, display : 1, action : "switchTypeProduit",  nom : "", prix : 0});
+            // frite
+            produits.push({id_produit : 3, display : 1, action : "modifier", nom : "Frite", prix : 3});
+            // boissons
+            produits.push({id_produit : 98, display : 1, action : "setModalBoissons",  nom : "Boisson", prix : 2});
+            
+            return resolve(produits);
+          }
+      });
+    });
+  }
+
   static async getIngredientsparDate(date) {
     return new Promise((resolve, reject) => {
       var query = "SELECT * FROM pense_bete pb join ingredients i on pb.id_ingredient=i.id_ingredient WHERE pb.date = '"+date+"'";

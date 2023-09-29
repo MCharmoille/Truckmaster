@@ -15,26 +15,8 @@ const Add = () => {
         time:"",
         paye:null
     });
-    // TO DO : remplacer par une requête à l'API
-    const produits_affiches = [
-        {id : 1, display : true, onclick : () => modifierCommande(1, 1), nom : "Campagnard", prix : 10},
-        {id : 2, display : true, onclick : () => modifierCommande(2, 1), nom : "Pouly", prix : 10},
-        {id : 5, display : true, onclick : () => modifierCommande(5, 1), nom : "Classique", prix : 9},
-        {id : 6, display : true, onclick : () => modifierCommande(6, 1), nom : "Lo'cale", prix : 11},
-        {id : 7, display : true, onclick : () => modifierCommande(7, 1), nom : "Végé", prix : 9},
-        {id : 8, display : true, onclick : () => modifierCommande(8, 1), nom : "Menu enfant", prix : 7},
-        {id : 9, display : true, onclick : () => modifierCommande(9, 1), nom : "Spécial mois", prix : 11},
-        {id : 99, display : true, onclick : () => modifierCommande(99, 1),  nom : "Autre", prix : 0},
-        {id : 3, display : true, onclick : () => modifierCommande(3, 1), nom : "Frite", prix : 3},
-        {id : 98, display : true, onclick : () => setModalBoissons(true),  nom : "Boisson", prix : 2},
-        {id : 10, display : false, nom : "Coca", prix : 2},
-        {id : 11, display : false, nom : "Orangina", prix : 2},
-        {id : 12, display : false, nom : "Schweppes", prix : 2},
-        {id : 13, display : false, nom : "Ice Tea", prix : 2},
-        {id : 14, display : false, nom : "Caprisun", prix : 1},
-        {id : 15, display : false, nom : "Bière", prix : 2},
-        {id : 16, display : false, nom : "Bière locale", prix : 3.5}
-    ];
+    const [typeProduit, setTypeProduit] = useState(1);
+    const [produitsAffiches, setproduitsAffiches] = useState([]);
     const [produitsCommandes, setProduitsCommandes] = useState([]);
     const [tempId, setTempId] = useState(0);
     const [total, setTotal] = useState(0);
@@ -61,8 +43,40 @@ const Add = () => {
 
     useEffect(() => {
         console.log("code au changement de date");
-        // TO DO : aller chercher les stocks pour la date sélectionné
+        // TO DO : aller chercher les stocks pour la date sélectionné appeler getProduitsAffiches en ajoutant la date en paramètre
     }, [commande.date]);
+
+    useEffect(() => {
+        axios.get(process.env.REACT_APP_API_URL + `produits/produitsAffiches/${typeProduit}`)
+            .then((response) => {
+                setproduitsAffiches(response.data);
+            })
+            .catch((error) => {
+                console.error("Erreur lors de la récupération des produits à afficher :", error);
+            });
+    }, [typeProduit]);
+
+    
+    const handleClick = (id) => {
+        var produit = produitsAffiches[produitsAffiches.findIndex((p) => p.id_produit === id)];
+
+        switch(produit.action){
+            case "modifier" :
+                modifierCommande(produit.id_produit, 1);
+                break;
+            case "setModalBoissons":
+                setModalBoissons(true);
+                break;
+            case "switchTypeProduit":
+                if(typeProduit === 1 ) // affichage des tacos
+                    setTypeProduit(2);
+                else  // affichage des burgers
+                    setTypeProduit(1);  
+                break;
+            default : 
+                break;
+        }
+    };
 
     const validerCommande = async () => {
         const updatedCommande = {  libelle: document.querySelector('#input_libelle').value, 
@@ -94,8 +108,8 @@ const Add = () => {
             if(pc_clone[id_pc].qte < 1) pc_clone.splice(id_pc, 1);
             setProduitsCommandes(pc_clone);
         } else { // nouvel item
-            var produit = produits_affiches[produits_affiches.findIndex((p) => p.id === id)];
-            setProduitsCommandes([...produitsCommandes, { id_produit: produit.id, nom: produit.nom, prix: produit.prix, qte: 1, tempId: tempId}]);
+            var produit = produitsAffiches[produitsAffiches.findIndex((p) => p.id_produit === id)];
+            setProduitsCommandes([...produitsCommandes, { id_produit: produit.id_produit, nom: produit.nom, prix: produit.prix, qte: 1, tempId: tempId}]);
             setTempId(tempId + 1);
         }
     };
@@ -142,10 +156,10 @@ const Add = () => {
         <div className='form'>
             {/* Partie gauche (liste des produits) */}
             <div className='zone_gauche'>
-                {produits_affiches.filter((produit) => produit.display === true).map((produit, index) => (
-                    <div className={`bt_produit ${produit.id === 3 || produit.id === 98 ? 'bt_large' : ''}`} 
-                         onClick={produit.onclick}
-                         key={index}> {produit.nom} </div>
+                {produitsAffiches.filter((produit) => produit.display === 1).map((produit, index) => (
+                    <div className={`bt_produit ${produit.id_produit === 3 || produit.id_produit === 98 ? 'bt_large' : ''} ${produit.id_produit === 99 ? 'bt_gris' : ''}`} 
+                         onClick={() => {handleClick(produit.id_produit)}}
+                         key={index}> {produit.id_produit !== 99 ? produit.nom : (typeProduit === 1 ? "Voir les tacos" : "Voir les burgers")} </div>
                 ))}
             </div>
             {/* Partie droite (récap + total) */}

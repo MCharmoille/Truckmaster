@@ -18,6 +18,15 @@ export const get_recette = async (req, res) => {
     }
 }
 
+export const getProduitsAffiches = async (req, res) => {
+    try {
+        const produits = await Produit.getProduitsAffiches(req.params.id_type);
+        res.status(200).json(produits);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
+
 export const getIngredientsparDate = async (req, res) => {
     try {
         const ingredients = await Produit.getIngredientsparDate(req.params.date);

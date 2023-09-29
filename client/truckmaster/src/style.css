@@ -105,6 +105,10 @@
     background-color: #444;
     height: 16%;
   }
+
+  .bt_gris {
+    background-color: purple !important;
+  }
   
   /* Styles pour la partie droite */
   .zone_droite {
