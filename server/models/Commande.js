@@ -27,6 +27,7 @@ class Commande {
                 produits_commandes.forEach((produit_commande) => {
                     const id_commande = produit_commande.id_commande;
                     if (commandes_map.has(id_commande)) {
+                      if(produit_commande.prix_custom != null) produit_commande.prix = produit_commande.prix_custom;
                       commandes_map.get(id_commande).total += (produit_commande.prix * produit_commande.qte);
                       commandes_map.get(id_commande).produits.push({
                         ...produit_commande,
@@ -86,16 +87,17 @@ class Commande {
           db.query(q2, [commande.id_commande], (err, produits_commandes) => {
               if (err) reject(err);
               
-              var temp_id = 0;
+              var tempId = 0;
 
               produits_commandes.forEach((produit_commande) => {
+                if(produit_commande.prix_custom != null) produit_commande.prix = produit_commande.prix_custom;
                 commande.total += (produit_commande.prix * produit_commande.qte);
                 commande.produits.push({
                   ...produit_commande,
-                  temp_id : temp_id,
+                  tempId : tempId,
                   modifications: [], // Initialisez le tableau de modifications ici
                 });
-                temp_id ++;
+                tempId ++;
               });
 
               const pc_ids = produits_commandes.map((produits_commandes) => produits_commandes.id_pc);
@@ -190,12 +192,13 @@ class Commande {
               
               if (produits && produits.length > 0) {
                 produits.forEach((produit) => {
-                  const q = "INSERT INTO produits_commandes(`id_commande`, `id_produit`, `qte`, `custom`) VALUES (?)";
+                  const q = "INSERT INTO produits_commandes(`id_commande`, `id_produit`, `qte`, `custom`, `prix_custom`) VALUES (?)";
                   const values = [
                     data.insertId,
                     produit.id_produit,
                     produit.qte,
-                    produit.modifications && produit.modifications.length > 0 ? 1 : 0
+                    produit.modifications && produit.modifications.length > 0 ? 1 : 0,
+                    produit.prix_custom
                   ];
                   
                   db.query(q, [values], (err, pc_data) => {
@@ -254,12 +257,13 @@ class Commande {
                   
                   if (produits && produits.length > 0) {
                     produits.forEach((produit) => {
-                      const q = "INSERT INTO produits_commandes(`id_commande`, `id_produit`, `qte`, `custom`) VALUES (?)";
+                      const q = "INSERT INTO produits_commandes(`id_commande`, `id_produit`, `qte`, `custom`, `prix_custom`) VALUES (?)";
                       const values = [
                         id_commande,
                         produit.id_produit,
                         produit.qte,
-                        produit.modifications && produit.modifications.length > 0 ? 1 : 0
+                        produit.modifications && produit.modifications.length > 0 ? 1 : 0,
+                        produit.prix_custom
                       ];
                       
                       db.query(q, [values], (err, pc_data) => {

@@ -101,7 +101,7 @@ const Commandes = () => {
                     {commande.produits.length !== 0 ? (
                         commande.produits.map((produit, p_index) => (
                             <div className='produit' style={{margin: "10px 0px 10px 0px"}} key={p_index}>
-                                {produit.qte} x {produit.nom}
+                                <span style={produit.prix_custom !== null ? {"color":"yellow"} : {}}> {produit.qte} x {produit.nom} {produit.prix_custom !== null ? "("+produit.prix+"€)" : ""}</span>
                                 {produit.modifications.length !== 0 ? (
                                     produit.modifications.map((modif, m_index) => (
                                       <div className={`modification modificateur_${modif.modificateur}`} key={m_index}>

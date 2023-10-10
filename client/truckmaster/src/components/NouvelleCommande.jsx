@@ -41,10 +41,15 @@ const Add = () => {
         }
     }, [commandeId]);
 
-    useEffect(() => {
-        console.log("code au changement de date");
-        // TO DO : aller chercher les stocks pour la date sélectionné appeler getProduitsAffiches en ajoutant la date en paramètre
-    }, [commande.date]);
+    // useEffect(() => {
+    //     axios.get(process.env.REACT_APP_API_URL + `produits/stock/${commande.date}`)
+    //         .then((response) => {
+    //             console.log(response);
+    //         })
+    //         .catch((error) => {
+    //             console.error("Erreur lors de la récupération des produits à afficher :", error);
+    //         });
+    // }, [commande.date]);
 
     useEffect(() => {
         axios.get(process.env.REACT_APP_API_URL + `produits/produitsAffiches/${typeProduit}`)
@@ -95,11 +100,11 @@ const Add = () => {
     const modifierCommande = (id, qte) => {
         var id_pc = -1;
         
-        if(qte === -1){ // suppression d'un item, on cherche l'tempId de la cible
+        if(qte === -1){ // suppression d'un item, on cherche le tempId de la cible
             id_pc = produitsCommandes.findIndex((p) => (p.tempId === id));
         }
         else { // ajout d'un item, on utilise l'id produit
-            id_pc = produitsCommandes.findIndex((p) => (p.id_produit === id) && (!p.modifications || p.modifications.length === 0));
+            id_pc = produitsCommandes.findIndex((p) => (p.id_produit === id) && (!p.modifications || p.modifications.length === 0) && (p.prix_custom === null));
         }
 
         if (id_pc !== -1) { // item trouvé dans la liste
@@ -109,7 +114,7 @@ const Add = () => {
             setProduitsCommandes(pc_clone);
         } else { // nouvel item
             var produit = produitsAffiches[produitsAffiches.findIndex((p) => p.id_produit === id)];
-            setProduitsCommandes([...produitsCommandes, { id_produit: produit.id_produit, nom: produit.nom, prix: produit.prix, qte: 1, tempId: tempId}]);
+            setProduitsCommandes([...produitsCommandes, { id_produit: produit.id_produit, nom: produit.nom, prix: produit.prix, qte: 1, tempId: tempId, prix_custom: null}]);
             setTempId(tempId + 1);
         }
     };
@@ -126,12 +131,18 @@ const Add = () => {
     const [showModalCustom, setModalCustom] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
 
-    const CloseModalCustom = (modifications) => {
+    const CloseModalCustom = (modifications, nouveauPrix) => {
         setModalCustom(false);
         
         const id_pc = produitsCommandes.findIndex((p) => p.tempId === selectedProduct.tempId);
         const pc_clone = [...produitsCommandes];
         pc_clone[id_pc].modifications = modifications;
+
+        if(pc_clone[id_pc].prix !== nouveauPrix){
+            pc_clone[id_pc].prix = parseInt(nouveauPrix);
+            pc_clone[id_pc].prix_custom = parseInt(nouveauPrix);
+        }
+
         setProduitsCommandes(pc_clone);
     };
 
@@ -184,7 +195,7 @@ const Add = () => {
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}> 
                                 <div> 
                                     <span className='enlever_article' onClick={() => modifierCommande(produit.tempId, -1)}> - </span> 
-                                    <span onClick={() => {setSelectedProduct(produit); setModalCustom(true);}}>
+                                    <span onClick={() => {setSelectedProduct(produit); setModalCustom(true);}} style={produit.prix_custom !== null ? {"color":"yellow"} : {}}>
                                         {produit.qte} x {produit.nom}
                                     </span>
                                 </div> 

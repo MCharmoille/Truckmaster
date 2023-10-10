@@ -279,7 +279,7 @@
 }
 
 .modificateur_1{
-  color:purple;
+  color:rgb(255,100,255);
 }
 
 .modificateur_-1{
@@ -298,6 +298,18 @@
 }
 .plus{
   background-color: green;
+}
+
+.cst_prix{
+  width: 100%;
+  font-size: 25px;
+  line-height: 50px;
+}
+
+.cst_prix input[type="number"] {
+  width: 50px;
+  font-size: 25px;
+  margin-left: 15px;
 }
 
 .bt_custom{

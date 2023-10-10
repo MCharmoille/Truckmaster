@@ -3,6 +3,7 @@ import axios from 'axios';
 
 const Modal = ({ produit, onClose }) => {
   const [recette, setRecette] = useState([]);
+  const [prix, setPrix] = useState(produit.prix);
   
   useEffect(() => {
     const get_recette = async () => {
@@ -39,10 +40,9 @@ const Modal = ({ produit, onClose }) => {
       if(ing.modificateur !== 0)
         modification.push({id_ingredient: ing.id_ingredient, nom: ing.nom, modificateur: ing.modificateur});
     });
-    onClose(modification);
+    onClose(modification, prix);
   };
   
-
   return (
     <div className="modal-overlay">
       <div className='modal-content'>
@@ -57,6 +57,10 @@ const Modal = ({ produit, onClose }) => {
                 <span className='plus' onClick={() => modifier_recette(ingredient.id_ingredient, 1)}> + </span>
               </div>
           ))}
+        </div>
+        <div className='cst_prix' >
+          Prix spécial : 
+          <input type='number' name='libelle' placeholder={produit.prix} onChange={(e) => setPrix(e.target.value)} /> €
         </div>
         <button className='bt_custom' onClick={valider}>Fermer</button>
       </div>
