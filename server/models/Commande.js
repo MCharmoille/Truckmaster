@@ -141,9 +141,10 @@ class Commande {
           if(err) reject(err)
           if(produits.length === 0) resolve([]);
           else{
-            const type_produit = [{id_type: 1, nom: "Burger / Tacos", produits: [], qte: 0},
-                                  {id_type: 2, nom: "Accompagnements", produits: [], qte: 0},
-                                  {id_type: 3, nom: "Boissons", produits: [], qte: 0}
+            const type_produit = [{id_type: 1, nom: "Burger", produits: [], qte: 0},
+                                  {id_type: 2, nom: "Tacos", produits: [], qte: 0},
+                                  {id_type: 3, nom: "Boissons", produits: [], qte: 0},
+                                  {id_type: 4, nom: "Accompagnements", produits: [], qte: 0}
                                  ];
                                  
             produits.forEach((produit) => {
