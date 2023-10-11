@@ -139,8 +139,8 @@ const Add = () => {
         pc_clone[id_pc].modifications = modifications;
 
         if(pc_clone[id_pc].prix !== nouveauPrix){
-            pc_clone[id_pc].prix = parseInt(nouveauPrix);
-            pc_clone[id_pc].prix_custom = parseInt(nouveauPrix);
+            pc_clone[id_pc].prix = parseFloat(nouveauPrix);
+            pc_clone[id_pc].prix_custom = parseFloat(nouveauPrix);
         }
 
         setProduitsCommandes(pc_clone);
