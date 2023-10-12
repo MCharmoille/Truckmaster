@@ -53,6 +53,10 @@
   margin-bottom: 10px;
 }
 
+.tranche.hidden {
+  display: none;
+}
+
 .commandes {
   display: flex;
   gap: 20px;
@@ -405,3 +409,16 @@
 
 .confirm-valider { background-color: green;}
 .confirm-annuler { background-color: red;}
+
+.filtre_commandes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+}
+
+.filtre_commandes input[type="checkbox"] {
+  width: 25px;
+  height: 25px;
+  margin-left: 20px;
+}

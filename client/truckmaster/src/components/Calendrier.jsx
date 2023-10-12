@@ -1,50 +1,50 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const Calendrier = ({ onDateChange }) => {
-    const getNextFriday = () => {
-      const today = new Date();
-      const daysUntilFriday = 5 - today.getDay(); // Jours restants jusqu'au vendredi (0 pour vendredi).
-      const nextFriday = new Date(today);
-      nextFriday.setDate(today.getDate() + daysUntilFriday);
-      return nextFriday;
-    };
+  const [dates, setDates] = useState([]);
+  const [currentDate, setCurrentDate] = useState();
+  useEffect(() => {
+    const getDates = async() => {
+      try {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}dates`);
+        setDates(res.data);
 
-    const [currentDate, setCurrentDate] = useState(getNextFriday());
+        const today = new Date();
 
-    useEffect(() => {
-        onDateChange(currentDate);
-      }, [currentDate, onDateChange]);
+        const date = res.data.find(date => new Date(date.jour) >= today) || res.data[res.data.length - 1];
+        setCurrentDate(date);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    getDates();
+  }, []);
+
+  useEffect(() => {
+    console.log("ici");
+    if(typeof currentDate !== "undefined") onDateChange(currentDate);
+  }, [currentDate, onDateChange]);
     
-  const handlePrevDay = () => {
-    const prevDate = new Date(currentDate);
-    prevDate.setDate(currentDate.getDate() - 7); // Déplacez-vous de 7 jours en arrière (une semaine).
-    while (prevDate.getDay() !== 5) {
-      // Recherchez le vendredi précédent.
-      prevDate.setDate(prevDate.getDate() - 1);
+  const changeDay = (mode) => {
+    const id = dates.findIndex(date => date.jour === currentDate.jour);
+    if(typeof dates[id + mode] !== "undefined")
+      setCurrentDate(dates[id + mode]);
+    else{
+      alert("Aucune date n'existe "+(mode === 1 ? "après" : "avant")+" le "+formatDate(currentDate.jour)+". Merci d'en créer depuis le menu, onglet Gestion des dates.");
     }
-    setCurrentDate(prevDate);
-  };
-
-  const handleNextDay = () => {
-    const nextDate = new Date(currentDate);
-    nextDate.setDate(currentDate.getDate() + 7); // Déplacez-vous de 7 jours en avant (une semaine).
-    while (nextDate.getDay() !== 5) {
-      // Recherchez le prochain vendredi.
-      nextDate.setDate(nextDate.getDate() + 1);
-    }
-    setCurrentDate(nextDate);
   };
 
   const formatDate = (date) => {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return date.toLocaleDateString('fr-FR', options);
+    return new Date(date).toLocaleDateString('fr-FR', options);
   };
 
   return (
     <div className="calendrier">
-      <button onClick={handlePrevDay}>&#8592;</button>
-      <p>{formatDate(currentDate)}</p>
-      <button onClick={handleNextDay}>&#8594;</button>
+      <button onClick={() => changeDay(-1)}>&#8592;</button>
+      <p>{currentDate ? formatDate(currentDate.jour) : ""}</p>
+      <button onClick={() => changeDay(1)}>&#8594;</button>
     </div>
   );
 };

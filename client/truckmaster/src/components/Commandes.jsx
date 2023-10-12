@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Commandes = () => {
   const [commandes, setCommandes] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(); //{jour: null, cb_midi: true, cb_soir: true}
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,27 +28,48 @@ const Commandes = () => {
   }, [selectedDate]);
 
   const tranches = [];
-  
-  // Heure de départ
-  let heure = 18;
-  let minute = 0;
-  
-  // Boucle pour créer les 20 tranches
-  for (let i = 0; i < 20; i++) {
+
+  // Heure de départ pour la première période
+  let heure1 = 11;
+  let minute1 = 0;
+
+  // Boucle pour créer les tranches de 11h à 14h
+  for (let i = 0; i < 13; i++) {
     tranches.push({
-      time: `${heure.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`,
+      time: `${heure1.toString().padStart(2, '0')}:${minute1.toString().padStart(2, '0')}`,
+      //type: 1, // midi
       content: [],
     });
-  
-    minute += 15;
-    if (minute === 60) {
-      heure++;
-      minute = 0;
+
+    minute1 += 15;
+    if (minute1 === 60) {
+      heure1++;
+      minute1 = 0;
+    }
+  }
+
+  // Heure de départ pour la deuxième période
+  let heure2 = 18;
+  let minute2 = 30;
+
+  // Boucle pour créer les tranches de 18h30 à minuit
+  for (let i = 0; i < 22; i++) {
+    tranches.push({
+      time: `${heure2.toString().padStart(2, '0')}:${minute2.toString().padStart(2, '0')}`,
+      //type: 2, // soir
+      content: [],
+    });
+
+    minute2 += 15;
+    if (minute2 === 60) {
+      heure2++;
+      minute2 = 0;
     }
   }
 
   const handleDateChange = (newDate) => {
-    setSelectedDate(newDate);
+    console.log(newDate);
+    setSelectedDate(newDate.jour);
   };
   
   // Ajoute la commande à la tranche horaire correspondante
@@ -85,12 +106,32 @@ const Commandes = () => {
     setselectedCommande(commande);
     setShowModal(true);
   };
+
+  // const showTranche = (event) => {
+  //   console.log("changement");
+  //   // Obtenez l'élément qui a déclenché l'événement de clic (c'est-à-dire l'input)
+  //   const inputElement = event.target;
+  
+  //   // Obtenez le nom de l'input
+  //   const inputName = inputElement.name;
+  
+  //   // Vérifiez si l'input est coché ou non
+  //   const isChecked = inputElement.checked;
+  
+  //   // Affichez les informations dans la console
+  //   console.log(`Nom de l'input : ${inputName}`);
+  //   console.log(`Est coché : ${isChecked}`);
+  // };
   
   return (
     <div>
       <Calendrier onDateChange={handleDateChange} />
+      {/* <div className='filtre_commandes'>
+        <input type="checkbox" id="cb_midi" name="cb_midi" checked={selectedDate.cb_midi} onChange={(event) => setSelectedDate({ ...selectedDate, cb_midi: event.target.checked })}/> Midi 
+        <input type="checkbox" id="cb_soir" name="cb_soir" checked={selectedDate.cb_soir} onChange={(event) => setSelectedDate({ ...selectedDate, cb_soir: event.target.checked })}/> Soir
+      </div> */}
       {tranches.map((tranche, t_index) => (
-        <div className="tranche" key={t_index}>
+        <div className="tranche" key={t_index} type={tranche.type}>
           <h2>{tranche.time}</h2>
           <div className="commandes">
             {tranche.content.length !== 0 ? (

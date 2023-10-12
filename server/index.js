@@ -4,6 +4,7 @@ import cors from "cors"
 
 import produitsRoutes from './routes/produits.js';
 import commandesRoutes from './routes/commandes.js';
+import datesRoutes from './routes/dates.js';
 
 import https from 'https';
 import fs from 'fs';
@@ -60,6 +61,7 @@ export { db }; // pour utiliser la connexion dans toute l'app
 
 app.use('/produits', produitsRoutes);
 app.use('/commandes', commandesRoutes);
+app.use('/dates', datesRoutes);
 
 // devis
 app.get("/devis", (req, res) => {

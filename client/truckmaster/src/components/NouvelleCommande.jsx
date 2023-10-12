@@ -180,11 +180,16 @@ const Add = () => {
                     <div> 
                         <input id="input_date" type="date" value={commande.date} onChange={(e) => {setCommande((prevCommande) => ({ ...prevCommande, date: e.target.value }));}}/> 
                         <select id='input_time' name='time' value={commande.time} onChange={(e) => {setCommande((prevCommande) => ({ ...prevCommande, time: e.target.value }));}}>
-                            <option> 18:00 </option><option> 18:15 </option><option> 18:30 </option><option> 18:45 </option>
+                            <option> 11:00 </option><option> 11:15 </option><option> 11:30 </option><option> 11:45 </option>
+                            <option> 12:00 </option><option> 12:15 </option><option> 12:30 </option><option> 12:45 </option>
+                            <option> 13:00 </option><option> 13:15 </option><option> 13:30 </option><option> 13:45 </option>
+                            <option> 14:00 </option>
+                            <option> 18:30 </option><option> 18:45 </option>
                             <option> 19:00 </option><option> 19:15 </option><option> 19:30 </option><option> 19:45 </option>
                             <option> 20:00 </option><option> 20:15 </option><option> 20:30 </option><option> 20:45 </option>
                             <option> 21:00 </option><option> 21:15 </option><option> 21:30 </option><option> 21:45 </option>
                             <option> 22:00 </option><option> 22:15 </option><option> 22:30 </option><option> 22:45 </option>
+                            <option> 23:00 </option><option> 23:15 </option><option> 23:30 </option><option> 23:45 </option>
                         </select>
                     </div>
                     <hr/>
