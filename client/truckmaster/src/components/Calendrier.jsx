@@ -10,9 +10,8 @@ const Calendrier = ({ onDateChange }) => {
         const res = await axios.get(`${process.env.REACT_APP_API_URL}dates`);
         setDates(res.data);
 
-        const today = new Date();
-
-        const date = res.data.find(date => new Date(date.jour) >= today) || res.data[res.data.length - 1];
+        const today = new Date().setHours(0, 0, 0, 0);
+        const date = res.data.find(date => new Date(date.jour).setHours(0, 0, 0, 0) >= today) || res.data[res.data.length - 1];
         setCurrentDate(date);
       } catch (err) {
         console.log(err);
