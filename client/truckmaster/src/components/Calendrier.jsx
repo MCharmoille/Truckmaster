@@ -1,9 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 const Calendrier = ({ onDateChange }) => {
   const [dates, setDates] = useState([]);
   const [currentDate, setCurrentDate] = useState();
+
+  // useCallback mémorise la fonction onDateChange pour ne pas la recréer à chaque changement de currentDate
+  const memoizedOnDateChange = useCallback(
+    (currentDate) => {
+      onDateChange(currentDate);
+      // commentaire permettant de skip le warning
+      // eslint-disable-next-line react-hooks/exhaustive-deps 
+    }, []
+  );
+  
   useEffect(() => {
     const getDates = async() => {
       try {
@@ -22,8 +32,8 @@ const Calendrier = ({ onDateChange }) => {
 
   useEffect(() => {
     console.log("ici");
-    if(typeof currentDate !== "undefined") onDateChange(currentDate);
-  }, [currentDate, onDateChange]);
+    if (typeof currentDate !== "undefined") memoizedOnDateChange(currentDate);
+  }, [currentDate, memoizedOnDateChange]);
     
   const changeDay = (mode) => {
     const id = dates.findIndex(date => date.jour === currentDate.jour);

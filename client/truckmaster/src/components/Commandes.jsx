@@ -7,14 +7,14 @@ import { useNavigate } from 'react-router-dom';
 
 const Commandes = () => {
   const [commandes, setCommandes] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(); //{jour: null, cb_midi: true, cb_soir: true}
+  const [selectedDate, setSelectedDate] = useState({jour: null, cb_midi: true, cb_soir: true});
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCommandesForDate = async () => {
-      if (selectedDate) {
+      if (selectedDate.jour !== null) {
         try {
-          const formattedDate = moment(selectedDate).format('YYYY-MM-DD');
+          const formattedDate = moment(selectedDate.jour).format('YYYY-MM-DD');
           
           const res = await axios.get(`${process.env.REACT_APP_API_URL}commandes/date/${formattedDate}`);
           setCommandes(res.data);
@@ -37,7 +37,7 @@ const Commandes = () => {
   for (let i = 0; i < 13; i++) {
     tranches.push({
       time: `${heure1.toString().padStart(2, '0')}:${minute1.toString().padStart(2, '0')}`,
-      //type: 1, // midi
+      type: 1, // midi
       content: [],
     });
 
@@ -56,7 +56,7 @@ const Commandes = () => {
   for (let i = 0; i < 22; i++) {
     tranches.push({
       time: `${heure2.toString().padStart(2, '0')}:${minute2.toString().padStart(2, '0')}`,
-      //type: 2, // soir
+      type: 2, // soir
       content: [],
     });
 
@@ -69,7 +69,7 @@ const Commandes = () => {
 
   const handleDateChange = (newDate) => {
     console.log(newDate);
-    setSelectedDate(newDate.jour);
+    setSelectedDate(newDate);
   };
   
   // Ajoute la commande à la tranche horaire correspondante
@@ -107,31 +107,25 @@ const Commandes = () => {
     setShowModal(true);
   };
 
-  // const showTranche = (event) => {
-  //   console.log("changement");
-  //   // Obtenez l'élément qui a déclenché l'événement de clic (c'est-à-dire l'input)
-  //   const inputElement = event.target;
-  
-  //   // Obtenez le nom de l'input
-  //   const inputName = inputElement.name;
-  
-  //   // Vérifiez si l'input est coché ou non
-  //   const isChecked = inputElement.checked;
-  
-  //   // Affichez les informations dans la console
-  //   console.log(`Nom de l'input : ${inputName}`);
-  //   console.log(`Est coché : ${isChecked}`);
-  // };
+  const checkCb = async (event) => {
+      setSelectedDate({ ...selectedDate, [event.target.name]: event.target.checked })
+
+      try {
+        await axios.post(process.env.REACT_APP_API_URL+"dates/updateCb", {id_date : selectedDate.id_date, cb : [event.target.name], checked : event.target.checked});
+      } catch (error) {
+        console.error("Une erreur s'est produite lors de la requête POST :", error);
+      }
+  };
   
   return (
     <div>
       <Calendrier onDateChange={handleDateChange} />
-      {/* <div className='filtre_commandes'>
-        <input type="checkbox" id="cb_midi" name="cb_midi" checked={selectedDate.cb_midi} onChange={(event) => setSelectedDate({ ...selectedDate, cb_midi: event.target.checked })}/> Midi 
-        <input type="checkbox" id="cb_soir" name="cb_soir" checked={selectedDate.cb_soir} onChange={(event) => setSelectedDate({ ...selectedDate, cb_soir: event.target.checked })}/> Soir
-      </div> */}
+      <div className='filtre_commandes'>
+        <input type="checkbox" id="cb_midi" name="cb_midi" checked={selectedDate.cb_midi} onChange={(e) => checkCb(e)}/> Midi 
+        <input type="checkbox" id="cb_soir" name="cb_soir" checked={selectedDate.cb_soir} onChange={(e) => checkCb(e)}/> Soir
+      </div>
       {tranches.map((tranche, t_index) => (
-        <div className="tranche" key={t_index} type={tranche.type}>
+        <div className={"tranche" + (tranche.type === 1 ? (!selectedDate.cb_midi ? " hidden" : "") : (!selectedDate.cb_soir ? " hidden" : ""))} key={t_index}>
           <h2>{tranche.time}</h2>
           <div className="commandes">
             {tranche.content.length !== 0 ? (
