@@ -1,75 +1,24 @@
-import { db } from '../index.js';
+import { db, customConsoleLog } from '../index.js';
 
 class Commande {
   static async getCommandeparDate(date) {
     return new Promise((resolve, reject) => {
-      
-      db.query("SELECT * FROM commandes WHERE date_commande LIKE '"+date+"%'", (err, commandes) =>{
-          if(err) reject(err)
-          if(commandes.length === 0) resolve([]);
-          else{
-            const commandes_ids = commandes.map((commandes) => commandes.id_commande);
-          
-            const q2 = "SELECT * FROM produits_commandes pc JOIN produits p ON pc.id_produit=p.id_produit WHERE pc.id_commande IN (?)";
-            db.query(q2, [commandes_ids], (err, produits_commandes) => {
-                if (err) return res.json(err);
-                
-                const commandes_map = new Map();
-
-                commandes.forEach((commandes) => {
-                  commandes_map.set(commandes.id_commande, {
-                        ...commandes,
-                        total: 0,
-                        produits: [],
-                    });
-                });
-                
-                produits_commandes.forEach((produit_commande) => {
-                    const id_commande = produit_commande.id_commande;
-                    if (commandes_map.has(id_commande)) {
-                      if(produit_commande.prix_custom != null) produit_commande.prix = produit_commande.prix_custom;
-                      commandes_map.get(id_commande).total += (produit_commande.prix * produit_commande.qte);
-                      commandes_map.get(id_commande).produits.push({
-                        ...produit_commande,
-                        modifications: [], // Initialisez le tableau de modifications ici
-                      });
-                    }
-                });
-
-                const pc_ids = produits_commandes.map((produits_commandes) => produits_commandes.id_pc);
-
-                const q3 = "SELECT * FROM modifications m JOIN ingredients i ON m.id_ingredient=i.id_ingredient WHERE m.id_pc IN (?)";
-                db.query(q3, [pc_ids], (err, modifications) => {
-                    if (err) return res.json(err);
-                    
-                    modifications.forEach((modification) => {
-                      const id_pc = modification.id_pc;
-
-                      produits_commandes.forEach((produit_commande) => {
-                        if (produit_commande.id_pc === id_pc) {
-                            const id_commande = produit_commande.id_commande;
-                            
-                            if (commandes_map.has(id_commande)) {
-                              commandes_map.get(id_commande).produits.find((p) => p.id_pc === id_pc).modifications.push(modification);
-                            }
-                        }
-                      });
-
-                    });
-
-                    const result = Array.from(commandes_map.values());
-                    return resolve(result);
-                    
-                });
-
-                
-            });
-
+      db.query("SELECT * FROM commandes WHERE date_commande LIKE '"+date+"%'", async (err, commandes) => {
+        if (err) reject(err);
+        for (let i = 0; i < commandes.length; i++) {
+          try {
+            commandes[i] = await this.getCommandeParId(commandes[i].id_commande);
+          } catch (error) {
+            reject(error);
+            return;
           }
-      })
+        }
+        resolve(commandes);
+      });
     });
   }
 
+  // Cette fonction doit être la seule qui va chercher les détails d'une commande, toutes les autres doivent passer par la 
   static async getCommandeParId(id_commande){
     return new Promise((resolve, reject) => {
       db.query("SELECT * FROM commandes WHERE id_commande = "+id_commande, (err, commande) =>{
@@ -95,7 +44,7 @@ class Commande {
                 commande.produits.push({
                   ...produit_commande,
                   tempId : tempId,
-                  modifications: [], // Initialisez le tableau de modifications ici
+                  modifications: [],
                 });
                 tempId ++;
               });
@@ -187,7 +136,7 @@ class Commande {
         db.query(q, [values], (err, data) =>{
             if(err) reject(err)
             else{ 
-              console.log("Une nouvelle commande à été ajoutée");
+              customConsoleLog("Une nouvelle commande à été ajoutée (id : "+data.insertId+")");
               // Ajout des lignes dans produits_commandes
               const produits = req.body.produits;
               
@@ -206,11 +155,7 @@ class Commande {
                     if (err) {
                       console.error("Erreur lors de l'ajout d'une ligne dans produits_commandes : ", err);
                     } else {
-                      console.log("Une nouvelle ligne a été ajoutée dans produits_commandes");
-
                       if(produit.modifications && produit.modifications.length > 0){
-                        console.log("ajout de modification pour le produit "+produit.nom);
-
                         produit.modifications.forEach((modification) => {
                           const q = "INSERT INTO modifications(`id_pc`, `id_ingredient`, `modificateur`) VALUES (?)";
                           const values = [
@@ -222,8 +167,6 @@ class Commande {
                           db.query(q, [values], (err, modif_data) => {
                             if (err) {
                               console.error("Erreur lors de l'ajout d'une ligne dans modification : ", err);
-                            } else {
-                              console.log("Une nouvelle ligne a été ajoutée dans modification");
                             }
                           });
                         });
@@ -246,12 +189,12 @@ class Commande {
         db.query(q, (err, data) =>{
             if(err) reject(err)
             else{ 
-              console.log("La commande "+id_commande+" à été modifiée");
+              customConsoleLog("La commande "+id_commande+" à été modifiée");
               
               db.query("DELETE pc, m FROM produits_commandes pc LEFT JOIN modifications m ON pc.id_pc=m.id_pc WHERE id_commande = "+id_commande, (err, data) => {
                 if(err) reject(err)
                 else{
-                  console.log("suppression des anciens pc effectuée");
+                  customConsoleLog("suppression des anciens pc effectuée");
 
                   // Ajout des lignes dans produits_commandes
                   const produits = req.body.produits;
@@ -271,10 +214,10 @@ class Commande {
                         if (err) {
                           console.error("Erreur lors de l'ajout d'une ligne dans produits_commandes : ", err);
                         } else {
-                          console.log("Une nouvelle ligne a été ajoutée dans produits_commandes");
+                          customConsoleLog("Une nouvelle ligne a été ajoutée dans produits_commandes");
 
                           if(produit.modifications && produit.modifications.length > 0){
-                            console.log("ajout de modification pour le produit "+produit.nom);
+                            customConsoleLog("ajout de modification pour le produit "+produit.nom);
 
                             produit.modifications.forEach((modification) => {
                               const q = "INSERT INTO modifications(`id_pc`, `id_ingredient`, `modificateur`) VALUES (?)";
@@ -288,7 +231,7 @@ class Commande {
                                 if (err) {
                                   console.error("Erreur lors de l'ajout d'une ligne dans modification : ", err);
                                 } else {
-                                  console.log("Une nouvelle ligne a été ajoutée dans modification");
+                                  customConsoleLog("Une nouvelle ligne a été ajoutée dans modification");
                                 }
                               });
                             });
@@ -308,16 +251,16 @@ class Commande {
 
   static async supprimerCommande(id_commande){
     return new Promise((resolve, reject) => {
-        console.log("suppression de la commande "+id_commande);
+        customConsoleLog("suppression de la commande "+id_commande);
         db.query("DELETE pc, m FROM produits_commandes pc LEFT JOIN modifications m ON pc.id_pc=m.id_pc WHERE id_commande = "+id_commande, (err, data) => {
           if(err) reject(err)
           else{
-            console.log("suppression des anciens pc effectuée");
+            customConsoleLog("suppression des anciens pc effectuée");
 
             db.query("DELETE FROM commandes WHERE id_commande = "+id_commande, (err, data) => {
               if(err) reject(err)
               else{
-                console.log("suppression de la commande effectuée");
+                customConsoleLog("suppression de la commande effectuée");
 
                 return resolve(true);
               }
@@ -338,7 +281,7 @@ class Commande {
       db.query(db.format(q, values), (err, data) =>{
           if(err) reject(err)
           else{ 
-            console.log("La commande "+req.body.id_commande+" à correctement été payée");
+            customConsoleLog("La commande "+req.body.id_commande+" à correctement été payée");
             
             return resolve(true);
           }

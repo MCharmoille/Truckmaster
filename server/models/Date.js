@@ -1,4 +1,4 @@
-import { db } from '../index.js';
+import { db, customConsoleLog } from '../index.js';
 
 class Produit {
   static async getDates() {

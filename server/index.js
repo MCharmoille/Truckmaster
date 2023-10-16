@@ -14,13 +14,11 @@ var db = {};
 
 app.use(express.json());
 
-console.log(process.env.NODE_ENV);
-
 if (process.env.NODE_ENV === 'dev') {
     app.use(cors());
 
     app.listen(8800, () =>{
-        console.log("Le serveur Truckmaster est correctement démarré en local.");
+        customConsoleLog("Le serveur Truckmaster est correctement démarré en local.");
     })
 
     db = mysql.createConnection({
@@ -46,7 +44,7 @@ if (process.env.NODE_ENV === 'dev') {
     const httpsServer = https.createServer(credentials, app);
 
     httpsServer.listen(8800, () => {
-        console.log("Le serveur HTTPS Truckmaster est correctement démarré en production.")
+        customConsoleLog("Le serveur HTTPS Truckmaster est correctement démarré en production.")
     });
 
     db = mysql.createConnection({
@@ -62,6 +60,14 @@ export { db }; // pour utiliser la connexion dans toute l'app
 app.use('/produits', produitsRoutes);
 app.use('/commandes', commandesRoutes);
 app.use('/dates', datesRoutes);
+
+// fonction utilitaire, si il y en a plusieurs, créer un fichier util.js
+function customConsoleLog(message) {
+  const formattedDate = new Date().toLocaleString('fr-FR');
+
+  console.log(`[${formattedDate}] ${message}`);
+}
+export {customConsoleLog};
 
 // devis
 app.get("/devis", (req, res) => {

@@ -1,4 +1,4 @@
-import { db } from '../index.js';
+import { db, customConsoleLog } from '../index.js';
 
 class Produit {
   static async find() {
@@ -56,7 +56,7 @@ class Produit {
       db.query(query, (err, ingredients) =>{
           if(err) reject(err)
           if(ingredients.length === 0){
-            console.log("ajout dans les bd des entrées des ingrédients pour "+date);
+            customConsoleLog("ajout dans les bd des entrées des ingrédients pour "+date);
                   
             db.query("SELECT * FROM ingredients", (err, ingredients) =>{
                 if(err) reject(err)
@@ -91,7 +91,7 @@ class Produit {
       // db.query(query, (err, ingredients) =>{
       //     if(err) reject(err)
       //     if(ingredients.length === 0){
-      //       console.log("ajout dans les bd des entrées des ingrédients pour "+date);
+      //       customConsoleLog("ajout dans les bd des entrées des ingrédients pour "+date);
                   
       //       db.query("SELECT * FROM ingredients", (err, ingredients) =>{
       //           if(err) reject(err)
