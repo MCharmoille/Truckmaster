@@ -68,7 +68,6 @@ const Commandes = () => {
   }
 
   const handleDateChange = (newDate) => {
-    console.log(newDate);
     setSelectedDate(newDate);
   };
   

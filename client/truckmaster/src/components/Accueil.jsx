@@ -12,7 +12,7 @@ function App() {
         <div className='home_boutons'>
           <Link to="/pensebete"> <button className="home_bouton">Pense-bête</button> </Link>
           <Link to="/commandes"> <button className="home_bouton">Commandes</button> </Link>
-          <Link to="/resume"> <button className="home_bouton">Résumé (BETA)</button> </Link>
+          <Link to="/resume"> <button className="home_bouton">Résumé</button> </Link>
           <Link to="/devis"> <button className="home_bouton">Devis (BETA)</button> </Link>
           <button className="home_bouton">Facture (TODO)</button>
           <button className="home_bouton">Bouton 6</button>
@@ -20,7 +20,7 @@ function App() {
           
         <div className="home_credits">
           <p>Maxime Charmoille</p>
-          <p>Truckmaster v1.2</p>
+          <p>Truckmaster v1.3</p>
         </div>
       </div>
     </div>

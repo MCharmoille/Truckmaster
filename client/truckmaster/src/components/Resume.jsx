@@ -14,7 +14,6 @@ const Resume = () => {
           const formattedDate = moment(selectedDate).format('YYYY-MM-DD');
           
           const res = await axios.get(`${process.env.REACT_APP_API_URL}commandes/resume/${formattedDate}`);
-          console.log(res.data);
           setData(res.data);
         } catch (err) {
           console.log(err);
@@ -25,53 +24,39 @@ const Resume = () => {
   }, [selectedDate]);
   
   const handleDateChange = (newDate) => {
-    setSelectedDate(newDate);
+    setSelectedDate(newDate.jour);
   };
   
   return (
     <div>
-        <Calendrier onDateChange={handleDateChange} />
+      <Calendrier onDateChange={handleDateChange} />
+      {data.length !== 0 ? (
         <div>
-            <h2> Résumé des commandes du {moment(selectedDate).format('YYYY-MM-DD')}</h2>
-            <div>
-            {data.length !== 0 ? (
-                <div>
-                {data.type_produit.length !== 0 ? (
-                    data.type_produit.map((tp, tp_index) => (
-                      <div key={tp_index}>
-                        <h3>{tp.qte} x {tp.nom}</h3>
-                        <div>
-                          {tp.produits.length !== 0 ? (
-                              tp.produits.map((produit, p_index) => (
-                                  <div key={p_index}>
-                                      {produit.qte} x {produit.nom}
-                                  </div>
-                              ))
-                          ) : null
-                          }
-                        </div>
-                        
-                      </div>
+          <div className='res_tps'>
+            {data.type_produit.map((tp, tp_index) => (
+              <div className='res_tp' key={tp_index}>
+                <img className='res_icone' src={require(`../img/${tp.icon}.png`)} alt={tp.icon} />
+                  {tp.produits.length !== 0 ? (
+                    tp.produits.map((produit, pr_index) => (
+                      <div key={pr_index}>{produit.qte} x {produit.nom}</div>
                     ))
-                ) : null
-                }
-                <div> <hr/> </div>
-                {data.paiements.length !== 0 ? (
-                    data.paiements.map((p, p_index) => (
-                        <div key={p_index}>
-                            {p.nom} : {p.valeur} €
-                        </div>
-                    ))
-                ) : null
-                }
-                </div>
-            ) : null
-            }
-            
+                  ) : null}
+                  {tp.id_type === 1 ? <h3>{tp.qte} x {tp.nom}s</h3> : ""}
+              </div>
+            ))}
+          </div>
+          <div className='res_paiements'>
+            <img className='res_icone_paiement' src={require(`../img/paiement.png`)} alt="paiement" />
+            {data.paiements.map((p, p_index) => (
+              <div key={p_index}>
+                {p.nom} : {p.valeur} €
+              </div>
+            ))}
           </div>
         </div>
+      ) : null}
     </div>
-  );
+  );  
 };
 
 export default Resume;

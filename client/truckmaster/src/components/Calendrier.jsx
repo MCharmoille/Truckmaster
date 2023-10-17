@@ -31,7 +31,6 @@ const Calendrier = ({ onDateChange }) => {
   }, []);
 
   useEffect(() => {
-    console.log("ici");
     if (typeof currentDate !== "undefined") memoizedOnDateChange(currentDate);
   }, [currentDate, memoizedOnDateChange]);
     
