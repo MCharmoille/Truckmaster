@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import reload from '../../img/reload.png';
+import CustomSauce from "./CustomSauce";
 
 const Modal = ({ produit, onClose }) => {
   const [recette, setRecette] = useState([]);
   const [prix, setPrix] = useState(produit.prix);
+  const [selectedIngredient, setSelectedIngredient] = useState(null);
+  const [showCustomSauce, setCustomSauce] = useState(false);
   
   useEffect(() => {
     const get_recette = async () => {
@@ -42,6 +46,16 @@ const Modal = ({ produit, onClose }) => {
     });
     onClose(modification, prix);
   };
+
+  const CloseCustomSauce = (new_id, new_nom) => {
+    setCustomSauce(false);
+
+    const recette_clone = [...recette];
+    recette_clone[recette.findIndex((p) => p.id_ingredient === selectedIngredient)].nom = new_nom;
+    recette_clone[recette.findIndex((p) => p.id_ingredient === selectedIngredient)].modificateur = 2;
+    recette_clone[recette.findIndex((p) => p.id_ingredient === selectedIngredient)].id_ingredient = new_id;
+    setRecette(recette_clone);
+  };
   
   return (
     <div className="modal-overlay">
@@ -52,6 +66,7 @@ const Modal = ({ produit, onClose }) => {
               <div key={index}> 
                 <span className={`nom_ingredient modificateur_${ingredient.modificateur}`}>
                   {ingredient.modificateur === -1 ? "SANS " : ingredient.modificateur === 1 ? "SUPPLÉMENT " : ""}{ingredient.nom}
+                  {ingredient.gestion_sauce === 1 ? <img src={reload} alt="reload" className='changeSauce' onClick={() => {setSelectedIngredient(ingredient.id_ingredient); setCustomSauce(true);}} /> : null}
                 </span>
                 <span className='moins' onClick={() => modifier_recette(ingredient.id_ingredient, -1)}> - </span> 
                 <span className='plus' onClick={() => modifier_recette(ingredient.id_ingredient, 1)}> + </span>
@@ -64,6 +79,9 @@ const Modal = ({ produit, onClose }) => {
         </div>
         <button className='bt_custom' onClick={valider}>Fermer</button>
       </div>
+      {showCustomSauce && (
+          <CustomSauce onClose={CloseCustomSauce} />
+      )}
     </div>
   );
 };

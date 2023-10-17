@@ -275,7 +275,7 @@
 }
 
 .nom_ingredient{
-  width: 200px;
+  width: 250px;
 }
 
 .nom_ingredient[modification=1]{
@@ -285,10 +285,13 @@
 .modificateur_1{
   color:rgb(255,100,255);
 }
-
 .modificateur_-1{
   color:red;
 }
+.modificateur_2{
+  color:orange;
+}
+
 .moins,
 .plus {
   font-size: 1.2em;
@@ -302,6 +305,12 @@
 }
 .plus{
   background-color: green;
+}
+.changeSauce {
+  padding: 5px;
+  background-color: white;
+  width: 22px;
+  float: right;
 }
 
 .cst_prix{
@@ -463,4 +472,26 @@
   background-color: #444;
   height: 220px;
   line-height: 30px;
+}
+
+.bt_sauce {
+  font-size: 20px;
+  margin: 5px;
+  padding: 10px 20px;
+  width: 190px;
+  height: 150px;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+}
+
+.bt_annuler {
+  font-size: 20px;
+  margin: 5px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  margin-left: 35%;
+  width: 30%;
 }
