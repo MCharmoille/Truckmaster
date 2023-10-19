@@ -101,9 +101,8 @@ class Commande {
             type_produit.find((p) => p.id_type === produit.id_type).produits.find((pr) => pr.id_produit === produit.id_produit).qte += parseInt(produit.qte);
           
           type_produit.find((p) => p.id_type === produit.id_type).qte += parseInt(produit.qte);
-
-          paiements.find((p) => p.id === commande.moyen_paiement).valeur += parseInt(produit.prix);
         });
+        paiements.find((p) => p.id === commande.moyen_paiement).valeur += parseInt(commande.total);
       });
 
       return({type_produit: type_produit, paiements: paiements});
