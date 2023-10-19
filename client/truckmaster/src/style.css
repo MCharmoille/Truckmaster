@@ -19,12 +19,13 @@
 }
 
 .home_bouton {
-  background-color: #007bff;
-    color: white;
-    border: none;
-    font-size: 40px;
-    width: 100%;
-    height: 100%;
+  background-color: #555;
+  color: white;
+  border: solid white 1px;
+  font-size: 40px;
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
 }
 
 .home_credits {
@@ -474,7 +475,7 @@
   line-height: 30px;
 }
 
-.bt_sauce {
+.bt_sauce, .bt_boisson {
   font-size: 20px;
   margin: 5px;
   padding: 10px 20px;
