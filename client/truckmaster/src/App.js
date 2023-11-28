@@ -6,6 +6,7 @@ import NouvelleCommande from "./components/NouvelleCommande";
 import Resume from "./components/Resume";
 import PenseBete from "./components/PenseBete";
 import Parametres from "./components/Parametres";
+import Bus from "./components/Bus";
 import "./style.css";
 import home from './img/home.png';
 import list from './img/list.png';
@@ -32,6 +33,7 @@ function App() {
             <Route path="/resume" element={<Resume/>}/>
             <Route path="/pensebete" element={<PenseBete/>}/>
             <Route path="/parametres" element={<Parametres/>}/>
+            <Route path="/bus" element={<Bus/>}/>
           </Routes>
         </div>
       </BrowserRouter>
