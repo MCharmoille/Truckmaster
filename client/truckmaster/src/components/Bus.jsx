@@ -39,16 +39,18 @@ const Bus = () => {
     
 
   return (
-    <div className='bus_img'>
-      <div className='bus_datedebut'>2023-12-01</div>
-      <div className='bus_datefin'>2023-12-31</div>
-      <div className='bus_date'>{currentDate}</div>
-      <div className='bus_time'>{currentTime}</div>
-      <div className='timer'>{formatTime(seconds)}</div>
+    <div className='testcss' style={{backgroundColor:"white", height:"110vh"}}>
+        <div className='bus_img'>
+            <div className='bus_datedebut'>2023-12-01</div>
+            <div className='bus_datefin'>2023-12-31</div>
+            <div className='bus_date'>{currentDate}</div>
+            <div className='bus_time'>{currentTime}</div>
+            <div className='timer'>{formatTime(seconds)}</div>
 
 
-      <div className="dot dot1"></div>
-      <div className="dot dot2"></div>
+            <div className="dot dot1"></div>
+            <div className="dot dot2"></div>
+        </div>
     </div>
   );
 };
