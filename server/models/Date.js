@@ -13,9 +13,33 @@ class Produit {
     });
   }
 
+  static async addDate(req, res) {
+    return new Promise((resolve, reject) => {
+      const dateObj = new Date(req.body.jour);
+
+      var query = "INSERT INTO dates_travailles (jour, cb_midi, cb_soir) VALUES ('"+`${dateObj.getUTCFullYear()}-${String(dateObj.getUTCMonth() + 1).padStart(2, '0')}-${String(dateObj.getUTCDate()).padStart(2, '0')}`+"', "+req.body.cb_midi+", "+req.body.cb_soir+")";
+
+      db.query(query, (err) =>{
+        if(err) reject(err)
+        resolve(true);
+      });
+    });
+  }
+
   static async updateCb(req, res) {
     return new Promise((resolve, reject) => {
       var query = "UPDATE dates_travailles SET "+req.body.cb+" = "+req.body.checked+" WHERE id_date = "+req.body.id_date;
+
+      db.query(query, (err) =>{
+        if(err) reject(err)
+        resolve(true);
+      });
+    });
+  }
+
+  static async deleteDate(req, res) {
+    return new Promise((resolve, reject) => {
+      var query = "DELETE FROM dates_travailles WHERE id_date = "+req.body.id_date;
 
       db.query(query, (err) =>{
         if(err) reject(err)

@@ -496,3 +496,138 @@
   margin-left: 35%;
   width: 30%;
 }
+
+.con_login {
+  margin-top: 80px;
+  padding-left: 25%;
+  height: 200px;
+  line-height: 40px;
+}
+
+.con_titre {
+  font-size: 25px;
+  margin-top: 20px;
+  width: 94%;
+  left: 3%;
+  position: relative;
+}
+
+.con_user, .con_mdp {
+  font-size: 26px;
+  line-height: 50px;
+}
+
+.con_input {
+  font-size: 25px;
+  width: 200px;
+  margin-left: 20px;
+}
+
+.con_valider {
+  background-color: green;
+  font-size: 25px;
+  border-radius: 15px;
+  padding: 10px 25px;
+  color:white;
+  margin-top: 20px;
+}
+
+.con_error {
+  font-size: 24px;
+  color: red;
+}
+
+.acc_connecte {
+  font-size: 25px;
+  color: black;
+  display: inline;
+  float: right;
+  margin-top: 10px;
+}
+
+.par_section_title {
+  border-top: solid white 0.5px;
+  border-bottom: solid white 0.5px;
+  background-color: #444;
+  font-size: 26px;
+  font-weight: bold;
+  height: 40px;
+  padding-top: 7px;
+  margin: 10px 0px;
+}
+
+.par_section {
+  font-size: 25px;
+  margin: 10px 40px;
+  height: 400px;
+  overflow-y: auto;
+}
+
+.par_add_date {
+  font-size: 25px;
+  border-radius: 15px;
+  padding: 5px 20px;
+}
+
+.par_date_table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.par_date_row {
+  display: table-row;
+  border-bottom: 1px solid #ddd;
+}
+
+.par_date_cell {
+  display: table-cell;
+  padding: 10px;
+}
+
+/* Style pour le bouton supprimer */
+.par_date_delete {
+  background-color: #e74c3c; /* Couleur de fond */
+  color: #fff; /* Couleur du texte */
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+
+/* Style pour la barre de défilement verticale */
+.par_section::-webkit-scrollbar {
+  width: 12px; /* Largeur de la barre de défilement */
+}
+
+.par_section::-webkit-scrollbar-thumb {
+  background-color: #ccc; /* Couleur de la poignée de défilement */
+  border-radius: 6px; /* Bord arrondi de la poignée */
+}
+
+.par_section::-webkit-scrollbar-track {
+  background-color: #555; /* Couleur de l'arrière-plan de la barre de défilement */
+}
+
+.react-datepicker {
+  border: 1px solid #aeaeae;
+  border-radius: 0.3rem;
+  font-family: "Helvetica Neue", helvetica, arial, sans-serif;
+  font-size: 1.2rem;
+  background-color: #fff;
+  color: #000;
+  position: absolute;
+}
+
+.par_date_cell input[type="checkbox"] {
+  width: 25px;
+  height: 25px;
+}
+
+.par_logout {
+  background-color: #e74c3c;
+  font-size: 25px;
+  border-radius: 15px;
+  padding: 10px 25px;
+  color:white
+}

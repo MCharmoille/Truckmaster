@@ -20,7 +20,7 @@ function App() {
           
         <div className="home_credits">
           <p>Maxime Charmoille</p>
-          <p>Truckmaster v1.3</p>
+          <p>Truckmaster v1.4</p>
         </div>
       </div>
     </div>
