@@ -33,9 +33,7 @@ class Produit {
 
   static async addDate(req, res) {
     return new Promise((resolve, reject) => {
-      const dateObj = new Date(req.body.jour);
-
-      var query = "INSERT INTO dates_travailles (jour, cb_midi, cb_soir) VALUES ('"+`${dateObj.getUTCFullYear()}-${String(dateObj.getUTCMonth() + 1).padStart(2, '0')}-${String(dateObj.getUTCDate()).padStart(2, '0')}`+"', "+req.body.cb_midi+", "+req.body.cb_soir+")";
+      var query = "INSERT INTO dates_travailles (jour, cb_midi, cb_soir) VALUES ('"+moment(req.body.jour).format('YYYY-MM-DD')+"', "+req.body.cb_midi+", "+req.body.cb_soir+")";
 
       db.query(query, (err) =>{
         if(err) reject(err)
