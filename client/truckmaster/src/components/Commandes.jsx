@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Commandes = () => {
   const [commandes, setCommandes] = useState([]);
+  const [tranches, setTranches] = useState([]);
   const [selectedDate, setSelectedDate] = useState({jour: null, cb_midi: true, cb_soir: true});
   const navigate = useNavigate();
 
@@ -18,6 +19,21 @@ const Commandes = () => {
           
           const res = await axios.get(`${process.env.REACT_APP_API_URL}commandes/date/${formattedDate}`);
           setCommandes(res.data);
+
+          const new_tranches = [];
+          res.data.forEach((commande) => {
+            const timeCommande = moment(commande.date_commande).format('HH:mm');
+        
+            const foundTranche = new_tranches.find((tranche) => tranche.time === timeCommande);
+        
+            if (foundTranche) {
+              foundTranche.content.push(commande);
+            } else {
+              new_tranches.push({time : timeCommande, type : timeCommande.substring(0, 2) < 16 ? 1 : 2, content : [commande]});
+            }
+          });
+          
+          setTranches(new_tranches);
         } catch (err) {
           console.log(err);
         }
@@ -27,62 +43,9 @@ const Commandes = () => {
     fetchCommandesForDate();
   }, [selectedDate]);
 
-  const tranches = [];
-
-  // Heure de départ pour la première période
-  let heure1 = 11;
-  let minute1 = 0;
-
-  // Boucle pour créer les tranches de 11h à 14h
-  for (let i = 0; i < 13; i++) {
-    tranches.push({
-      time: `${heure1.toString().padStart(2, '0')}:${minute1.toString().padStart(2, '0')}`,
-      type: 1, // midi
-      content: [],
-    });
-
-    minute1 += 15;
-    if (minute1 === 60) {
-      heure1++;
-      minute1 = 0;
-    }
-  }
-
-  // Heure de départ pour la deuxième période
-  let heure2 = 18;
-  let minute2 = 30;
-
-  // Boucle pour créer les tranches de 18h30 à minuit
-  for (let i = 0; i < 22; i++) {
-    tranches.push({
-      time: `${heure2.toString().padStart(2, '0')}:${minute2.toString().padStart(2, '0')}`,
-      type: 2, // soir
-      content: [],
-    });
-
-    minute2 += 15;
-    if (minute2 === 60) {
-      heure2++;
-      minute2 = 0;
-    }
-  }
-
   const handleDateChange = (newDate) => {
     setSelectedDate(newDate);
   };
-  
-  // Ajoute la commande à la tranche horaire correspondante
-  commandes.forEach((commande) => {
-    const timeCommande = moment(commande.date_commande).format('HH:mm');
-
-    const foundTranche = tranches.find((tranche) => tranche.time === timeCommande);
-
-    if (foundTranche) {
-      foundTranche.content.push(commande);
-    } else {
-      console.log("Tranche interdite ! Heure impossible : "+timeCommande);
-    }
-  });
 
   const [showModal, setShowModal] = useState(false);
   const [selectedCommande, setselectedCommande] = useState(null);

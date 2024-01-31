@@ -9,6 +9,15 @@ export const getDates = async (req, res) => {
     }
 }
 
+export const getDate = async (req, res) => {
+    try {
+        const dates = await Date.getDate(req.params.date);
+        res.status(200).json(dates);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
+
 export const addDate = async (req, res) => {
     try {
         const date = await Date.addDate(req, res);

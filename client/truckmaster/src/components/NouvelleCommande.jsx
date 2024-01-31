@@ -6,26 +6,59 @@ import ModalCustom from "./modals/CustomProduit";
 import ModalBoissons from "./modals/Boissons";
 import Confirm from "./modals/Confirm";
 import moment from 'moment';
+import 'moment/locale/fr';
+
 
 const Add = () => {
     const { commandeId } = useParams();
     const [commande, setCommande] = useState({
         libelle:"",
-        date:moment(new Date()).format("YYYY-MM-DD"),
+        date:"",
         time:"",
         paye:null
     });
     const [typeProduit, setTypeProduit] = useState(1);
+    const [dates, setDates] = useState([]);
+    const [tranches, setTranches] = useState([]);
+    const [isMidiSoir, setIsMidiSoir] = useState({"midi" : 1, "soir" : 1})
     const [produitsAffiches, setproduitsAffiches] = useState([]);
     const [produitsCommandes, setProduitsCommandes] = useState([]);
     const [tempId, setTempId] = useState(0);
     const [total, setTotal] = useState(0);
     const navigate = useNavigate();
 
+    useEffect(() => { // recupere les dates et tranches
+        try {
+            axios.get(`${process.env.REACT_APP_API_URL}dates`)
+            .then((res) => {
+                setDates(res.data.reverse());
+                setIsMidiSoir({"midi" : res.data[0].cb_midi, "soir" : res.data[0].cb_soir});
+            })
+            .catch((error) => {
+                console.error("Erreur lors de la récupération de la commande existante :", error);
+            });
+            
+            axios.get(`${process.env.REACT_APP_API_URL}tranches`)
+            .then((res) => {
+                setTranches(res.data);
+            })
+            .catch((error) => {
+                console.error("Erreur lors de la récupération de la commande existante :", error);
+            });
+
+        } catch (err) {
+          console.log(err);
+        }
+        
+    }, []);
+
     useEffect(() => {
         if (commandeId) {
             axios.get(process.env.REACT_APP_API_URL+`commandes/id/${commandeId}`)
                 .then((response) => {
+                    console.log(response.data.date_commande);
+                    console.log(moment(response.data.date_commande).format('YYYY-MM-DD'));
+                    console.log(moment(response.data.date_commande).format('dddd D MMMM'));
                     setCommande(({
                         libelle: response.data.libelle,
                         date: moment(response.data.date_commande).format('YYYY-MM-DD'),
@@ -41,15 +74,16 @@ const Add = () => {
         }
     }, [commandeId]);
 
-    // useEffect(() => {
-    //     axios.get(process.env.REACT_APP_API_URL + `produits/stock/${commande.date}`)
-    //         .then((response) => {
-    //             console.log(response);
-    //         })
-    //         .catch((error) => {
-    //             console.error("Erreur lors de la récupération des produits à afficher :", error);
-    //         });
-    // }, [commande.date]);
+    useEffect(() => {
+        if(commande.date === "") return;
+        axios.get(`${process.env.REACT_APP_API_URL}dates/id/${commande.date}`)
+            .then((res) => {
+                setIsMidiSoir({"midi" : res.data.cb_midi, "soir" : res.data.cb_soir});
+            })
+            .catch((error) => {
+                console.error("Erreur lors de la récupération de la date", error);
+            });
+    }, [commande.date]);
 
     useEffect(() => {
         axios.get(process.env.REACT_APP_API_URL + `produits/produitsAffiches/${typeProduit}`)
@@ -61,6 +95,9 @@ const Add = () => {
             });
     }, [typeProduit]);
 
+    const formatDate = (date) => {
+        return moment(date).format('dddd D MMMM');
+    };
     
     const handleClick = (id) => {
         var produit = produitsAffiches[produitsAffiches.findIndex((p) => p.id_produit === id)];
@@ -84,8 +121,10 @@ const Add = () => {
     };
 
     const validerCommande = async () => {
+        commande.date = commande.date || dates[0].jour;
+        commande.time = commande.time || tranches[0].tranche;
         const updatedCommande = {  libelle: document.querySelector('#input_libelle').value, 
-                                   date_commande: `${document.querySelector('#input_date').value} ${document.querySelector('#input_time').value}:00`, 
+                                   date_commande: `${commande.date} ${commande.time}:00`, 
                                    produits: produitsCommandes
                                 };
         try {
@@ -99,7 +138,7 @@ const Add = () => {
 
     const modifierCommande = (id, qte) => {
         var id_pc = -1;
-        
+
         if(qte === -1){ // suppression d'un item, on cherche le tempId de la cible
             id_pc = produitsCommandes.findIndex((p) => (p.tempId === id));
         }
@@ -178,18 +217,15 @@ const Add = () => {
                 <div className='recap'> 
                     <input type='text' id='input_libelle' placeholder='Nouvelle Commande' name='libelle' defaultValue={commande.libelle}/>
                     <div> 
-                        <input id="input_date" type="date" value={commande.date} onChange={(e) => {setCommande((prevCommande) => ({ ...prevCommande, date: e.target.value }));}}/> 
+                        <select id="input_date" name="date" value={commande.date} onChange={(e) => {setCommande((prevCommande) => ({ ...prevCommande, date: e.target.value }));}}>
+                            {dates.map((date, d_index) => (
+                                <option key={d_index} value={date.jour}>{formatDate(date.jour)}</option>
+                            ))}
+                        </select>
                         <select id='input_time' name='time' value={commande.time} onChange={(e) => {setCommande((prevCommande) => ({ ...prevCommande, time: e.target.value }));}}>
-                            <option> 11:00 </option><option> 11:15 </option><option> 11:30 </option><option> 11:45 </option>
-                            <option> 12:00 </option><option> 12:15 </option><option> 12:30 </option><option> 12:45 </option>
-                            <option> 13:00 </option><option> 13:15 </option><option> 13:30 </option><option> 13:45 </option>
-                            <option> 14:00 </option>
-                            <option> 18:30 </option><option> 18:45 </option>
-                            <option> 19:00 </option><option> 19:15 </option><option> 19:30 </option><option> 19:45 </option>
-                            <option> 20:00 </option><option> 20:15 </option><option> 20:30 </option><option> 20:45 </option>
-                            <option> 21:00 </option><option> 21:15 </option><option> 21:30 </option><option> 21:45 </option>
-                            <option> 22:00 </option><option> 22:15 </option><option> 22:30 </option><option> 22:45 </option>
-                            <option> 23:00 </option><option> 23:15 </option><option> 23:30 </option><option> 23:45 </option>
+                            {tranches.map((tranche, t_index) => (
+                                (tranche.is_midi === 1 && isMidiSoir["midi"] === 1) || (tranche.is_midi === 0 && isMidiSoir["soir"] === 1) ? <option key={t_index}>{tranche.tranche}</option> : ""
+                            ))}
                         </select>
                     </div>
                     <hr/>

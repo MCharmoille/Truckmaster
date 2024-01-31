@@ -3,7 +3,7 @@ import { db, customConsoleLog } from '../index.js';
 class Commande {
   static async getCommandeparDate(date) {
     return new Promise((resolve, reject) => {
-      db.query("SELECT * FROM commandes WHERE date_commande LIKE '"+date+"%'", async (err, commandes) => {
+      db.query("SELECT * FROM commandes WHERE date_commande LIKE '"+date+"%' ORDER BY date_commande ASC", async (err, commandes) => {
         if (err) reject(err);
         for (let i = 0; i < commandes.length; i++) {
           try {

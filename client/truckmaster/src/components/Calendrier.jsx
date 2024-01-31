@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import moment from 'moment';
+import 'moment/locale/fr';
 
 const Calendrier = ({ onDateChange }) => {
   const [dates, setDates] = useState([]);
@@ -44,8 +46,7 @@ const Calendrier = ({ onDateChange }) => {
   };
 
   const formatDate = (date) => {
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(date).toLocaleDateString('fr-FR', options);
+    return moment(date).format('dddd D MMMM');
   };
 
   return (

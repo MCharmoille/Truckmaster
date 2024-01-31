@@ -584,7 +584,6 @@
   padding: 10px;
 }
 
-/* Style pour le bouton supprimer */
 .par_date_delete {
   background-color: #e74c3c; /* Couleur de fond */
   color: #fff; /* Couleur du texte */
@@ -630,4 +629,41 @@
   border-radius: 15px;
   padding: 10px 25px;
   color:white
+}
+
+.par_tranches {
+  width: 100%;
+}
+
+.par_tranche {
+  border: solid white 1px;
+  display: inline-block;
+  margin: 5px;
+  padding: 10px 5px;
+  border-radius: 10px;
+  background-color: #445;
+}
+
+.par_tranche_delete {
+  background-color: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 10px;
+  position: relative;
+  top: -4px;
+}
+
+.par_add_tranche_midi_div, .par_add_tranche_soir_div {
+  display: inline;
+}
+
+.par_add_tranche_midi_input, .par_add_tranche_soir_input {
+  font-size: 22px;
+  margin-left: 10px;
+  height: 40px;
+  width: 100px;
+  border-radius: 10px;
 }

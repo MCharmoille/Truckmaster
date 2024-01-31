@@ -1,11 +1,13 @@
 import express from "express"
 import mysql from "mysql2"
 import cors from "cors"
+import moment from "moment"
 
 import produitsRoutes from './routes/produits.js';
 import commandesRoutes from './routes/commandes.js';
 import datesRoutes from './routes/dates.js';
 import utilisateursRoutes from './routes/utilisateurs.js';
+import tranchesRoutes from './routes/tranches.js';
 
 import https from 'https';
 import fs from 'fs';
@@ -56,12 +58,13 @@ if (process.env.NODE_ENV === 'dev') {
     }); 
 }
 
-export { db }; // pour utiliser la connexion dans toute l'app
+export { db, moment }; // pour utiliser la connexion dans toute l'app
 
 app.use('/produits', produitsRoutes);
 app.use('/commandes', commandesRoutes);
 app.use('/dates', datesRoutes);
 app.use('/utilisateurs', utilisateursRoutes);
+app.use('/tranches', tranchesRoutes);
 
 // fonction utilitaire, si il y en a plusieurs, créer un fichier util.js
 function customConsoleLog(message) {

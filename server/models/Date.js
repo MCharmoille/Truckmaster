@@ -1,4 +1,4 @@
-import { db, customConsoleLog } from '../index.js';
+import { db, customConsoleLog, moment } from '../index.js';
 
 class Produit {
   static async getDates() {
@@ -7,7 +7,25 @@ class Produit {
         if (err) {
           reject(err);
         } else {
-          resolve(results);
+          // Formater les dates avec moment
+          const formattedResults = results.map(result => {
+            result.jour = moment(result.jour).format('YYYY-MM-DD');
+            return result;
+          });
+
+          resolve(formattedResults);
+        }
+      });
+    });
+  }
+
+  static async getDate(date) {
+    return new Promise((resolve, reject) => {
+      db.query('SELECT * FROM dates_travailles WHERE jour LIKE "'+date+'"', (err, results) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(results[0]);
         }
       });
     });

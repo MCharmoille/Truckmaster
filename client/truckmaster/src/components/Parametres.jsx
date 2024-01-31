@@ -4,11 +4,16 @@ import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import fr from 'date-fns/locale/fr';
+import moment from 'moment';
+import 'moment/locale/fr';
 
 const Parametres = ({isLoggedIn, setIsLoggedIn}) => {
   const navigate = useNavigate();
   const [dates, setDates] = useState([]);
+  const [tranches, setTranches] = useState([]);
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [AddMidiOpen, setAddMidiOpen] = useState(false);
+  const [AddSoirOpen, setAddSoirOpen] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
@@ -17,8 +22,7 @@ const Parametres = ({isLoggedIn, setIsLoggedIn}) => {
   };
 
   const formatDate = (date) => {
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(date).toLocaleDateString('fr-FR', options);
+    return moment(date).format('dddd D MMMM');
   };
 
   const getDates = async() => {
@@ -29,9 +33,20 @@ const Parametres = ({isLoggedIn, setIsLoggedIn}) => {
       console.log(err);
     }
   }
+  
+  const getTranches = async() => {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}tranches`);
+      
+      setTranches(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  }
 
   useEffect(() => {
     getDates();
+    getTranches();
   }, []);
 
   const addDate = async(date) => {
@@ -53,6 +68,28 @@ const Parametres = ({isLoggedIn, setIsLoggedIn}) => {
     }
   };
 
+  const addTranche = async(is_midi) => {
+    try {
+      var tranche = is_midi ? document.querySelector('.par_add_tranche_midi_input').value : document.querySelector('.par_add_tranche_soir_input').value;
+      
+      if(tranche.length !== 5) return;
+      await axios.post(process.env.REACT_APP_API_URL+"tranches/addTranche", {tranche : tranche, is_midi : is_midi});
+      getTranches();
+      is_midi ? setAddMidiOpen(false) : setAddSoirOpen(false);
+    } catch (error) {
+      console.error("Une erreur s'est produite lors de l'ajout de la tranche :", error);
+    }
+  };
+
+  const deleteTranche = async(tranche) => {
+    try {
+      await axios.post(process.env.REACT_APP_API_URL+"tranches/deleteTranche", {id_tranche : tranche.id_tranche});
+      getTranches();
+    } catch (error) {
+      console.error("Une erreur s'est produite lors de la suppression d'une tranche :", error);
+    }
+  };
+
   const checkCb = async(date, event) => {
     try {
       await axios.post(process.env.REACT_APP_API_URL+"dates/updateCb", {id_date : date.id_date, cb : [event.target.name], checked : event.target.checked});
@@ -62,7 +99,7 @@ const Parametres = ({isLoggedIn, setIsLoggedIn}) => {
     }
   };
 
-  return (
+  return ( 
     <div>
         <div className='par_section_title'> -- Jours travaillés : </div>
         <div className='par_section'>
@@ -92,10 +129,29 @@ const Parametres = ({isLoggedIn, setIsLoggedIn}) => {
           
         </div> 
         
-        <div className='par_section_title'> -- Tranches horaires : <i>( Bientôt ! )</i></div>
-        <div className='par_section' hidden>
-          Midi : 
-          Soir : 
+        <div className='par_section_title'> -- Tranches horaires :</div>
+        <div className='par_section'> 
+          Midi : <button className='par_add_date' onClick={() => setAddMidiOpen(!AddMidiOpen)}> + Ajouter une tranche (midi) </button>
+          {AddMidiOpen && (
+              <input type="time" className='par_add_tranche_midi_input' onBlur={() => addTranche(true)}/>
+          )} <br/>
+          {tranches.filter((tranche) => tranche.is_midi === 1).map((tranche, t_index) => (
+            <div key={t_index} className='par_tranche'>
+              {tranche.tranche}
+              <button className="par_tranche_delete" onClick={(e) => { deleteTranche(tranche); }}> X </button>
+            </div>
+          ))} 
+          <br/>
+          Soir : <button className='par_add_date' onClick={() => setAddSoirOpen(!AddSoirOpen)}> + Ajouter une tranche (soir) </button>
+          {AddSoirOpen && (
+              <input type="time" className='par_add_tranche_soir_input' onBlur={() => addTranche(false)}/> 
+          )} <br/>
+          {tranches.filter((tranche) => tranche.is_midi === 0).map((tranche, t_index) => (
+            <div key={t_index} className='par_tranche'>
+              {tranche.tranche}
+              <button className="par_tranche_delete" onClick={(e) => { deleteTranche(tranche); }}> X </button>
+            </div>
+          ))} 
         </div>
 
         <div className='par_section_title'> -- Couleurs de l'application : <i>( Bientôt ! )</i></div>
