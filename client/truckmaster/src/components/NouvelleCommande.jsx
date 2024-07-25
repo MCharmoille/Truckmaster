@@ -56,9 +56,6 @@ const Add = () => {
         if (commandeId) {
             axios.get(process.env.REACT_APP_API_URL+`commandes/id/${commandeId}`)
                 .then((response) => {
-                    console.log(response.data.date_commande);
-                    console.log(moment(response.data.date_commande).format('YYYY-MM-DD'));
-                    console.log(moment(response.data.date_commande).format('dddd D MMMM'));
                     setCommande(({
                         libelle: response.data.libelle,
                         date: moment(response.data.date_commande).format('YYYY-MM-DD'),
@@ -121,6 +118,8 @@ const Add = () => {
     };
 
     const validerCommande = async () => {
+        if(produitsCommandes.length === 0){ alert("Attention, la commande est vide !"); return false;}
+
         commande.date = commande.date || dates[0].jour;
         commande.time = commande.time || tranches[0].tranche;
         const updatedCommande = {  libelle: document.querySelector('#input_libelle').value, 

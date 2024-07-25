@@ -113,7 +113,7 @@ const Commandes = () => {
                     }
                   </div>
                   {commande.moyen_paiement !== null ? (
-                    null 
+                    <div style={{fontSize:"15px"}}> <hr/> Payé {commande.moyen_paiement === "c" ? "par carte" : "en espèce"} </div> 
                   ) : (
                     <div className='paiement' onClick={(e) => {
                       e.stopPropagation();

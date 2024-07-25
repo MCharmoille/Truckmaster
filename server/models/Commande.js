@@ -54,6 +54,7 @@ class Commande {
               const q3 = "SELECT * FROM modifications m JOIN ingredients i ON m.id_ingredient=i.id_ingredient WHERE m.id_pc IN (?)";
               db.query(q3, [pc_ids], (err, modifications) => {
                   if (err) reject(err);
+                  // if(typeof modifications === "undefined") return resolve(commande);
                   
                   modifications.forEach((modification) => {
                     const id_pc = modification.id_pc;
@@ -102,7 +103,7 @@ class Commande {
           
           type_produit.find((p) => p.id_type === produit.id_type).qte += parseInt(produit.qte);
         });
-        paiements.find((p) => p.id === commande.moyen_paiement).valeur += parseInt(commande.total);
+        paiements.find((p) => p.id === commande.moyen_paiement).valeur += parseFloat(commande.total);
       });
 
       return({type_produit: type_produit, paiements: paiements});
