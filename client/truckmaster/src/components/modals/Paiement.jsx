@@ -20,7 +20,8 @@ const Modal = ({ commande, onClose }) => {
         <h2>Paiement {commande.libelle} : {commande.total} €</h2>
         <button className='bt_paiement' onClick={() => valider("c")}>Carte</button>
         <button className='bt_paiement' onClick={() => valider("m")}>Monnaie</button>
-        <button className='bt_paiement' onClick={() => valider("h")}>Cheque</button>
+        <button className='bt_paiement' onClick={() => valider("h")}>Chèque</button>
+        <button className='bt_paiement' onClick={() => valider("o")}>Offert</button>
         <button className='bt_paiement' onClick={() => valider(0)}>Annuler</button>
       </div>
     </div>

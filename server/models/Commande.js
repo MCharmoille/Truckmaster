@@ -3,7 +3,7 @@ import { db, customConsoleLog } from '../index.js';
 class Commande {
   static async getCommandeparDate(date) {
     return new Promise((resolve, reject) => {
-      db.query("SELECT * FROM commandes WHERE date_commande LIKE '"+date+"%' ORDER BY date_commande ASC", async (err, commandes) => {
+      db.query("SELECT * FROM commandes WHERE date_commande LIKE '%"+date+"%' ORDER BY date_commande ASC", async (err, commandes) => {
         if (err) reject(err);
         for (let i = 0; i < commandes.length; i++) {
           try {
@@ -39,7 +39,6 @@ class Commande {
               var tempId = 0;
 
               produits_commandes.forEach((produit_commande) => {
-                if(produit_commande.prix_custom != null) produit_commande.prix = produit_commande.prix_custom;
                 commande.total += (produit_commande.prix * produit_commande.qte);
                 commande.produits.push({
                   ...produit_commande,
@@ -81,14 +80,15 @@ class Commande {
     try {
       const commandes = await this.getCommandeparDate(date);
       
-      const type_produit = [{id_type: 1, nom: "Burger", produits: [], qte: 0, icon: "burger"},
+      const type_produit = [{id_type: 1, nom: "Burgers", produits: [], qte: 0, icon: "burger"},
                             {id_type: 2, nom: "Tacos", produits: [], qte: 0, icon: "tacos"},
                             {id_type: 3, nom: "Boissons", produits: [], qte: 0, icon: "boisson"},
                             {id_type: 4, nom: "Accompagnements", produits: [], qte: 0, icon: "frites"}
                            ];
       const paiements = [{id: "c", nom: "Carte", valeur: 0},
-                         {id: "m", nom: "Espèces", valeur: 0},
+                         {id: "m", nom: "Espèce", valeur: 0},
                          {id: "h", nom: "Chèque", valeur: 0},
+                         {id: "o", nom: "Offert", valeur: 0},
                          {id: null, nom: "Non payé", valeur: 0}
                         ];
 
@@ -113,6 +113,47 @@ class Commande {
     }
   }
 
+  static async getStatistiques() {
+    try {
+      const currentMonth = new Date().getMonth() + 1; // Mois courant (1-12)
+      const currentYear = new Date().getFullYear(); // Année courante
+  
+      const paiementsInitial = [
+        { id: "c", nom: "Carte", valeur: 0 },
+        { id: "m", nom: "Espèce", valeur: 0 },
+        { id: "h", nom: "Chèque", valeur: 0 },
+        { id: "o", nom: "Offert", valeur: 0 },
+        { id: null, nom: "Non payé", valeur: 0 }
+      ];
+  
+      const statistiques = [];
+  
+      for (let i = 0; i < 6; i++) {
+        const month = (currentMonth - i + 11) % 12 + 1; // Calcul du mois
+        const year = currentYear - Math.floor((12 - currentMonth + i) / 12); // Calcul de l'année
+  
+        const monthString = month < 10 ? `0${month}` : `${month}`; // Formatage du mois
+        const commandes = await this.getCommandeparDate(`${year}-${monthString}-`);
+  
+        const paiements = paiementsInitial.map(p => ({ ...p, valeur: 0 })); // Réinitialiser les paiements pour chaque mois
+  
+        commandes.forEach(commande => {
+          const paiement = paiements.find(p => p.id === commande.moyen_paiement);
+          if (paiement) {
+            paiement.valeur += parseFloat(commande.total);
+          }
+        });
+  
+        statistiques.push({ mois: `${year}-${monthString}`, paiements });
+      }
+  
+      return { statistiques };
+    } catch (err) {
+      customConsoleLog(err);
+      throw err;
+    }
+  }  
+
   static async addCommande(req, res){
     return new Promise((resolve, reject) => {
         const q = "INSERT INTO commandes(`libelle`, `date_commande`) VALUES (?)";
@@ -130,13 +171,13 @@ class Commande {
               
               if (produits && produits.length > 0) {
                 produits.forEach((produit) => {
-                  const q = "INSERT INTO produits_commandes(`id_commande`, `id_produit`, `qte`, `custom`, `prix_custom`) VALUES (?)";
+                  const q = "INSERT INTO produits_commandes(`id_commande`, `id_produit`, `qte`, `custom`, `prix`) VALUES (?)";
                   const values = [
                     data.insertId,
                     produit.id_produit,
                     produit.qte,
-                    produit.modifications && produit.modifications.length > 0 ? 1 : 0,
-                    produit.prix_custom
+                    ((produit.modifications && produit.modifications.length) > 0  || produit.custom === 1) ? 1 : 0,
+                    produit.prix
                   ];
                   
                   db.query(q, [values], (err, pc_data) => {
@@ -189,13 +230,13 @@ class Commande {
                   
                   if (produits && produits.length > 0) {
                     produits.forEach((produit) => {
-                      const q = "INSERT INTO produits_commandes(`id_commande`, `id_produit`, `qte`, `custom`, `prix_custom`) VALUES (?)";
+                      const q = "INSERT INTO produits_commandes(`id_commande`, `id_produit`, `qte`, `custom`, `prix`) VALUES (?)";
                       const values = [
                         id_commande,
                         produit.id_produit,
                         produit.qte,
-                        produit.modifications && produit.modifications.length > 0 ? 1 : 0,
-                        produit.prix_custom
+                        ((produit.modifications && produit.modifications.length) > 0  || produit.custom === 1) ? 1 : 0,
+                        produit.prix
                       ];
                       
                       db.query(q, [values], (err, pc_data) => {

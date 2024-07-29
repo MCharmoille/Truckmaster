@@ -7,6 +7,7 @@ import NouvelleCommande from "./components/NouvelleCommande";
 import Resume from "./components/Resume";
 import PenseBete from "./components/PenseBete";
 import Parametres from "./components/Parametres";
+import Statistiques from "./components/Statistiques";
 import Connexion from "./components/Connexion";
 import Bus from "./components/Bus";
 import "./style.css";
@@ -46,6 +47,7 @@ function App() {
                 <Route path="/add/:commandeId" element={<NouvelleCommande />} />
                 <Route path="/devis" element={<Devis/>}/>
                 <Route path="/resume" element={<Resume/>}/>
+                <Route path="/statistiques" element={<Statistiques/>}/>
                 <Route path="/pensebete" element={<PenseBete/>}/>
                 <Route path="/parametres" element={<Parametres isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}/>}/>
                 <Route path="/bus" element={<Bus/>}/>

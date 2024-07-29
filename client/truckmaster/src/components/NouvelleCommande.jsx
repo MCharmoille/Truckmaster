@@ -142,7 +142,7 @@ const Add = () => {
             id_pc = produitsCommandes.findIndex((p) => (p.tempId === id));
         }
         else { // ajout d'un item, on utilise l'id produit
-            id_pc = produitsCommandes.findIndex((p) => (p.id_produit === id) && (!p.modifications || p.modifications.length === 0) && (p.prix_custom === null));
+            id_pc = produitsCommandes.findIndex((p) => (p.id_produit === id) && (!p.modifications || p.modifications.length === 0) && (p.custom === 0));
         }
 
         if (id_pc !== -1) { // item trouvé dans la liste
@@ -152,7 +152,7 @@ const Add = () => {
             setProduitsCommandes(pc_clone);
         } else { // nouvel item
             var produit = produitsAffiches[produitsAffiches.findIndex((p) => p.id_produit === id)];
-            setProduitsCommandes([...produitsCommandes, { id_produit: produit.id_produit, nom: produit.nom, prix: produit.prix, qte: 1, tempId: tempId, prix_custom: null}]);
+            setProduitsCommandes([...produitsCommandes, { id_produit: produit.id_produit, nom: produit.nom, prix: produit.prix_produit, qte: 1, tempId: tempId, custom: 0}]);
             setTempId(tempId + 1);
         }
     };
@@ -175,10 +175,9 @@ const Add = () => {
         const id_pc = produitsCommandes.findIndex((p) => p.tempId === selectedProduct.tempId);
         const pc_clone = [...produitsCommandes];
         pc_clone[id_pc].modifications = modifications;
-
-        if(pc_clone[id_pc].prix !== nouveauPrix){
+        if(pc_clone[id_pc].prix !== parseFloat(nouveauPrix)){ 
             pc_clone[id_pc].prix = parseFloat(nouveauPrix);
-            pc_clone[id_pc].prix_custom = parseFloat(nouveauPrix);
+            pc_clone[id_pc].custom = 1;
         }
 
         setProduitsCommandes(pc_clone);
@@ -235,7 +234,7 @@ const Add = () => {
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}> 
                                 <div> 
                                     <span className='enlever_article' onClick={() => modifierCommande(produit.tempId, -1)}> - </span> 
-                                    <span onClick={() => {setSelectedProduct(produit); setModalCustom(true);}} style={produit.prix_custom !== null ? {"color":"yellow"} : {}}>
+                                    <span onClick={() => {setSelectedProduct(produit); setModalCustom(true);}} style={produit.custom === 1 ? {"color":"yellow"} : {}}>
                                         {produit.qte} x {produit.nom}
                                     </span>
                                 </div> 

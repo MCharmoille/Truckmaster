@@ -62,3 +62,12 @@ export const paiementCommande = async (req, res) => {
         res.status(404).json({ message: error.message });
     }
 }
+
+export const getStatistiques = async (req, res) => {
+    try {
+        const commandes = await Commande.getStatistiques();
+        res.status(200).json(commandes);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
