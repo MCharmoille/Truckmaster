@@ -447,7 +447,7 @@
   border-radius: 10px;
   margin: 1%;
   background-color: #444;
-  height: 300px;
+  height: 290px;
   padding: 2%;
   line-height: 30px;
   overflow-x: auto;
@@ -694,7 +694,7 @@
   width: 100%;
   background-color: #444;
   padding-top: 5px;
-  border: 1px solid #444;
+  border: 1px solid #ccc;
   font-size: 22px;
   border-radius: 10px;
   height: 50px;
@@ -712,7 +712,7 @@
   flex-wrap: nowrap;
   width: 100%;
   background-color: #444;
-  border: 1px solid #444;
+  border: 1px solid #ccc;
   border-radius: 10px;
   height: 300px;
   margin-top: 25px;
@@ -731,7 +731,7 @@
 .stat_graph {
   width: 98%;
   background-color: #444;
-  border: 1px solid #444;
+  border: 1px solid #ccc;
   border-radius: 10px;
   height: 400px;
   margin-top: 25px;
