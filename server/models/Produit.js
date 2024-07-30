@@ -39,7 +39,7 @@ class Produit {
             // switch
             produits.push({id_produit : 99, display : 1, action : "switchTypeProduit",  nom : "", prix : 0});
             // frite
-            produits.push({id_produit : 3, display : 1, action : "modifier", nom : "Frite", prix : 3});
+            produits.push({id_produit : 3, display : 1, action : "modifier", nom : "Frite", prix_produit : 3});
             // boissons
             produits.push({id_produit : 98, display : 1, action : "setModalBoissons",  nom : "Boisson", prix : 2});
             

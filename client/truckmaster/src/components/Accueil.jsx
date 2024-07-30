@@ -13,9 +13,9 @@ function App() {
           <Link to="/pensebete"> <button className="home_bouton">Pense-bête</button> </Link>
           <Link to="/commandes"> <button className="home_bouton">Commandes</button> </Link>
           <Link to="/resume"> <button className="home_bouton">Résumé</button> </Link>
-          <Link to="/devis"> <button className="home_bouton" disabled>Devis (BETA)</button> </Link>
-          <button className="home_bouton">Facture (TODO)</button>
-          <button className="home_bouton">Bouton 6</button>
+          <Link to="/devis"> <button className="home_bouton">Devis</button> </Link>
+          <button className="home_bouton">Ma carte <i>(Bientôt !)</i></button>
+          <button className="home_bouton"><i>(Bientôt !)</i></button>
         </div>
           
         <div className="home_credits">
