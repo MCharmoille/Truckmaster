@@ -17,6 +17,7 @@ const CustomSauce = ({ onClose }) => {
         <button className='bt_sauce' onClick={() => valider(36, "Moutarde à l'ancienne")} style={{backgroundColor: "#d1b16f"}}>Mout. à l'ancienne</button>
         <button className='bt_sauce' onClick={() => valider(37, "Sauce algérienne")} style={{backgroundColor: "#b5651d"}}>Algérienne</button>
         <button className='bt_sauce' onClick={() => valider(38, "Sauce barbecue")} style={{backgroundColor: "#4b2e1a", color: "white"}}>Barbecue</button>
+        <button className='bt_sauce' onClick={() => valider(42, "Sauce burger")} style={{backgroundColor: "#c85019"}}>Burger</button>
         <br/>
         <button className='bt_annuler' onClick={() => valider(0)}>Annuler</button>
       </div>
