@@ -755,52 +755,51 @@
 
 .prod-container {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  padding: 1%;
+  align-items: center;
+  flex-direction: column;
 }
 
 .prod_produit {
-  width: 48%;
+  width: 70%;
   margin: 0% 0% 3% 1%;
-}
-
-.prod_produit h2 {
   border: solid 1px #ccc;
   border-radius: 8px;
   background-color: #f9f9f9;
   color: black;
-  padding: 20px 20px;
+  padding: 10px 20px; /* Ajout d'un padding plus confortable */
+  display: flex; /* Utilisation de flexbox */
+  align-items: center; /* Alignement vertical */
+  justify-content: space-between; /* Espace entre le titre et les boutons */
+}
+
+.prod_produit h2 {
   margin: 0;
+  font-size: 1.5rem; /* Ajuste la taille si nécessaire */
 }
 
-.prod_recette{
-  padding: 2%;
-  line-height: 30px;
-  font-size: 22px;
-  display:none;
-  border: solid 1px #ccc;
-  border-radius: 2px 2px 8px 8px;
-  background-color: #444;
+.prod_options {
+  display: flex; /* Aligne les boutons horizontalement */
+  gap: 10px; /* Espace entre les boutons */
 }
 
-.prod_recette.show {
-  display:block;
+.prod_options button {
+  border: none;
+  border-radius: 50%; /* Forme ronde pour simuler des icônes */
+  padding: 2px 5px;
 }
 
-.nc_gestion_page {
-  width: 100%;
-  height: 9%;
-  margin: 0 1%;
+.prod_options .prod_bt_show {
+  background-color: #4caf50; /* Vert */
 }
 
-.nc_bt_prec, .nc_bt_suiv {
-  height: 100%;
-  width: 32%;
-  margin: 0 1%;
-  background-color: #8bf;
+.prod_options button:nth-child(2) {
+  background-color: #2196f3; /* Bleu */
 }
 
-.nc_disabled { background-color: #aeaeae !important;}
-.nc_num_page { font-size: 22px;}
-.nc_imgs {width: 50px;}
+.prod_options button:nth-child(3) {
+  background-color: #f44336; /* Rouge */
+}
+
+.prod_options img {
+  width: 40px;
+}

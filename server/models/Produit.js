@@ -5,17 +5,7 @@ class Produit {
     return new Promise((resolve, reject) => {
       db.query('SELECT * FROM produits ORDER BY id_type', async (err, produits) => {
         if (err) reject(err);
-        
-        for (let i = 0; i < produits.length; i++) {
-          try {
-            produits[i].recette = await this.get_recette(produits[i].id_produit);
-          } catch (error) {
-            reject(error);
-            return;
-          }
-        }
         resolve(produits);
-
       });
     });
   }
@@ -139,6 +129,32 @@ class Produit {
       });
     });
   }
+
+  static async save(id_produit, data) {
+    return new Promise((resolve, reject) => {
+      if (!id_produit || !data || Object.keys(data).length === 0) {
+        reject(new Error('L\'ID du produit et les données sont requis.'));
+        return;
+      }
+
+      const fields = Object.keys(data).map(key => `${key} = ?`).join(', ');
+      const values = Object.values(data);
+      values.push(id_produit);
+
+      const q = `UPDATE produits SET ${fields} WHERE id_produit = ?`;
+
+      db.query(db.format(q, values), (err, result) => {
+        if (err) {
+          reject(new Error('Erreur lors de la mise à jour du produit: ' + err.message));
+        } else if (result.affectedRows === 0) {
+          reject(new Error('Aucun produit trouvé avec cet ID.'));
+        } else {
+          resolve('Produit mis à jour avec succès.');
+        }
+      });
+    });
+  }
+  
 }
 
 

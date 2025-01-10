@@ -53,3 +53,12 @@ export const stockIngredient = async (req, res) => {
         res.status(404).json({ message: error.message });
     }
 }
+
+export const save = async (req, res) => {
+    try {
+        const ing = await Produit.save(req.params.id, req.body);
+        res.status(200).json(ing);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
