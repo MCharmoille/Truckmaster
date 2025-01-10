@@ -128,7 +128,7 @@ class Commande {
   
       const statistiques = [];
   
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < 13; i++) {
         const month = (currentMonth - i + 11) % 12 + 1; // Calcul du mois
         const year = currentYear - Math.floor((12 - currentMonth + i) / 12); // Calcul de l'année
   
