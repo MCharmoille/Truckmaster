@@ -11,7 +11,7 @@ export const getProduits = async (req, res) => {
 
 export const get_recette = async (req, res) => {
     try {
-        const recette = await Produit.get_recette(req, res);
+        const recette = await Produit.get_recette(req.query.id_produit);
         res.status(200).json(recette);
     } catch (error) {
         res.status(404).json({ message: error.message });
@@ -20,7 +20,7 @@ export const get_recette = async (req, res) => {
 
 export const getProduitsAffiches = async (req, res) => {
     try {
-        const produits = await Produit.getProduitsAffiches(req.params.id_type);
+        const produits = await Produit.getProduitsAffiches();
         res.status(200).json(produits);
     } catch (error) {
         res.status(404).json({ message: error.message });

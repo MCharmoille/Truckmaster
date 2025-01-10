@@ -17,7 +17,6 @@ const Add = () => {
         time:"",
         paye:null
     });
-    const [typeProduit, setTypeProduit] = useState(1);
     const [dates, setDates] = useState([]);
     const [tranches, setTranches] = useState([]);
     const [isMidiSoir, setIsMidiSoir] = useState({"midi" : 1, "soir" : 1})
@@ -83,14 +82,14 @@ const Add = () => {
     }, [commande.date]);
 
     useEffect(() => {
-        axios.get(process.env.REACT_APP_API_URL + `produits/produitsAffiches/${typeProduit}`)
+        axios.get(process.env.REACT_APP_API_URL + `produits/produitsAffiches`)
             .then((response) => {
                 setproduitsAffiches(response.data);
             })
             .catch((error) => {
                 console.error("Erreur lors de la récupération des produits à afficher :", error);
             });
-    }, [typeProduit]);
+    }, []);
 
     const formatDate = (date) => {
         return moment(date).format('dddd D MMMM');
@@ -105,12 +104,6 @@ const Add = () => {
                 break;
             case "setModalBoissons":
                 setModalBoissons(true);
-                break;
-            case "switchTypeProduit":
-                if(typeProduit === 1 ) // affichage des tacos
-                    setTypeProduit(2);
-                else  // affichage des burgers
-                    setTypeProduit(1);  
                 break;
             default : 
                 break;
@@ -141,11 +134,11 @@ const Add = () => {
         if(qte === -1){ // suppression d'un item, on cherche le tempId de la cible
             id_pc = produitsCommandes.findIndex((p) => (p.tempId === id));
         }
-        else { // ajout d'un item, on utilise l'id produit
+        else { // ajout d'un item, on cherche si il y en a déjà dans la commande (non modifié)
             id_pc = produitsCommandes.findIndex((p) => (p.id_produit === id) && (!p.modifications || p.modifications.length === 0) && (p.custom === 0));
         }
 
-        if (id_pc !== -1) { // item trouvé dans la liste
+        if (id_pc !== -1) { // item trouvé dans la liste, on ajoute ou diminue la quantité
             const pc_clone = [...produitsCommandes];
             pc_clone[id_pc].qte += qte;
             if(pc_clone[id_pc].qte < 1) pc_clone.splice(id_pc, 1);
@@ -204,11 +197,33 @@ const Add = () => {
         <div className='form'>
             {/* Partie gauche (liste des produits) */}
             <div className='zone_gauche'>
-                {produitsAffiches.filter((produit) => produit.display === 1).map((produit, index) => (
-                    <div className={`bt_produit ${produit.id_produit === 3 || produit.id_produit === 98 ? 'bt_large' : ''} ${produit.id_produit === 99 ? 'bt_gris' : ''}`} 
-                         onClick={() => {handleClick(produit.id_produit)}}
-                         key={index}> {produit.id_produit !== 99 ? produit.nom : (typeProduit === 1 ? "Voir les tacos" : "Voir les burgers")} </div>
-                ))}
+                <div className='bt_produits'>
+                    {(() => {
+                        const produitsFiltres = produitsAffiches.filter(produit => produit.display === 1);
+                        const produitsComplet = produitsFiltres.length < 8 
+                            ? [...produitsFiltres, ...Array(8 - produitsFiltres.length).fill({ 
+                                id_produit: null, 
+                                nom: '' 
+                            })] 
+                            : produitsFiltres;
+
+                        return produitsComplet.map((produit, index) => (
+                            <div 
+                                className={`bt_produit`} 
+                                onClick={() => produit.id_produit && handleClick(produit.id_produit)}
+                                key={index}>
+                                {produit.nom}
+                            </div>
+                        ));
+                    })()}
+                </div>
+                <div className='bt_boissons'>
+                    {produitsAffiches.filter((produit) => produit.display === -1).map((produit, index) => (
+                        <div className={`bt_produit bt_large`} 
+                            onClick={() => {handleClick(produit.id_produit)}}
+                            key={index}> {produit.nom} </div>
+                    ))}
+                </div>
             </div>
             {/* Partie droite (récap + total) */}
             <div className='zone_droite'>

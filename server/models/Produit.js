@@ -3,45 +3,47 @@ import { db, customConsoleLog } from '../index.js';
 class Produit {
   static async find() {
     return new Promise((resolve, reject) => {
-      db.query('SELECT * FROM produits', (err, results) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(results);
+      db.query('SELECT * FROM produits ORDER BY id_type', async (err, produits) => {
+        if (err) reject(err);
+        
+        for (let i = 0; i < produits.length; i++) {
+          try {
+            produits[i].recette = await this.get_recette(produits[i].id_produit);
+          } catch (error) {
+            reject(error);
+            return;
+          }
         }
+        resolve(produits);
+
       });
     });
   }
 
-  static async get_recette(req, res){
+  static async get_recette(id_produit){
     return new Promise((resolve, reject) => {
-        const q = "SELECT r.*, i.* FROM recette r JOIN ingredients i ON r.id_ingredient=i.id_ingredient WHERE r.id_produit = (?)";
-        db.query(q, [req.query.id_produit], (err, recette) =>{
+        db.query("SELECT r.*, i.* FROM recette r JOIN ingredients i ON r.id_ingredient=i.id_ingredient WHERE r.id_produit = "+id_produit, (err, recette) =>{
             if(err) reject(err)
-            else{
-              return resolve(recette);
-            }
+            
+            return resolve(recette);
         });
     });
   }
 
-  static async getProduitsAffiches(type = null){
+  static async getProduitsAffiches(){
       return new Promise((resolve, reject) => {
-      if(type == null) type = 1;
 
-      db.query("SELECT * FROM produits WHERE id_type IN ("+type+", 3)", (err, produits) =>{
+      db.query("SELECT * FROM produits WHERE display > 0", (err, produits) =>{
           if(err) reject(err)
           else{
             produits.forEach(produit => {
               produit.action = "modifier";
             })
 
-            // switch
-            produits.push({id_produit : 99, display : 1, action : "switchTypeProduit",  nom : "", prix : 0});
             // frite
-            produits.push({id_produit : 3, display : 1, action : "modifier", nom : "Frite", prix_produit : 3});
+            produits.push({id_produit : 3, display : -1, action : "modifier", nom : "Frites", prix_produit : 3});
             // boissons
-            produits.push({id_produit : 98, display : 1, action : "setModalBoissons",  nom : "Boisson", prix : 2});
+            produits.push({id_produit : 98, display : -1, action : "setModalBoissons",  nom : "Boissons", prix : 2});
             
             return resolve(produits);
           }

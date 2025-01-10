@@ -95,23 +95,33 @@
   
   /* Styles pour la partie gauche */
   .zone_gauche {
-    flex: 1; /* Occupe tout l'espace disponible */
+    width: 55%;
+  }
+
+  .bt_produits {
+    overflow-x: auto;
+    height: 80%;
     display: flex;
-    flex-wrap: wrap; /* Pour que les cases aient 2 par ligne */
+    flex-wrap: wrap;
+  }
+
+  .bt_boissons {
+    height: 20%;
+    border-top: solid white 5px;
   }
   
   .bt_produit {
     width: 48%; /* 2 cases par ligne */
     box-sizing: border-box; 
     border: 1px solid #ccc;
-    font-size: 23px;
+    font-size: 22px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 10px;
     margin: 1%;
     background-color: #444;
-    height: 16%;
+    min-height: 18%;
   }
 
   .bt_gris {
@@ -168,6 +178,7 @@
 
   .bt_large {
     width: 100% !important;
+    height: 48% !important;
   }
 
 #input_libelle {
@@ -741,3 +752,55 @@
   font-size: 23px;
   padding: 1%;
 }
+
+.prod-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 1%;
+}
+
+.prod_produit {
+  width: 48%;
+  margin: 0% 0% 3% 1%;
+}
+
+.prod_produit h2 {
+  border: solid 1px #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  color: black;
+  padding: 20px 20px;
+  margin: 0;
+}
+
+.prod_recette{
+  padding: 2%;
+  line-height: 30px;
+  font-size: 22px;
+  display:none;
+  border: solid 1px #ccc;
+  border-radius: 2px 2px 8px 8px;
+  background-color: #444;
+}
+
+.prod_recette.show {
+  display:block;
+}
+
+.nc_gestion_page {
+  width: 100%;
+  height: 9%;
+  margin: 0 1%;
+}
+
+.nc_bt_prec, .nc_bt_suiv {
+  height: 100%;
+  width: 32%;
+  margin: 0 1%;
+  background-color: #8bf;
+}
+
+.nc_disabled { background-color: #aeaeae !important;}
+.nc_num_page { font-size: 22px;}
+.nc_imgs {width: 50px;}
