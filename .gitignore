@@ -1,0 +1,5 @@
+# React (client)
+client/truckmaster/node_modules/
+
+# Node.js (server)
+server/node_modules/
