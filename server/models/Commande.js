@@ -128,11 +128,11 @@ class Commande {
   
       const statistiques = [];
   
-      for (let i = 0; i < 13; i++) {
+      for (let i = 0; i < 17; i++) {
         const month = (currentMonth - i + 11) % 12 + 1; // Calcul du mois
         const year = currentYear - Math.floor((12 - currentMonth + i) / 12); // Calcul de l'année
   
-        const monthString = month < 14 ? `0${month}` : `${month}`; // Formatage du mois
+        const monthString = month < 10 ? `0${month}` : `${month}`; // Formatage du mois
         const commandes = await this.getCommandeparDate(`${year}-${monthString}-`);
   
         const paiements = paiementsInitial.map(p => ({ ...p, valeur: 0 })); // Réinitialiser les paiements pour chaque mois
