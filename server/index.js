@@ -8,6 +8,7 @@ import commandesRoutes from './routes/commandes.js';
 import datesRoutes from './routes/dates.js';
 import utilisateursRoutes from './routes/utilisateurs.js';
 import tranchesRoutes from './routes/tranches.js';
+import ingredientsRoutes from './routes/ingredients.js';
 
 import https from 'https';
 import fs from 'fs';
@@ -65,6 +66,7 @@ app.use('/commandes', commandesRoutes);
 app.use('/dates', datesRoutes);
 app.use('/utilisateurs', utilisateursRoutes);
 app.use('/tranches', tranchesRoutes);
+app.use('/ingredients', ingredientsRoutes);
 
 // fonction utilitaire, si il y en a plusieurs, créer un fichier util.js
 function customConsoleLog(message) {

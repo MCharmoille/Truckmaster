@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Produits = () => {
   const [produits, setProduits] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getProduits = async () => {
@@ -41,19 +43,20 @@ const Produits = () => {
   
 
   return (
-    <div className='prod-container'>  
+    <div className='prods-container'>  
       {produits.map((produit, p_index) => {
         const isDisplayOn = produit.display === 1;
   
         return (
-          <div className={`prod_produit`} key={p_index}>
+          <div className={`prods_produit`} key={p_index}>
             <h2>{produit.nom}</h2>
-            <div className='prod_options' display={produit.display}>
-              <button className={isDisplayOn ? "prod_bt_show" : "prod_bt_hide"} onClick={() => changeDisplay(p_index)}> 
+            <div className='prods_options' display={produit.display}>
+              <button className={isDisplayOn ? "prods_bt_show" : "prods_bt_hide"} onClick={() => changeDisplay(p_index)}> 
                 <img src={require(`../img/${isDisplayOn ? "show" : "hide"}.png`)} alt="show" /> 
               </button>
-              <button> <img src={require(`../img/edit.png`)} alt="edit" /> </button>
-              <button> <img src={require(`../img/bin.png`)} alt="bin" /> </button>
+              <button onClick={() => navigate(`/produit/${produit.id_produit}`)}> 
+                <img src={require(`../img/edit.png`)} alt="edit" />
+              </button>
             </div>
           </div>
         );

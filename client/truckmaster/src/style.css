@@ -753,13 +753,13 @@
   padding: 1%;
 }
 
-.prod-container {
+.prods-container {
   display: flex;
   align-items: center;
   flex-direction: column;
 }
 
-.prod_produit {
+.prods_produit {
   width: 70%;
   margin: 0% 0% 3% 1%;
   border: solid 1px #ccc;
@@ -772,34 +772,62 @@
   justify-content: space-between; /* Espace entre le titre et les boutons */
 }
 
-.prod_produit h2 {
+.prods_produit h2 {
   margin: 0;
   font-size: 1.5rem; /* Ajuste la taille si nécessaire */
 }
 
-.prod_options {
+.prods_options {
   display: flex; /* Aligne les boutons horizontalement */
   gap: 10px; /* Espace entre les boutons */
 }
 
-.prod_options button {
+.prods_options button {
   border: none;
   border-radius: 50%; /* Forme ronde pour simuler des icônes */
   padding: 2px 5px;
 }
 
-.prod_options .prod_bt_show {
+.prods_options .prods_bt_show {
   background-color: #4caf50; /* Vert */
 }
 
-.prod_options button:nth-child(2) {
+.prods_options button:nth-child(2) {
   background-color: #2196f3; /* Bleu */
 }
 
-.prod_options button:nth-child(3) {
-  background-color: #f44336; /* Rouge */
-}
-
-.prod_options img {
+.prods_options img {
   width: 40px;
 }
+
+
+/* PRODUITS */
+.prod_container { padding: 16px; font-family: Arial, sans-serif; color: #333;}
+.prod_info { background: #f9f9f9; padding: 16px; border-radius: 8px; margin-bottom: 20px; position: relative;}
+.prod_info h1 { font-size: 24px; margin: 12px 0; text-align: center;}
+.prod_prix { display: flex; justify-content: center; font-size: 18px;}
+.prod_retour { position: absolute; padding: 8px 12px; font-size: 18px; color: #fff; background-color: #007bff; border: none; border-radius: 4px;}
+.prod_recette { background: #fff; padding: 16px; border-radius: 8px; margin-bottom: 20px;}
+.prod_recette ul { padding: 0;}
+.prod_ingredient { display: grid; grid-template-columns: 80px 120px 1fr 100px; padding: 12px 0; border-bottom: 1px solid #eee;}
+.prod_ingredient:last-child { border-bottom: none;}
+.prod_drag { text-align: center;}
+.prod_ingredient_qte { text-align: center; font-size: 18px; font-weight: bold;}
+.prod_ingredient_nom { font-size: 20px;}
+.prod_ingredient_delete { font-size: 16px; border: none; border-radius: 4px; background-color: #dc3545; color: white;}
+.prod_ingredient_new { padding: 12px 0 0 0; text-align: center;}
+.prod_ingredient_new button { background-color: #28a745; color: white; padding: 8px 16px; font-size: 18px; border: none; border-radius: 4px;}
+.prod_stat { background: #f9f9f9; padding: 16px; border-radius: 8px;}
+.prod_stat h2 { font-size: 20px;}
+.prod_graph_placeholder { background-color: #e9ecef; height: 200px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;}
+
+/* MODAL INGREDIENTS */
+.ingr_overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;}
+.ingr_content { background-color: white; border-radius: 8px; padding: 20px; width: 90%; max-width: 500px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); position: relative; display: flex; flex-direction: column; gap: 16px;}
+.ingr_content h3 { margin: 0; font-size: 1.5em; font-weight: bold; color: #333;}
+.ingr_content input[type='text'] { padding: 10px; font-size: 1em; width: 100%; border: 1px solid #ccc; border-radius: 4px; margin-top: 10px; box-sizing: border-box;}
+.ingr_list { list-style-type: none; padding: 0; margin: 10px 0; max-height: 200px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px;}
+.ingr_item { padding: 10px;}
+.ingr_new input[type='text'] { width: 80%;}
+.ingr_new button { padding: 10px; font-size: 1em; background-color: #bbb; color: white; border: none; border-radius: 4px;}
+.ingr_close { position: absolute; top: 10px; right: 10px; background: none; border: none; color: #999; font-size: 1.7em;}

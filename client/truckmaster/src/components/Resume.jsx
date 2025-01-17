@@ -36,7 +36,7 @@ const Resume = () => {
           <div className='res_tps'>
             {data.type_produit.map((tp, tp_index) => (
               <div className='res_tp' key={tp_index}>
-                <img className='res_icone' src={require(`../img/${tp.icon}.png`)} alt={tp.icon} />
+                <img className='res_icone' src={require(`../img/type_produit/${tp.id_type}.png`)} alt={tp.nom} />
                   {tp.qte !== 0 && tp.id_type !== 4 ? <h3>{tp.qte} x {tp.nom}</h3> : ""}
                   {tp.produits.length !== 0 ? (
                     tp.produits.map((produit, pr_index) => (

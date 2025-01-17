@@ -1,7 +1,7 @@
 import { db, customConsoleLog } from '../index.js';
 
 class Produit {
-  static async find() {
+  static async getProduits() {
     return new Promise((resolve, reject) => {
       db.query('SELECT * FROM produits ORDER BY id_type', async (err, produits) => {
         if (err) reject(err);
@@ -9,16 +9,31 @@ class Produit {
       });
     });
   }
-
-  static async get_recette(id_produit){
+  
+  static async getProduit(id_produit) {
     return new Promise((resolve, reject) => {
-        db.query("SELECT r.*, i.* FROM recette r JOIN ingredients i ON r.id_ingredient=i.id_ingredient WHERE r.id_produit = "+id_produit, (err, recette) =>{
-            if(err) reject(err)
-            
-            return resolve(recette);
+        db.query("SELECT * FROM produits WHERE id_produit = ?", [id_produit], (err, produits) => {
+            if (err) return reject(err);
+
+            if (produits.length === 0) {
+                return reject(new Error("Produit introuvable"));
+            }
+
+            const produit = produits[0]; 
+
+            db.query(
+                "SELECT r.*, i.* FROM recette r JOIN ingredients i ON r.id_ingredient = i.id_ingredient WHERE r.id_produit = ?",
+                [id_produit],
+                (err, recette) => {
+                    if (err) return reject(err);
+
+                    produit.recette = recette;
+                    return resolve(produit);
+                }
+            );
         });
     });
-  }
+}
 
   static async getProduitsAffiches(){
       return new Promise((resolve, reject) => {
@@ -136,24 +151,89 @@ class Produit {
         reject(new Error('L\'ID du produit et les données sont requis.'));
         return;
       }
-
+      id_produit *= 1;
+  
+      if (data.recette) {
+        var recette = data.recette;
+        delete data.recette;
+      }
+  
       const fields = Object.keys(data).map(key => `${key} = ?`).join(', ');
       const values = Object.values(data);
       values.push(id_produit);
-
+  
       const q = `UPDATE produits SET ${fields} WHERE id_produit = ?`;
-
-      db.query(db.format(q, values), (err, result) => {
+  
+      db.beginTransaction((err) => {
         if (err) {
-          reject(new Error('Erreur lors de la mise à jour du produit: ' + err.message));
-        } else if (result.affectedRows === 0) {
-          reject(new Error('Aucun produit trouvé avec cet ID.'));
-        } else {
-          resolve('Produit mis à jour avec succès.');
+          reject(new Error('Erreur lors du début de la transaction: ' + err.message));
+          return;
         }
+  
+        db.query(db.format(q, values), (err, result) => {
+          if (err) {
+            db.rollback(() => {
+              reject(new Error('Erreur lors de la mise à jour du produit: ' + err.message));
+            });
+            return;
+          } else if (result.affectedRows === 0) {
+            db.rollback(() => {
+              reject(new Error('Aucun produit trouvé avec cet ID.'));
+            });
+            return;
+          }
+  
+          if (recette && Array.isArray(recette)) {
+            const deleteQuery = `DELETE FROM recette WHERE id_produit = ?`;
+            db.query(db.format(deleteQuery, [id_produit]), (err) => {
+              if (err) {
+                db.rollback(() => {
+                  reject(new Error('Erreur lors de la suppression des anciennes recettes: ' + err.message));
+                });
+                return;
+              }
+  
+              const insertQuery = `INSERT INTO recette (id_produit, id_ingredient, qte) VALUES ?`;
+              const recetteValues = recette.map(item => [id_produit, item.id_ingredient, item.qte]);
+
+              db.query(db.format(insertQuery, [recetteValues]), (err) => {
+                if (err) {
+                  db.rollback(() => {
+                    reject(new Error('Erreur lors de l\'insertion des nouvelles recettes: ' + err.message));
+                  });
+                  return;
+                }
+  
+                db.commit((err) => {
+                  if (err) {
+                    db.rollback(() => {
+                      reject(new Error('Erreur lors du commit de la transaction: ' + err.message));
+                    });
+                    return;
+                  }
+  
+                  resolve('Produit et recettes mis à jour avec succès.');
+                });
+              });
+            });
+          } else {
+            // Si aucune recette n'est fournie, simplement commit la transaction
+            db.commit((err) => {
+              if (err) {
+                db.rollback(() => {
+                  reject(new Error('Erreur lors du commit de la transaction: ' + err.message));
+                });
+                return;
+              }
+  
+              resolve('Produit mis à jour avec succès.');
+            });
+          }
+        });
       });
     });
   }
+  
   
 }
 

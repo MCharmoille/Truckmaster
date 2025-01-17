@@ -2,16 +2,16 @@ import Produit from '../models/Produit.js';
 
 export const getProduits = async (req, res) => {
     try {
-        const produits = await Produit.find();
+        const produits = await Produit.getProduits();
         res.status(200).json(produits);
     } catch (error) {
         res.status(404).json({ message: error.message });
     }
 }
 
-export const get_recette = async (req, res) => {
+export const getProduit = async (req, res) => {
     try {
-        const recette = await Produit.get_recette(req.query.id_produit);
+        const recette = await Produit.getProduit(req.query.id_produit);
         res.status(200).json(recette);
     } catch (error) {
         res.status(404).json({ message: error.message });

@@ -1,10 +1,10 @@
 import express from 'express';
-import { getProduits, get_recette, getIngredientsparDate, checkIngredient, stockIngredient, getProduitsAffiches, save } from '../controllers/produits.js';
+import { getProduits, getProduit, getIngredientsparDate, checkIngredient, stockIngredient, getProduitsAffiches, save } from '../controllers/produits.js';
 
 const router = express.Router();
 
 router.get('/', getProduits);
-router.get('/recette', get_recette);
+router.get('/produit', getProduit);
 router.get('/produitsAffiches', getProduitsAffiches);
 router.get('/ingredients/:date', getIngredientsparDate);
 router.post('/ingredients/check', checkIngredient);

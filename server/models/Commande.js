@@ -80,10 +80,10 @@ class Commande {
     try {
       const commandes = await this.getCommandeparDate(date);
       
-      const type_produit = [{id_type: 1, nom: "Burgers", produits: [], qte: 0, icon: "burger"},
-                            {id_type: 2, nom: "Tacos", produits: [], qte: 0, icon: "tacos"},
-                            {id_type: 3, nom: "Boissons", produits: [], qte: 0, icon: "boisson"},
-                            {id_type: 4, nom: "Accompagnements", produits: [], qte: 0, icon: "frites"}
+      const type_produit = [{id_type: 1, nom: "Burgers", produits: [], qte: 0},
+                            {id_type: 2, nom: "Tacos", produits: [], qte: 0},
+                            {id_type: 3, nom: "Boissons", produits: [], qte: 0},
+                            {id_type: 4, nom: "Accompagnements", produits: [], qte: 0}
                            ];
       const paiements = [{id: "c", nom: "Carte", valeur: 0},
                          {id: "m", nom: "Espèce", valeur: 0},

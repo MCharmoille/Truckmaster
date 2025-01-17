@@ -10,11 +10,11 @@ const Modal = ({ produit, onClose }) => {
   const [showCustomSauce, setCustomSauce] = useState(false);
   
   useEffect(() => {
-    const get_recette = async () => {
+    const getProduit = async () => {
       try {
-        const res = await axios.get(process.env.REACT_APP_API_URL+'produits/recette?id_produit='+produit.id_produit);
+        const res = await axios.get(process.env.REACT_APP_API_URL+'produits/produit?id_produit='+produit.id_produit);
         
-        res.data.forEach((ingredient) => {
+        res.data.recette.forEach((ingredient) => {
           // vérification que le produit était déjà modifié
           const modif = produit.modifications?produit.modifications.findIndex((i) => i.id_ingredient === ingredient.id_ingredient):-1;
           if(modif !== -1)
@@ -22,12 +22,12 @@ const Modal = ({ produit, onClose }) => {
           else
             ingredient.modificateur = 0;
         });
-        setRecette(res.data);
+        setRecette(res.data.recette);
       } catch (err) {
         console.log(err);
       }
     };
-    get_recette();
+    getProduit();
   }, [produit.id_produit, produit.modifications]);
 
   const modifier_recette = (id, action) => {

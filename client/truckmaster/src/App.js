@@ -10,6 +10,7 @@ import Parametres from "./components/Parametres";
 import Statistiques from "./components/Statistiques";
 import Connexion from "./components/Connexion";
 import Produits from "./components/Produits";
+import Produit from "./components/Produit";
 import "./style.css";
 import home from './img/home.png';
 import list from './img/list.png';
@@ -50,6 +51,7 @@ function App() {
                 <Route path="/statistiques" element={<Statistiques/>}/>
                 <Route path="/pensebete" element={<PenseBete/>}/>
                 <Route path="/produits" element={<Produits/>}/>
+                <Route path="/produit/:id" element={<Produit />} />
                 <Route path="/parametres" element={<Parametres isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}/>}/>
               </Routes>
             </div>
