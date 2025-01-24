@@ -115,7 +115,7 @@ const Add = () => {
 
         commande.date = commande.date || dates[0].jour;
         commande.time = commande.time || tranches[0].tranche;
-        const updatedCommande = {  libelle: document.querySelector('#input_libelle').value, 
+        const updatedCommande = {  libelle: document.querySelector('.com_libelle').value, 
                                    date_commande: `${commande.date} ${commande.time}:00`, 
                                    produits: produitsCommandes
                                 };
@@ -194,10 +194,9 @@ const Add = () => {
     }
 
     return (
-        <div className='form'>
-            {/* Partie gauche (liste des produits) */}
-            <div className='zone_gauche'>
-                <div className='bt_produits'>
+        <div className='com_container'>
+            <div className='com_produits_container'>
+                <div className='com_produits'>
                     {(() => {
                         const produitsFiltres = produitsAffiches.filter(produit => produit.display === 1);
                         const produitsComplet = produitsFiltres.length < 8 
@@ -209,7 +208,7 @@ const Add = () => {
 
                         return produitsComplet.map((produit, index) => (
                             <div 
-                                className={`bt_produit`} 
+                                className={`com_produit`} 
                                 onClick={() => produit.id_produit && handleClick(produit.id_produit)}
                                 key={index}>
                                 {produit.nom}
@@ -217,25 +216,24 @@ const Add = () => {
                         ));
                     })()}
                 </div>
-                <div className='bt_boissons'>
+                <div className='com_prod_large_container'>
                     {produitsAffiches.filter((produit) => produit.display === -1).map((produit, index) => (
-                        <div className={`bt_produit bt_large`} 
+                        <div className={`com_produit com_produit_large`} 
                             onClick={() => {handleClick(produit.id_produit)}}
                             key={index}> {produit.nom} </div>
                     ))}
                 </div>
             </div>
-            {/* Partie droite (récap + total) */}
-            <div className='zone_droite'>
-                <div className='recap'> 
-                    <input type='text' id='input_libelle' placeholder='Nouvelle Commande' name='libelle' defaultValue={commande.libelle}/>
+            <div className='com_details_container'>
+                <div className='com_details'> 
+                    <input type='text' className='com_libelle' placeholder='Nouvelle Commande' name='libelle' defaultValue={commande.libelle}/>
                     <div> 
-                        <select id="input_date" name="date" value={commande.date} onChange={(e) => {setCommande((prevCommande) => ({ ...prevCommande, date: e.target.value }));}}>
+                        <select className="com_date" name="date" value={commande.date} onChange={(e) => {setCommande((prevCommande) => ({ ...prevCommande, date: e.target.value }));}}>
                             {dates.map((date, d_index) => (
                                 <option key={d_index} value={date.jour}>{formatDate(date.jour)}</option>
                             ))}
                         </select>
-                        <select id='input_time' name='time' value={commande.time} onChange={(e) => {setCommande((prevCommande) => ({ ...prevCommande, time: e.target.value }));}}>
+                        <select className='com_time' name='time' value={commande.time} onChange={(e) => {setCommande((prevCommande) => ({ ...prevCommande, time: e.target.value }));}}>
                             {tranches.map((tranche, t_index) => (
                                 (tranche.is_midi === 1 && isMidiSoir["midi"] === 1) || (tranche.is_midi === 0 && isMidiSoir["soir"] === 1) ? <option key={t_index}>{tranche.tranche}</option> : ""
                             ))}
@@ -243,13 +241,12 @@ const Add = () => {
                     </div>
                     <hr/>
 
-                    <div className='contenu_commande'>
                     {produitsCommandes.map((produit, index) => (
-                        <div key={index}> 
-                            <div style={{ display: 'flex', justifyContent: 'space-between' }}> 
+                        <div key={index} className='com_pc_container'> 
+                            <div className='com_pc'> 
                                 <div> 
-                                    <span className='enlever_article' onClick={() => modifierCommande(produit.tempId, -1)}> - </span> 
-                                    <span onClick={() => {setSelectedProduct(produit); setModalCustom(true);}} style={produit.custom === 1 ? {"color":"yellow"} : {}}>
+                                    <span className='com_remove_pc' onClick={() => modifierCommande(produit.tempId, -1)}> - </span> 
+                                    <span onClick={() => {setSelectedProduct(produit); setModalCustom(true);}}>
                                         {produit.qte} x {produit.nom}
                                     </span>
                                 </div> 
@@ -257,7 +254,7 @@ const Add = () => {
                             </div>
                             {produit.modifications && produit.modifications.length > 0 ? (
                                 produit.modifications.map((modif, m_index) => (
-                                    <div className={`modification modificateur_${modif.modificateur}`} key={m_index}>
+                                    <div className={`com_modification glo_modificateur_${modif.modificateur}`} key={m_index}>
                                         {modif.modificateur === -1 ? "SANS " : modif.modificateur === 1 ? "SUPPLÉMENT " : ""}{modif.nom}
                                     </div>
                                 ))
@@ -266,17 +263,16 @@ const Add = () => {
                     ))}
                         
                         
-                    </div>
                 </div>
-                <div className='total'>{total} €</div>
-                <div className='deja_paye'> { commande.paye !== null ? "Attention, cette commande à déjà été payée." :""} </div>
+                <div className='com_total'>{total} €</div>
+                <div className='com_message_paye'> { commande.paye !== null ? "Attention, cette commande à déjà été payée." :""} </div>
                 {commandeId ? 
-                    <div className='button-container'>
-                        <div className='ajouter_small' onClick={validerCommande}> Modifier </div>
-                        <div className='suppr_small' onClick={() => setshowConfirm(true)}> X </div>
+                    <div className='com_bt_edit'>
+                        <div className='com_edit' onClick={validerCommande}> Modifier </div>
+                        <div className='com_delete' onClick={() => setshowConfirm(true)}> X </div>
                     </div>
                             : 
-                    <div className='ajouter' onClick={validerCommande}> Ajouter </div>
+                    <div className='com_add' onClick={validerCommande}> Ajouter </div>
                 }
             </div>
 

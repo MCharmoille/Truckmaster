@@ -154,13 +154,6 @@ const Parametres = ({isLoggedIn, setIsLoggedIn}) => {
           ))} 
         </div>
 
-        <div className='par_section_title'> -- Couleurs de l'application : <i>( Bientôt ! )</i></div>
-        <div className='par_section' hidden>
-          Retrait d'un ingrédient :
-          Ajout d'un ingrédient :
-          Produit avec un prix modifié : 
-        </div>
-
         <div> <button onClick={handleLogout} className='par_logout'> Se déconnecter</button>  </div>
     </div>
   );

@@ -82,17 +82,17 @@ const Commandes = () => {
   return (
     <div>
       <Calendrier onDateChange={handleDateChange} />
-      <div className='filtre_commandes'>
+      <div className='coms_filtres'>
         <input type="checkbox" id="cb_midi" name="cb_midi" checked={selectedDate.cb_midi} onChange={(e) => checkCb(e)}/> Midi 
         <input type="checkbox" id="cb_soir" name="cb_soir" checked={selectedDate.cb_soir} onChange={(e) => checkCb(e)}/> Soir
       </div>
       {tranches.map((tranche, t_index) => (
-        <div className={"tranche" + (tranche.type === 1 ? (!selectedDate.cb_midi ? " hidden" : "") : (!selectedDate.cb_soir ? " hidden" : ""))} key={t_index}>
+        <div className={"coms_tranche" + (tranche.type === 1 ? (!selectedDate.cb_midi ? " hidden" : "") : (!selectedDate.cb_soir ? " hidden" : ""))} key={t_index}>
           <h2>{tranche.time}</h2>
-          <div className="commandes">
+          <div className="coms_container">
             {tranche.content.length !== 0 ? (
               tranche.content.map((commande, c_index) => (
-                <div className={`commande ${commande.moyen_paiement !== null ? 'paye' : ''}`} key={c_index} onClick={() => navigate("/add/"+commande.id_commande)}>
+                <div className={`coms_commande ${commande.moyen_paiement !== null ? 'coms_paye' : ''}`} key={c_index} onClick={() => navigate("/add/"+commande.id_commande)}>
                   <h2>{commande.libelle} - {commande.total} €</h2>
                   <div className='produits'>
                     {commande.produits.length !== 0 ? (
@@ -101,7 +101,7 @@ const Commandes = () => {
                                 <span style={produit.custom === 1 ? {"color":"yellow"} : {}}> {produit.qte} x {produit.nom} {produit.custom === 1 ? "("+produit.prix+"€)" : ""}</span>
                                 {produit.modifications.length !== 0 ? (
                                     produit.modifications.map((modif, m_index) => (
-                                      <div className={`modification modificateur_${modif.modificateur}`} key={m_index}>
+                                      <div className={`coms_modification glo_modificateur_${modif.modificateur}`} key={m_index}>
                                           {modif.modificateur === -1 ? "SANS " : modif.modificateur === 1 ? "SUPPLÉMENT " : ""}{modif.nom}
                                       </div>
                                   ))
@@ -115,7 +115,7 @@ const Commandes = () => {
                   {commande.moyen_paiement !== null ? (
                     <div style={{fontSize:"15px"}}> <hr/> {commande.moyen_paiement === "c" ? "Payé par carte" : commande.moyen_paiement === "o" ? "Offert" : "Payé en espèce"} </div> 
                   ) : (
-                    <div className='paiement' onClick={(e) => {
+                    <div className='coms_paiement' onClick={(e) => {
                       e.stopPropagation();
                       paiement_commande(commande);
                     }}>

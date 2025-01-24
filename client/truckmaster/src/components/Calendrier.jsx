@@ -50,7 +50,7 @@ const Calendrier = ({ onDateChange }) => {
   };
 
   return (
-    <div className="calendrier">
+    <div className="cal_container">
       <button onClick={() => changeDay(-1)}>&#8592;</button>
       <p>{currentDate ? formatDate(currentDate.jour) : ""}</p>
       <button onClick={() => changeDay(1)}>&#8594;</button>

@@ -70,7 +70,7 @@ const PenseBete = () => {
         <Calendrier onDateChange={handleDateChange} />
         <div>
             {ingredients.length !== 0 ? (
-                <div className='pense_bete'>
+                <div className='pb_container'>
                 {ingredients.map((ing, i_index) => (
                   <div key={i_index}>
                     <input type="checkbox" checked={checkedValues[ing.id_ingredient] || 0} onChange={(event) => checkIngredient(ing.id_ingredient, event.target.checked)}/> {ing.nom}

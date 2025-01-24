@@ -58,26 +58,26 @@ const Modal = ({ produit, onClose }) => {
   };
   
   return (
-    <div className="modal-overlay">
-      <div className='modal-content'>
+    <div className="cusprod_overlay">
+      <div className='cusprod_content'>
         <h2>Personnalisation {produit.nom}</h2>
-        <div className='recette'>
+        <div className='cusprod_recette'>
           {recette.map((ingredient, index) => (
               <div key={index}> 
-                <span className={`nom_ingredient modificateur_${ingredient.modificateur}`}>
+                <span className={`cusprod_nom_ingredient modificateur_${ingredient.modificateur}`}>
                   {ingredient.modificateur === -1 ? "SANS " : ingredient.modificateur === 1 ? "SUPPLÉMENT " : ""}{ingredient.nom}
-                  {ingredient.gestion_sauce === 1 ? <img src={reload} alt="reload" className='changeSauce' onClick={() => {setSelectedIngredient(ingredient.id_ingredient); setCustomSauce(true);}} /> : null}
+                  {ingredient.gestion_sauce === 1 ? <img src={reload} alt="reload" className='cusprod_changeSauce' onClick={() => {setSelectedIngredient(ingredient.id_ingredient); setCustomSauce(true);}} /> : null}
                 </span>
-                <span className='moins' onClick={() => modifier_recette(ingredient.id_ingredient, -1)}> - </span> 
-                <span className='plus' onClick={() => modifier_recette(ingredient.id_ingredient, 1)}> + </span>
+                <span className='cusprod_moins' onClick={() => modifier_recette(ingredient.id_ingredient, -1)}> - </span> 
+                <span className='cusprod_plus' onClick={() => modifier_recette(ingredient.id_ingredient, 1)}> + </span>
               </div>
           ))}
         </div>
-        <div className='cst_prix' >
+        <div className='cusprod_prix' >
           Prix spécial : 
           <input type='number' name='libelle' placeholder={produit.prix} onChange={(e) => setPrix(e.target.value)} /> €
         </div>
-        <button className='bt_custom' onClick={valider}>Fermer</button>
+        <button className='cusprod_close' onClick={valider}>Fermer</button>
       </div>
       {showCustomSauce && (
           <CustomSauce onClose={CloseCustomSauce} />

@@ -15,14 +15,14 @@ const Modal = ({ commande, onClose }) => {
     };
 
   return (
-    <div className="modal-overlay">
-      <div className='modal-content'>
+    <div className="pai_overlay">
+      <div className='pai_content'>
         <h2>Paiement {commande.libelle} : {commande.total} €</h2>
-        <button className='bt_paiement' onClick={() => valider("c")}>Carte</button>
-        <button className='bt_paiement' onClick={() => valider("m")}>Monnaie</button>
-        <button className='bt_paiement' onClick={() => valider("h")}>Chèque</button>
-        <button className='bt_paiement' onClick={() => valider("o")}>Offert</button>
-        <button className='bt_paiement' onClick={() => valider(0)}>Annuler</button>
+        <button onClick={() => valider("c")}>Carte</button>
+        <button onClick={() => valider("m")}>Monnaie</button>
+        <button onClick={() => valider("h")}>Chèque</button>
+        <button onClick={() => valider("o")}>Offert</button>
+        <button onClick={() => valider(0)}>Annuler</button>
       </div>
     </div>
   );
