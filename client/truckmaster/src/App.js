@@ -33,11 +33,11 @@ function App() {
       <BrowserRouter>
         {isLoggedIn ? (
           <div>
-            <div className="accueil">
-              <Link to="/"> <img src={home} alt="home" className="header_icons" /> </Link>
-              <Link to="/commandes"> <img src={list} alt="list" className="header_icons" /> </Link>
-              <Link to="/add"> <img src={plus} alt="plus" className="header_icons" /> </Link>
-              <Link to="/parametres"> <img src={params} alt="params" className="header_icons" style={{ float: "right", marginRight: "10px" }}/> </Link>
+            <div className="menu">
+              <Link to="/"> <img src={home} alt="home" className="menu_icons" /> </Link>
+              <Link to="/commandes"> <img src={list} alt="list" className="menu_icons" /> </Link>
+              <Link to="/add"> <img src={plus} alt="plus" className="menu_icons" /> </Link>
+              <Link to="/parametres"> <img src={params} alt="params" className="menu_icons" style={{ float: "right", marginRight: "10px" }}/> </Link>
               <div className='acc_connecte'> {localStorage.getItem('user')} </div>
             </div>
             <div className="corps">

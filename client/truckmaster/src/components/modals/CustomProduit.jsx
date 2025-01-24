@@ -64,7 +64,7 @@ const Modal = ({ produit, onClose }) => {
         <div className='cusprod_recette'>
           {recette.map((ingredient, index) => (
               <div key={index}> 
-                <span className={`cusprod_nom_ingredient modificateur_${ingredient.modificateur}`}>
+                <span className={`cusprod_nom_ingredient glo_modificateur_${ingredient.modificateur}`}>
                   {ingredient.modificateur === -1 ? "SANS " : ingredient.modificateur === 1 ? "SUPPLÉMENT " : ""}{ingredient.nom}
                   {ingredient.gestion_sauce === 1 ? <img src={reload} alt="reload" className='cusprod_changeSauce' onClick={() => {setSelectedIngredient(ingredient.id_ingredient); setCustomSauce(true);}} /> : null}
                 </span>

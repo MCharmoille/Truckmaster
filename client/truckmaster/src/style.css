@@ -1,7 +1,15 @@
 /* GLOBAL : classe devant être les mêmes partout */
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+       -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;}
+.App{ background-color: #333; color: #fff; font-family: Arial, sans-serif; padding: 10px 5px; min-height: 98vh;}
+.corps{ margin-top: 50px;}
 .glo_modificateur_1{ color:rgb(255,100,255);}
 .glo_modificateur_-1{ color:red;}
 .glo_modificateur_2{ color:orange;}
+
+/* MENU */
+.menu{ font-size: 20px; top: 0; position: fixed; height: 50px; left: 0; width: 100%; background-color: white;}
+.menu_icons { width: 50px; margin-left: 20px;}
 
 /* ACCUEIL */
 .home { height: 100vh;}

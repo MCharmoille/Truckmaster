@@ -1,6 +1,5 @@
 import React from 'react';
 import logo from '../img/tm_white.png';
-import '../App.css';
 import { Link } from 'react-router-dom'
 
 function App() {

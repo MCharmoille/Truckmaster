@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import logo from '../img/tm_white.png';
-import '../App.css';
 
 const Connexion = ({ onLogin }) => {
   const [username, setUsername] = useState('');
