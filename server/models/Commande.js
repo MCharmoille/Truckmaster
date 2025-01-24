@@ -115,9 +115,6 @@ class Commande {
 
   static async getStatistiques() {
     try {
-      const currentMonth = new Date().getMonth() + 1; // Mois courant (1-12)
-      const currentYear = new Date().getFullYear(); // Année courante
-  
       const paiementsInitial = [
         { id: "c", nom: "Carte", valeur: 0 },
         { id: "m", nom: "Espèce", valeur: 0 },
@@ -127,12 +124,15 @@ class Commande {
       ];
   
       const statistiques = [];
-  
-      for (let i = 0; i < 17; i++) {
-        const month = (currentMonth - i + 11) % 12 + 1; // Calcul du mois
-        const year = currentYear - Math.floor((12 - currentMonth + i) / 12); // Calcul de l'année
-  
-        const monthString = month < 10 ? `0${month}` : `${month}`; // Formatage du mois
+      const currentDate = new Date(); 
+
+      for (let i = 0; i < 15; i++) {
+        const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+        
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const monthString = month < 10 ? `0${month}` : `${month}`;
+
         const commandes = await this.getCommandeparDate(`${year}-${monthString}-`);
   
         const paiements = paiementsInitial.map(p => ({ ...p, valeur: 0 })); // Réinitialiser les paiements pour chaque mois
