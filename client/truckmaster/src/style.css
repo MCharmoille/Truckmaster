@@ -115,8 +115,8 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'R
 .res_tp { width: 48%; box-sizing: border-box; border: 1px solid #ccc; font-size: 22px; border-radius: 10px; margin: 1%; background-color: #444; height: 290px; padding: 2%; line-height: 30px; overflow-x: auto;}
 .res_icone { width: 40%; margin-left: 30%;}
 .res_icone_paiement { height: 80%; margin-top: 4%; float: left; margin-right: 20px;}
-.res_paiements { width: 68%; box-sizing: border-box; border: 1px solid #ccc; font-size: 22px; border-radius: 10px; margin: 1%; background-color: #444; height: 180px; line-height: 30px; float:left;}
-.res_stats { width: 28%; box-sizing: border-box; border: 1px solid #ccc; font-size: 22px; border-radius: 10px; margin: 1%; background-color: #444; height: 180px; padding: 2%; float: left;}
+.res_paiements { width: 68%; box-sizing: border-box; border: 1px solid #ccc; font-size: 22px; border-radius: 10px; margin: 1%; background-color: #444; height: 210px; line-height: 30px; float:left;}
+.res_stats { width: 28%; box-sizing: border-box; border: 1px solid #ccc; font-size: 22px; border-radius: 10px; margin: 1%; background-color: #444; height: 210px; padding: 2%; float: left;}
 
 /* CONNEXION */
 .con_login { margin-top: 80px; padding-left: 25%; height: 200px; line-height: 40px;}
@@ -155,7 +155,9 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'R
 .stat_graph { width: 98%; background-color: #444; border: 1px solid #ccc; border-radius: 10px; height: 400px; margin-top: 25px; font-size: 23px; padding: 1%;}
 
 /* PRODUITS */
-.prods-container { display: flex; align-items: center; flex-direction: column;}
+.prods_container { display: flex; align-items: center; flex-direction: column;}
+.prods_add { display: flex; align-items: center; gap: 8px; background-color: #28a745; color: #fff; font-size: 18px; font-weight: bold; padding: 10px 16px; border: none; border-radius: 6px; margin-bottom: 10px;}
+.prods_add img { width: 32px; height: auto;}
 .prods_produit { width: 70%; margin: 0% 0% 3% 1%; border: solid 1px #ccc; border-radius: 8px; background-color: #f9f9f9; 
                  color: black; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between;}
 .prods_produit h2 { margin: 0;}
@@ -167,10 +169,14 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'R
 
 /* PRODUIT */
 .prod_container { padding: 16px; font-family: Arial, sans-serif; color: #333;}
-.prod_info { background: #f9f9f9; padding: 16px; border-radius: 8px; margin-bottom: 20px; position: relative;}
+.prod_info { background: #f9f9f9; padding: 16px; border-radius: 8px; margin-bottom: 20px; position: relative; display: flex; align-items: center; justify-content: space-between;}
 .prod_info h1 { font-size: 24px; margin: 12px 0; text-align: center;}
 .prod_prix { display: flex; justify-content: center; font-size: 18px;}
-.prod_retour { position: absolute; padding: 8px 12px; font-size: 18px; color: #fff; background-color: #007bff; border: none; border-radius: 4px;}
+.prod_retour { padding: 8px 12px; font-size: 18px; color: #fff; background-color: #007bff; border: none; border-radius: 4px; margin-right: 16px;}
+.prod_details { display: flex; flex-direction: column; align-items: center; flex: 1; }   
+.prod_info img { width: 100px; height: auto; margin-left: 16px;}
+.prod_edit { position: absolute; top: 10px; right: 10px; background: none; border: none;}
+.prod_edit img { width: 30px; background-color: darkorange; border-radius: 10px;} 
 .prod_recette { background: #fff; padding: 16px; border-radius: 8px; margin-bottom: 20px;}
 .prod_recette ul { padding: 0; list-style-type: none;}
 .prod_ingredient { display: grid; grid-template-columns: 80px 120px 1fr 100px; padding: 12px 0; border-bottom: 1px solid #eee;}

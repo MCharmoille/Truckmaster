@@ -89,6 +89,7 @@ class Commande {
                          {id: "m", nom: "Espèce", valeur: 0},
                          {id: "h", nom: "Chèque", valeur: 0},
                          {id: "o", nom: "Offert", valeur: 0},
+                         {id: "v", nom: "Virement", valeur: 0},
                          {id: null, nom: "Non payé", valeur: 0}
                         ];
 
@@ -120,6 +121,7 @@ class Commande {
         { id: "m", nom: "Espèce", valeur: 0 },
         { id: "h", nom: "Chèque", valeur: 0 },
         { id: "o", nom: "Offert", valeur: 0 },
+        { id: "v", nom: "Virement", valeur: 0 },
         { id: null, nom: "Non payé", valeur: 0 }
       ];
   

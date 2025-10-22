@@ -28,7 +28,7 @@ const Parametres = ({isLoggedIn, setIsLoggedIn}) => {
   const getDates = async() => {
     try {
       const res = await axios.get(`${process.env.REACT_APP_API_URL}dates`);
-      setDates(res.data.reverse());
+      setDates(res.data.reverse().slice(0, 25));
     } catch (err) {
       console.log(err);
     }

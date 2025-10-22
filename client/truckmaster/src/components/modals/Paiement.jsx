@@ -21,6 +21,7 @@ const Modal = ({ commande, onClose }) => {
         <button onClick={() => valider("c")}>Carte</button>
         <button onClick={() => valider("m")}>Monnaie</button>
         <button onClick={() => valider("h")}>Chèque</button>
+        <button onClick={() => valider("v")}>Virement</button>
         <button onClick={() => valider("o")}>Offert</button>
         <button onClick={() => valider(0)}>Annuler</button>
       </div>
