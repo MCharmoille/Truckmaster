@@ -45,16 +45,6 @@ function App() {
             </div>
           </Link>
 
-          <Link to="/pensebete">
-            <div className="group bg-slate-800 p-8 rounded-2xl border border-slate-700 hover:border-yellow-500/50 hover:bg-slate-800/80 transition-all duration-300 hover:-translate-y-1 cursor-pointer shadow-lg hover:shadow-yellow-500/10">
-              <div className="h-14 w-14 bg-yellow-500/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <span className="text-3xl">📝</span>
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Pense-bête</h3>
-              <p className="text-slate-400 text-lg">Notes rapides et liste de courses.</p>
-            </div>
-          </Link>
-
           <Link to="/resume">
             <div className="group bg-slate-800 p-8 rounded-2xl border border-slate-700 hover:border-purple-500/50 hover:bg-slate-800/80 transition-all duration-300 hover:-translate-y-1 cursor-pointer shadow-lg hover:shadow-purple-500/10">
               <div className="h-14 w-14 bg-purple-500/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
@@ -62,16 +52,6 @@ function App() {
               </div>
               <h3 className="text-2xl font-bold text-white mb-2">Résumé</h3>
               <p className="text-slate-400 text-lg">Totaux de la journée et chiffre d'affaires.</p>
-            </div>
-          </Link>
-
-          <Link to="/produits">
-            <div className="group bg-slate-800 p-8 rounded-2xl border border-slate-700 hover:border-pink-500/50 hover:bg-slate-800/80 transition-all duration-300 hover:-translate-y-1 cursor-pointer shadow-lg hover:shadow-pink-500/10">
-              <div className="h-14 w-14 bg-pink-500/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <span className="text-3xl">🍔</span>
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Ma Carte</h3>
-              <p className="text-slate-400 text-lg">Gérer les produits, prix et ingrédients.</p>
             </div>
           </Link>
 
@@ -85,6 +65,26 @@ function App() {
               <p className="text-slate-400 text-lg">Graphiques et analyses détaillées.</p>
             </div>
           </Link>
+
+          <Link to="/produits">
+            <div className="group bg-slate-800 p-8 rounded-2xl border border-slate-700 hover:border-pink-500/50 hover:bg-slate-800/80 transition-all duration-300 hover:-translate-y-1 cursor-pointer shadow-lg hover:shadow-pink-500/10">
+              <div className="h-14 w-14 bg-pink-500/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <span className="text-3xl">🍔</span>
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-2">Ma Carte</h3>
+              <p className="text-slate-400 text-lg">Gérer les produits, prix et ingrédients.</p>
+            </div>
+          </Link>
+
+          {/* <Link to="/pensebete"> */}
+          <div className="opacity-50 grayscale cursor-not-allowed bg-slate-800 p-8 rounded-2xl border border-slate-700">
+            <div className="h-14 w-14 bg-yellow-500/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <span className="text-3xl">🔨</span>
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-2">Pense-bête</h3>
+            <p className="text-slate-400 text-lg">Fonctionnalité bientôt disponible.</p>
+          </div>
+          {/* </Link> */}
 
           {/* Coming Soon Card */}
           <div className="opacity-50 grayscale cursor-not-allowed bg-slate-800 p-8 rounded-2xl border border-slate-700">

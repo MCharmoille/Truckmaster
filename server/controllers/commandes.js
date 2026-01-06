@@ -65,7 +65,8 @@ export const paiementCommande = async (req, res) => {
 
 export const getStatistiques = async (req, res) => {
     try {
-        const commandes = await Commande.getStatistiques();
+        const { startDate, endDate } = req.query;
+        const commandes = await Commande.getStatistiques(startDate, endDate);
         res.status(200).json(commandes);
     } catch (error) {
         res.status(404).json({ message: error.message });
