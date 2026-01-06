@@ -29,36 +29,79 @@ function App() {
   }, []);
 
   return (
-    <div className="App">
+    <div className="flex flex-col h-screen bg-slate-900 text-white font-sans overflow-hidden">
       <BrowserRouter>
         {isLoggedIn ? (
-          <div>
-            <div className="menu">
-              <Link to="/"> <img src={home} alt="home" className="menu_icons" /> </Link>
-              <Link to="/commandes"> <img src={list} alt="list" className="menu_icons" /> </Link>
-              <Link to="/add"> <img src={plus} alt="plus" className="menu_icons" /> </Link>
-              <Link to="/parametres"> <img src={params} alt="params" className="menu_icons" style={{ float: "right", marginRight: "10px" }}/> </Link>
-              <div className='acc_connecte'> {localStorage.getItem('user')} </div>
-            </div>
-            <div className="corps">
+          <div className="flex-1 w-full h-full relative">
+
+            {/* Main Content Area - Scrollable */}
+            <div className="absolute top-0 left-0 right-0 bottom-32 pb-24 overflow-y-auto p-4 md:p-8 custom-scrollbar">
               <Routes>
-                <Route path="/" element={<Accueil/>}/>
-                <Route path="/commandes" element={<Commandes/>}/>
+                <Route path="/" element={<Accueil />} />
+                <Route path="/commandes" element={<Commandes />} />
                 <Route path="/add" element={<NouvelleCommande />} />
                 <Route path="/add/:commandeId" element={<NouvelleCommande />} />
-                <Route path="/devis" element={<Devis/>}/>
-                <Route path="/resume" element={<Resume/>}/>
-                <Route path="/statistiques" element={<Statistiques/>}/>
-                <Route path="/pensebete" element={<PenseBete/>}/>
-                <Route path="/produits" element={<Produits/>}/>
+                <Route path="/devis" element={<Devis />} />
+                <Route path="/resume" element={<Resume />} />
+                <Route path="/statistiques" element={<Statistiques />} />
+                <Route path="/pensebete" element={<PenseBete />} />
+                <Route path="/produits" element={<Produits />} />
                 <Route path="/produit/:id" element={<Produit />} />
-                <Route path="/parametres" element={<Parametres isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn}/>}/>
+                <Route path="/parametres" element={<Parametres isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />} />
               </Routes>
             </div>
+
+            {/* Bottom Navigation Bar */}
+            <nav className="fixed bottom-0 w-full h-32 bg-slate-800 border-t border-slate-700 flex justify-around items-center z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.3)]">
+
+              {/* Left Group */}
+              <div className="flex gap-8 md:gap-20">
+                <Link to="/" className="flex flex-col items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+                  <div className="p-3 rounded-2xl group-hover:bg-slate-700 transition-colors">
+                    <img src={home} alt="Accueil" className="w-10 h-10 invert opacity-70 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  <span className="text-lg font-bold">Accueil</span>
+                </Link>
+
+                <Link to="/commandes" className="flex flex-col items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+                  <div className="p-3 rounded-2xl group-hover:bg-slate-700 transition-colors">
+                    <img src={list} alt="Commandes" className="w-10 h-10 invert opacity-70 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  <span className="text-lg font-bold">Commandes</span>
+                </Link>
+              </div>
+
+              {/* Central Floating Button - NEW ORDER */}
+              <div className="relative -top-10">
+                <Link to="/add">
+                  <div className="w-28 h-28 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-xl shadow-emerald-500/30 flex items-center justify-center transform transition-transform hover:scale-105 active:scale-95 border-[10px] border-slate-900">
+                    <img src={plus} alt="Nouvelle Commande" className="w-14 h-14 invert brightness-0" />
+                  </div>
+                </Link>
+              </div>
+
+              {/* Right Group */}
+              <div className="flex gap-8 md:gap-20">
+                <Link to="/produits" className="flex flex-col items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+                  <div className="p-3 rounded-2xl group-hover:bg-slate-700 transition-colors">
+                    <span className="text-4xl leading-none mb-1">🍔</span>
+                  </div>
+                  <span className="text-lg font-bold">Carte</span>
+                </Link>
+
+                <Link to="/parametres" className="flex flex-col items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+                  <div className="p-3 rounded-2xl group-hover:bg-slate-700 transition-colors">
+                    <img src={params} alt="Paramètres" className="w-10 h-10 invert opacity-70 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  <span className="text-lg font-bold">Paramètres</span>
+                </Link>
+              </div>
+
+            </nav>
+
           </div>
         ) : (
-          <div>
-            <div className="accueil"></div>
+          <div className="w-full h-full flex items-center justify-center bg-slate-900">
             <Connexion onLogin={() => setIsLoggedIn(true)} />
           </div>
         )}

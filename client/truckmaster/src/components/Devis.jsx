@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 import { useState } from 'react'
 import axios from 'axios'
 // import { Link } from 'react-router-dom'
-import { format } from 'date-fns';
+// import { format } from 'date-fns';
 import { Page, Text, View, Document, PDFDownloadLink, Image, StyleSheet, Font} from '@react-pdf/renderer';
 import logo from '../img/logo.jpg';
 
@@ -110,7 +110,7 @@ const Devis = () => {
                     </View>
                     <View>
                         <Text style={styles.infoText}>Devis N° {devis.id.toString().padStart(4, '0')}</Text>
-                        <Text style={styles.infoText}>Date : {format(new Date(devis.date_commande), 'dd/MM/yyyy')}</Text>
+                        <Text style={styles.infoText}>Date : {devis.date_commande}</Text>
                     </View>
                 </View>
             </View>
@@ -149,11 +149,11 @@ const Devis = () => {
                 {devis.map(devis=>(
                     <div className='devis' key={devis.id}>
                         <div className={`devis-header ${selectedDevis === devis.id ? 'active' : ''}`}>
-                            Devis {devis.id.toString().padStart(4, '0')} pour {devis.nom} ({format(new Date(devis.date_commande), 'dd/MM/yyyy')})
+                            Devis {devis.id.toString().padStart(4, '0')} pour {devis.nom} ({devis.date_commande})
                             {selectedDevis === devis.id && (
                             <div className="devis-details">
                                 <input type="text" value={devis.nom} onChange={(e) => {/* Mettre à jour la valeur du nom du devis */}} />
-                                <input type="text" value={format(new Date(devis.date_commande), 'dd/MM/yyyy')} onChange={(e) => {/* Mettre à jour la valeur de la date du devis */}} />
+                                <input type="text" value={devis.date_commande} onChange={(e) => {/* Mettre à jour la valeur de la date du devis */}} />
                                 {/* Autres champs du formulaire */}
                             </div>
                             )}
@@ -169,9 +169,6 @@ const Devis = () => {
                     </div>
                 ))}
             </div>
-            {/* <button>
-                <Link to="/add"> Ajouter une nouvelle commande </Link>
-            </button> */}
         </div>
     )
 }
