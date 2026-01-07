@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import { CreditCard, Banknote, PenLine, Landmark, Gift } from 'lucide-react';
 
 const Modal = ({ commande, onClose }) => {
 
@@ -31,7 +32,7 @@ const Modal = ({ commande, onClose }) => {
               onClick={() => valider("c")}
               className="flex flex-col items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl p-6 transition-all active:scale-95 shadow-lg shadow-blue-500/20"
             >
-              <span className="text-4xl">💳</span>
+              <CreditCard className="w-10 h-10" />
               <span className="text-xl font-bold">Carte</span>
             </button>
 
@@ -39,7 +40,7 @@ const Modal = ({ commande, onClose }) => {
               onClick={() => valider("m")}
               className="flex flex-col items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl p-6 transition-all active:scale-95 shadow-lg shadow-emerald-500/20"
             >
-              <span className="text-4xl">💶</span>
+              <Banknote className="w-10 h-10" />
               <span className="text-xl font-bold">Espèces</span>
             </button>
 
@@ -47,7 +48,7 @@ const Modal = ({ commande, onClose }) => {
               onClick={() => valider("h")}
               className="flex flex-col items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl p-6 transition-all active:scale-95 shadow-lg shadow-indigo-500/20"
             >
-              <span className="text-4xl">✒️</span>
+              <PenLine className="w-10 h-10" />
               <span className="text-xl font-bold">Chèque</span>
             </button>
 
@@ -55,7 +56,7 @@ const Modal = ({ commande, onClose }) => {
               onClick={() => valider("v")}
               className="flex flex-col items-center justify-center gap-2 bg-purple-600 hover:bg-purple-500 text-white rounded-2xl p-6 transition-all active:scale-95 shadow-lg shadow-purple-500/20"
             >
-              <span className="text-4xl">🏦</span>
+              <Landmark className="w-10 h-10" />
               <span className="text-xl font-bold">Virement</span>
             </button>
 
@@ -63,7 +64,7 @@ const Modal = ({ commande, onClose }) => {
               onClick={() => valider("o")}
               className="col-span-2 flex items-center justify-center gap-3 bg-pink-600 hover:bg-pink-500 text-white rounded-2xl p-4 transition-all active:scale-95 shadow-lg shadow-pink-500/20"
             >
-              <span className="text-2xl">🎁</span>
+              <Gift className="w-8 h-8" />
               <span className="text-xl font-bold">Commande Offerte</span>
             </button>
           </div>

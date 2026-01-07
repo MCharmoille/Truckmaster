@@ -8,3 +8,14 @@ export const getIngredients = async (req, res) => {
         res.status(404).json({ message: error.message });
     }
 }
+
+export const createIngredient = async (req, res) => {
+    try {
+        const { nom } = req.body;
+        const newIngredient = await Ingredient.create(nom);
+        res.status(201).json(newIngredient);
+    } catch (error) {
+        import('../index.js').then(m => m.customConsoleLog("Erreur création ingrédient: " + error.message));
+        res.status(400).json({ message: error.message });
+    }
+}

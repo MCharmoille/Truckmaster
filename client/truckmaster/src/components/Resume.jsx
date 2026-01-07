@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import moment from 'moment';
 import Calendrier from './Calendrier';
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
+import { Calendar, CreditCard } from 'lucide-react';
 
 const Resume = () => {
   const [data, setData] = useState([]);
@@ -83,7 +84,7 @@ const Resume = () => {
               {/* Icon & Grand Total */}
               <div className="flex flex-col items-center gap-4 bg-emerald-500/10 p-6 rounded-3xl border border-emerald-500/20 min-w-[300px]">
                 <div className="w-24 h-24 bg-emerald-500/20 p-5 rounded-full flex items-center justify-center">
-                  <img className="w-full h-full invert brightness-0" src={require(`../img/paiement.png`)} alt="paiement" />
+                  <CreditCard className="w-12 h-12 text-emerald-400" />
                 </div>
                 <div className="text-center">
                   <p className="text-emerald-400 text-xl uppercase font-bold tracking-widest">Chiffre d'Affaires</p>
@@ -108,7 +109,7 @@ const Resume = () => {
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-20 opacity-50">
-          <span className="text-8xl mb-6">📅</span>
+          <Calendar className="w-20 h-20 text-slate-400 mb-6" />
           <p className="text-3xl text-slate-400 font-medium text-center">Sélectionnez une date ci-dessus<br />pour voir le résumé de la journée.</p>
         </div>
       )}

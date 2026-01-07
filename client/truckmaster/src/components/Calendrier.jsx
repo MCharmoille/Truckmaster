@@ -5,6 +5,7 @@ import 'moment/locale/fr';
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { fr } from 'date-fns/locale';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 registerLocale('fr', fr);
 
@@ -139,9 +140,7 @@ const Calendrier = ({ onDateChange }) => {
             : 'bg-slate-800/50 text-slate-600 cursor-not-allowed opacity-50'
           }`}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-8 h-8">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-        </svg>
+        <ChevronLeft className="w-8 h-8" />
       </button>
 
       <div className="flex-1 flex justify-center py-2 relative">
@@ -168,9 +167,7 @@ const Calendrier = ({ onDateChange }) => {
             : 'bg-slate-800/50 text-slate-600 cursor-not-allowed opacity-50'
           }`}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-8 h-8">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-        </svg>
+        <ChevronRight className="w-8 h-8" />
       </button>
 
     </div>

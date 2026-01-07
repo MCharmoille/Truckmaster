@@ -3,6 +3,7 @@ import axios from 'axios';
 import moment from 'moment';
 import 'moment/locale/fr'; // Ensure French locale is loaded
 import { Link } from 'react-router-dom';
+import { DollarSign, Calendar, Trophy, ArrowRight } from 'lucide-react';
 
 const Statistiques = () => {
     // Default: Last 6 months
@@ -102,7 +103,7 @@ const Statistiques = () => {
                             value={moment(startDate).format('YYYY-MM')}
                             onChange={(e) => setStartDate(e.target.value)}
                         />
-                        <span className="text-slate-500">➜</span>
+                        <ArrowRight className="w-5 h-5 text-slate-500" />
                         <input
                             type="month"
                             className="bg-transparent text-white font-bold outline-none cursor-pointer"
@@ -116,10 +117,9 @@ const Statistiques = () => {
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
 
-                {/* CA Total */}
                 <div className="bg-slate-800 rounded-3xl p-6 border border-slate-700/50 shadow-xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <span className="text-8xl">💰</span>
+                        <DollarSign className="w-20 h-20 text-white" />
                     </div>
                     <p className="text-slate-400 text-lg mb-2">Chiffre d'Affaires</p>
                     <h3 className="text-5xl font-extrabold text-white">{totalCa.toLocaleString('fr-FR')} €</h3>
@@ -131,7 +131,7 @@ const Statistiques = () => {
                 {/* Average */}
                 <div className="bg-slate-800 rounded-3xl p-6 border border-slate-700/50 shadow-xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <span className="text-8xl">📅</span>
+                        <Calendar className="w-20 h-20 text-white" />
                     </div>
                     <p className="text-slate-400 text-lg mb-2">Moyenne Mensuelle</p>
                     <h3 className="text-5xl font-extrabold text-cyan-400">{Number(averageCa).toLocaleString('fr-FR')} €</h3>
@@ -141,7 +141,7 @@ const Statistiques = () => {
                 {/* Best Month */}
                 <div className="bg-slate-800 rounded-3xl p-6 border border-slate-700/50 shadow-xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <span className="text-8xl">🏆</span>
+                        <Trophy className="w-20 h-20 text-white" />
                     </div>
                     <p className="text-slate-400 text-lg mb-2">Meilleur Mois</p>
                     <h3 className="text-5xl font-extrabold text-yellow-400">{maxMonth.toLocaleString('fr-FR')} €</h3>

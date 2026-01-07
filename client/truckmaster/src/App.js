@@ -12,10 +12,7 @@ import Connexion from "./components/Connexion";
 import Produits from "./components/Produits";
 import Produit from "./components/Produit";
 import "./style.css";
-import home from './img/home.png';
-import list from './img/list.png';
-import plus from './img/plus.png';
-import params from './img/parametres.png';
+import { Home, List, Plus, Utensils, Settings } from 'lucide-react';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -58,14 +55,14 @@ function App() {
               <div className="flex gap-8 md:gap-20">
                 <Link to="/" className="flex flex-col items-center gap-2 text-slate-400 hover:text-white transition-colors group">
                   <div className="p-3 rounded-2xl group-hover:bg-slate-700 transition-colors">
-                    <img src={home} alt="Accueil" className="w-10 h-10 invert opacity-70 group-hover:opacity-100 transition-opacity" />
+                    <Home className="w-8 h-8 opacity-70 group-hover:opacity-100 transition-opacity" />
                   </div>
                   <span className="text-lg font-bold">Accueil</span>
                 </Link>
 
                 <Link to="/commandes" className="flex flex-col items-center gap-2 text-slate-400 hover:text-white transition-colors group">
                   <div className="p-3 rounded-2xl group-hover:bg-slate-700 transition-colors">
-                    <img src={list} alt="Commandes" className="w-10 h-10 invert opacity-70 group-hover:opacity-100 transition-opacity" />
+                    <List className="w-8 h-8 opacity-70 group-hover:opacity-100 transition-opacity" />
                   </div>
                   <span className="text-lg font-bold">Commandes</span>
                 </Link>
@@ -75,7 +72,7 @@ function App() {
               <div className="relative -top-10">
                 <Link to="/add">
                   <div className="w-28 h-28 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 shadow-xl shadow-emerald-500/30 flex items-center justify-center transform transition-transform hover:scale-105 active:scale-95 border-[10px] border-slate-900">
-                    <img src={plus} alt="Nouvelle Commande" className="w-14 h-14 invert brightness-0" />
+                    <Plus className="w-14 h-14 text-slate-900" strokeWidth={3} />
                   </div>
                 </Link>
               </div>
@@ -84,14 +81,14 @@ function App() {
               <div className="flex gap-8 md:gap-20">
                 <Link to="/produits" className="flex flex-col items-center gap-2 text-slate-400 hover:text-white transition-colors group">
                   <div className="p-3 rounded-2xl group-hover:bg-slate-700 transition-colors">
-                    <span className="text-4xl leading-none mb-1">🍔</span>
+                    <Utensils className="w-8 h-8 opacity-70 group-hover:opacity-100 transition-opacity" />
                   </div>
                   <span className="text-lg font-bold">Carte</span>
                 </Link>
 
                 <Link to="/parametres" className="flex flex-col items-center gap-2 text-slate-400 hover:text-white transition-colors group">
                   <div className="p-3 rounded-2xl group-hover:bg-slate-700 transition-colors">
-                    <img src={params} alt="Paramètres" className="w-10 h-10 invert opacity-70 group-hover:opacity-100 transition-opacity" />
+                    <Settings className="w-8 h-8 opacity-70 group-hover:opacity-100 transition-opacity" />
                   </div>
                   <span className="text-lg font-bold">Paramètres</span>
                 </Link>

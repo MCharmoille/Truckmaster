@@ -4,6 +4,7 @@ import moment from 'moment';
 import Modal from "./modals/Paiement";
 import Calendrier from './Calendrier';
 import { useNavigate } from 'react-router-dom';
+import { Sun, Moon, CheckCircle } from 'lucide-react';
 
 const Commandes = () => {
   const [commandes, setCommandes] = useState([]);
@@ -97,7 +98,7 @@ const Commandes = () => {
             : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700'
             }`}
         >
-          <span>☀️</span> Midi
+          <Sun className="w-6 h-6" /> Midi
         </button>
 
         <button
@@ -107,7 +108,7 @@ const Commandes = () => {
             : 'bg-slate-800 text-slate-400 border-slate-700 hover:bg-slate-700'
             }`}
         >
-          <span>🌙</span> Soir
+          <Moon className="w-6 h-6" /> Soir
         </button>
       </div>
 
@@ -171,7 +172,7 @@ const Commandes = () => {
                     {/* Payment Footer */}
                     {commande.moyen_paiement !== null ? (
                       <div className="mt-4 pt-4 border-t border-slate-700/50 text-emerald-400 text-xl font-bold flex items-center gap-3">
-                        <span className="text-2xl">✅</span> {commande.moyen_paiement === "c" ? "Carte Bancaire" : (commande.moyen_paiement === "o" ? "Offert" : (commande.moyen_paiement === "v" ? "Virement" : "Espèces"))}
+                        <CheckCircle className="w-6 h-6" /> {commande.moyen_paiement === "c" ? "Carte Bancaire" : (commande.moyen_paiement === "o" ? "Offert" : (commande.moyen_paiement === "v" ? "Virement" : "Espèces"))}
                       </div>
                     ) : (
                       <button
