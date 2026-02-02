@@ -153,12 +153,20 @@ const Commandes = () => {
                     <div className='produits space-y-3 mb-6'>
                       {commande.produits.length !== 0 ? (
                         commande.produits.map((produit, p_index) => (
-                          <div className='produit text-2xl text-slate-300' key={p_index}>
-                            <span style={produit.custom === 1 ? { color: "yellow" } : {}}> {produit.qte} x {produit.nom} {produit.custom === 1 ? "(" + produit.prix + "€)" : ""}</span>
+                          <div className='produit text-xl text-slate-300' key={p_index}>
+                            <span className={produit.custom === 1 ? 'text-modification-custom font-bold' : ''}>
+                              {produit.qte} x {produit.nom} {produit.custom === 1 ? `(${produit.prix}€)` : ""}
+                            </span>
                             {produit.modifications.length !== 0 ? (
                               produit.modifications.map((modif, m_index) => (
-                                <div className={`text-xl pl-6 italic opacity-80 glo_modificateur_${modif.modificateur}`} key={m_index}>
-                                  {modif.modificateur === -1 ? "SANS " : modif.modificateur === 1 ? "SUPPLÉMENT " : ""}{modif.nom}
+                                <div
+                                  key={m_index}
+                                  className={`text-[10px] ml-6 mt-0.5 flex items-center gap-1 font-black uppercase tracking-wider ${modif.modificateur === -1 ? 'text-modification-remove' :
+                                      modif.modificateur === 1 ? 'text-modification-add' :
+                                        'text-modification-change'
+                                    }`}
+                                >
+                                  {modif.modificateur === -1 ? "- " : modif.modificateur === 1 ? "+ " : "~ "}{modif.nom}
                                 </div>
                               ))
                             ) : ""

@@ -11,7 +11,6 @@ import Statistiques from "./components/Statistiques";
 import Connexion from "./components/Connexion";
 import Produits from "./components/Produits";
 import Produit from "./components/Produit";
-import "./style.css";
 import { Home, List, Plus, Utensils, Settings } from 'lucide-react';
 
 function App() {

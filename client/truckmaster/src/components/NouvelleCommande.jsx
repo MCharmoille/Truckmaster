@@ -341,9 +341,9 @@ const NouvelleCommande = () => {
                                         {produit.modifications && produit.modifications.map((modif, midx) => (
                                             <div
                                                 key={midx}
-                                                className={`text-[10px] ml-11 mt-0.5 flex items-center gap-1 font-black uppercase tracking-wider ${modif.modificateur === -1 ? 'text-red-400' :
-                                                    modif.modificateur === 1 ? 'text-emerald-400' :
-                                                        'text-orange-400'
+                                                className={`text-[10px] ml-11 mt-0.5 flex items-center gap-1 font-black uppercase tracking-wider ${modif.modificateur === -1 ? 'text-modification-remove' :
+                                                    modif.modificateur === 1 ? 'text-modification-add' :
+                                                        'text-modification-change'
                                                     }`}
                                             >
                                                 {modif.modificateur === -1 ? "- " : modif.modificateur === 1 ? "+ " : "~ "}{modif.nom}
