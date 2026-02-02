@@ -31,7 +31,7 @@ function App() {
           <div className="flex-1 w-full h-full relative">
 
             {/* Main Content Area - Scrollable */}
-            <div className="absolute top-0 left-0 right-0 bottom-32 pb-24 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+            <div className="absolute top-0 left-0 right-0 bottom-32 pb-24 overflow-y-auto p-4 md:p-4 custom-scrollbar">
               <Routes>
                 <Route path="/" element={<Accueil />} />
                 <Route path="/commandes" element={<Commandes />} />

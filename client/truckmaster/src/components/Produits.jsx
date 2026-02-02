@@ -38,7 +38,7 @@ const ConfirmModal = ({ isOpen, onClose, onConfirm, productName }) => {
 const Produits = () => {
   const [produits, setProduits] = useState([]);
   const navigate = useNavigate();
-  const [sortBy, setSortBy] = useState('display'); // 'display', 'type', 'nom'
+  const [sortBy, setSortBy] = useState('type'); // 'display', 'type', 'nom'
   const [productToArchive, setProductToArchive] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
 
