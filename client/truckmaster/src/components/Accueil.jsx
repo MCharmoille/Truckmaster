@@ -2,7 +2,7 @@ import React from 'react';
 import logo from '../img/tm_white.png';
 import { Link } from 'react-router-dom'
 
-import { BarChart3, TrendingUp, Hammer, LayoutDashboard } from 'lucide-react';
+import { BarChart3, TrendingUp, Hammer } from 'lucide-react';
 
 function App() {
   return (

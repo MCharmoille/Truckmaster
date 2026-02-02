@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import moment from 'moment';
 import 'moment/locale/fr'; // Ensure French locale is loaded
-import { Link } from 'react-router-dom';
 import { DollarSign, Calendar, Trophy, ArrowRight } from 'lucide-react';
 
 const Statistiques = () => {

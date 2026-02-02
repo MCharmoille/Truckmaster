@@ -11,15 +11,12 @@ import {
     Trash2,
     Plus,
     Minus,
-    Pencil,
     Calendar as CalendarIcon,
     Clock,
     User,
     CheckCircle2,
     ChevronRight,
-    UtensilsCrossed,
     Beer,
-    ShoppingBasket
 } from 'lucide-react';
 
 const NouvelleCommande = () => {

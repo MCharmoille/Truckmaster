@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import moment from 'moment';
 import Calendrier from './Calendrier';
-import { Link } from 'react-router-dom';
 import { Calendar, CreditCard } from 'lucide-react';
 
 const Resume = () => {
