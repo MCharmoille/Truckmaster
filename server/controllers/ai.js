@@ -2,10 +2,10 @@ import axios from 'axios';
 import Achat from '../models/Achat.js';
 import { db, customConsoleLog } from '../index.js';
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
-
 export const scanReceipt = async (req, res) => {
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
+
     try {
         if (!req.file) {
             customConsoleLog(`[IA Scan] Erreur : Aucune image reçue.`);
@@ -51,6 +51,7 @@ export const scanReceipt = async (req, res) => {
             - "quantite": la quantité (nombre).
             - "prix": le prix TOTAL pour cet article (nombre).
 
+            Si l'image n'est pas un ticket de caisse, est illisible ou ne contient aucun article d'achat, retourne UNIQUEMENT un tableau vide : [].
             Retourne UNIQUEMENT une liste JSON compacte. 
             Exemple de format attendu : [{"nom": "Pain Burger", "quantite": 10, "prix": 15.50}, ...]
         `;
@@ -79,7 +80,19 @@ export const scanReceipt = async (req, res) => {
             resultText = jsonMatch[0];
         }
 
-        const extractedItems = JSON.parse(resultText);
+        let extractedItems = [];
+        try {
+            extractedItems = JSON.parse(resultText);
+            if (!Array.isArray(extractedItems)) extractedItems = [];
+        } catch (e) {
+            customConsoleLog(`[IA Scan] Erreur parsing JSON : ${e.message}`);
+            extractedItems = [];
+        }
+
+        if (extractedItems.length === 0) {
+            customConsoleLog(`[IA Scan] Aucun article trouvé ou image invalide.`);
+            return res.status(200).json([]);
+        }
 
         // 4. Incrémenter le quota
         customConsoleLog(`[IA Scan] Incrémentation du quota...`);
@@ -98,17 +111,18 @@ export const scanReceipt = async (req, res) => {
         res.status(200).json(extractedItems);
     } catch (error) {
         const errorDetail = error.response?.data || error.message;
+        const googleMessage = error.response?.data?.error?.message;
         customConsoleLog(`[IA Scan] Erreur CRITIQUE : ${JSON.stringify(errorDetail, null, 2)}`);
 
         if (error.response?.status === 429) {
             return res.status(429).json({
-                message: "Limite d'utilisation de l'IA atteinte (Google). Réessayez dans une minute.",
+                message: `Limite quota dépassée (Google) : ${googleMessage || "Réessayez dans une minute."}`,
                 details: errorDetail
             });
         }
 
         res.status(500).json({
-            message: "Erreur lors de l'analyse du ticket par l'IA",
+            message: googleMessage ? `Erreur Google : ${googleMessage}` : "Erreur lors de l'analyse du ticket par l'IA",
             details: errorDetail
         });
     }

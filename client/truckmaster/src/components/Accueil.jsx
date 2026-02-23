@@ -19,8 +19,8 @@ function App() {
             </div>
           </div>
           <div className="mt-4 md:mt-0 text-right hidden md:block">
-            <p className="text-emerald-400 font-bold text-xl">V1.5.2</p>
-            <p className="text-slate-500 text-base">Dernière MàJ : Janvier 2026</p>
+            <p className="text-emerald-400 font-bold text-xl">V1.5.3</p>
+            <p className="text-slate-500 text-base">Dernière MàJ : Février 2026</p>
           </div>
         </div>
 
