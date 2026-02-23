@@ -2,7 +2,7 @@ import React from 'react';
 import logo from '../img/tm_white.png';
 import { Link } from 'react-router-dom'
 
-import { BarChart3, TrendingUp, Hammer } from 'lucide-react';
+import { BarChart3, TrendingUp, Hammer, ShoppingBag } from 'lucide-react';
 
 function App() {
   return (
@@ -34,6 +34,16 @@ function App() {
               </div>
               <h3 className="text-2xl font-bold text-white mb-2">Résumé</h3>
               <p className="text-slate-400 text-lg">Totaux de la journée et chiffre d'affaires.</p>
+            </div>
+          </Link>
+
+          <Link to="/achats">
+            <div className="group bg-slate-800 p-8 rounded-2xl border border-slate-700 hover:border-emerald-500/50 hover:bg-slate-800/80 transition-all duration-300 hover:-translate-y-1 cursor-pointer shadow-lg hover:shadow-emerald-500/10">
+              <div className="h-14 w-14 bg-emerald-500/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <ShoppingBag className="w-8 h-8 text-emerald-400" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-2">Achats</h3>
+              <p className="text-slate-400 text-lg">Gestion des dépenses et fournitures.</p>
             </div>
           </Link>
 

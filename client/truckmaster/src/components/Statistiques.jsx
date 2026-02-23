@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import moment from 'moment';
 import 'moment/locale/fr'; // Ensure French locale is loaded
-import { DollarSign, Calendar, Trophy, ArrowRight } from 'lucide-react';
+import { DollarSign, Calendar, Trophy, ArrowRight, ShoppingBag } from 'lucide-react';
 
 const Statistiques = () => {
     // Default: Last 6 months
@@ -10,6 +10,7 @@ const Statistiques = () => {
     const [endDate, setEndDate] = useState(moment().endOf('month').format('YYYY-MM-DD'));
 
     const [data, setData] = useState([]);
+    const [achatsData, setAchatsData] = useState([]);
     const [inclureOffert, setInclureOffer] = useState(false);
     const [inclureNonPaye, setInclureNonPaye] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -33,9 +34,14 @@ const Statistiques = () => {
                     params: { startDate: s, endDate: e }
                 });
 
+                const resAchats = await axios.get(`${process.env.REACT_APP_API_URL}achats/statistiques`, {
+                    params: { startDate: s, endDate: e }
+                });
+
                 // Sort data by date
                 const sortedData = res.data.statistiques.sort((a, b) => moment(a.mois).diff(moment(b.mois)));
                 setData(sortedData);
+                setAchatsData(resAchats.data);
                 setIsLoading(false);
             } catch (err) {
                 console.log(err);
@@ -64,6 +70,12 @@ const Statistiques = () => {
         const val = getTotalForMonth(curr.paiements);
         return val > max ? val : max;
     }, 0);
+
+    const totalAchats = achatsData.reduce((acc, curr) => acc + curr.total_achats, 0);
+    const getAchatsForMonth = (mois) => {
+        const found = achatsData.find(a => a.mois === mois);
+        return found ? found.total_achats : 0;
+    };
 
     return (
         <div className="w-full min-h-screen bg-slate-900 p-6 md:p-12 pb-32">
@@ -147,6 +159,16 @@ const Statistiques = () => {
                     <p className="text-slate-500 text-sm mt-4">Record de la période</p>
                 </div>
 
+                {/* Total Achats */}
+                <div className="bg-slate-800 rounded-3xl p-6 border border-slate-700/50 shadow-xl relative overflow-hidden group md:col-span-3 lg:col-span-1">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <ShoppingBag className="w-20 h-20 text-white" />
+                    </div>
+                    <p className="text-slate-400 text-lg mb-2">Total Achats</p>
+                    <h3 className="text-5xl font-extrabold text-emerald-400">{totalAchats.toLocaleString('fr-FR')} €</h3>
+                    <p className="text-slate-500 text-sm mt-4">Dépenses totales sur la période</p>
+                </div>
+
             </div>
 
             {/* Chart Section */}
@@ -164,21 +186,29 @@ const Statistiques = () => {
                             return (
                                 <div key={index} className="w-16 md:w-20 flex flex-col items-center group relative h-full justify-end">
                                     {/* Value Tooltip (visible on hover) */}
-                                    <div className="absolute -top-12 bg-slate-900 border border-slate-600 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap font-mono">
-                                        {total} €
+                                    <div className="absolute -top-16 bg-slate-900 border border-slate-600 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap font-mono flex flex-col gap-1">
+                                        <span className="text-cyan-400">Ventes: {total} €</span>
+                                        <span className="text-emerald-400">Achats: {getAchatsForMonth(d.mois)} €</span>
                                     </div>
 
-                                    {/* Bar */}
-                                    <div
-                                        className={`w-full rounded-t-lg transition-all duration-700 ease-out flex items-end justify-center pb-2
-                                            ${isMax
-                                                ? 'bg-gradient-to-t from-yellow-600 to-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.3)]'
-                                                : 'bg-gradient-to-t from-cyan-900 to-cyan-500 opacity-80 hover:opacity-100'
-                                            }
-                                        `}
-                                        style={{ height: `${heightPercent}%` }}
-                                    >
-                                        {/* Show value inside bar if tall enough, else nothing */}
+                                    {/* Bar Container for stacking comparison */}
+                                    <div className="w-full flex items-end justify-center gap-1 h-full">
+                                        {/* Sales Bar */}
+                                        <div
+                                            className={`w-1/2 rounded-t-lg transition-all duration-700 ease-out 
+                                                ${isMax
+                                                    ? 'bg-gradient-to-t from-yellow-600 to-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.3)]'
+                                                    : 'bg-gradient-to-t from-cyan-900 to-cyan-500 opacity-80 hover:opacity-100'
+                                                }
+                                            `}
+                                            style={{ height: `${heightPercent}%` }}
+                                        ></div>
+
+                                        {/* Purchases Bar */}
+                                        <div
+                                            className="w-1/2 rounded-t-lg bg-gradient-to-t from-emerald-900 to-emerald-500 opacity-80 hover:opacity-100 transition-all duration-700 ease-out"
+                                            style={{ height: `${maxMonth > 0 ? (getAchatsForMonth(d.mois) / maxMonth) * 100 : 0}%` }}
+                                        ></div>
                                     </div>
 
                                     {/* Label */}

@@ -11,6 +11,7 @@ import Statistiques from "./components/Statistiques";
 import Connexion from "./components/Connexion";
 import Produits from "./components/Produits";
 import Produit from "./components/Produit";
+import Achats from "./components/Achats";
 import { Home, List, Plus, Utensils, Settings } from 'lucide-react';
 
 function App() {
@@ -43,6 +44,7 @@ function App() {
                 <Route path="/pensebete" element={<PenseBete />} />
                 <Route path="/produits" element={<Produits />} />
                 <Route path="/produit/:id" element={<Produit />} />
+                <Route path="/achats" element={<Achats />} />
                 <Route path="/parametres" element={<Parametres isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />} />
               </Routes>
             </div>
