@@ -2,7 +2,7 @@ import React from 'react';
 import logo from '../img/tm_white.png';
 import { Link } from 'react-router-dom'
 
-import { BarChart3, TrendingUp, Hammer, ShoppingBag } from 'lucide-react';
+import { BarChart3, TrendingUp, Hammer, ShoppingBag, FileText } from 'lucide-react';
 
 function App() {
   return (
@@ -58,21 +58,22 @@ function App() {
             </div>
           </Link>
 
+          <Link to="/documents">
+            <div className="group bg-slate-800 p-8 rounded-2xl border border-slate-700 hover:border-blue-500/50 hover:bg-slate-800/80 transition-all duration-300 hover:-translate-y-1 cursor-pointer shadow-lg hover:shadow-blue-500/10">
+              <div className="h-14 w-14 bg-blue-500/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <FileText className="w-8 h-8 text-blue-400" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-2">Documents</h3>
+              <p className="text-slate-400 text-lg">Génération de PDF (Achats, Recettes...).</p>
+            </div>
+          </Link>
+
           <div className="opacity-50 grayscale cursor-not-allowed bg-slate-800 p-8 rounded-2xl border border-slate-700">
             <div className="h-14 w-14 bg-yellow-500/20 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
               <Hammer className="w-8 h-8 text-yellow-400" />
             </div>
             <h3 className="text-2xl font-bold text-white mb-2">Pense-bête</h3>
             <p className="text-slate-400 text-lg">Fonctionnalité bientôt disponible.</p>
-          </div>
-
-          {/* Coming Soon Card */}
-          <div className="opacity-50 grayscale cursor-not-allowed bg-slate-800 p-8 rounded-2xl border border-slate-700">
-            <div className="h-14 w-14 bg-slate-500/20 rounded-xl flex items-center justify-center mb-4">
-              <Hammer className="w-8 h-8 text-slate-400" />
-            </div>
-            <h3 className="text-2xl font-bold text-slate-400 mb-2">Devis</h3>
-            <p className="text-slate-500 text-lg">Fonctionnalité bientôt disponible.</p>
           </div>
 
         </div>

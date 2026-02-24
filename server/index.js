@@ -12,6 +12,7 @@ import utilisateursRoutes from './routes/utilisateurs.js';
 import tranchesRoutes from './routes/tranches.js';
 import ingredientsRoutes from './routes/ingredients.js';
 import achatsRoutes from './routes/achats.js';
+import devisRoutes from './routes/devis.js';
 
 import https from 'https';
 import fs from 'fs';
@@ -71,6 +72,7 @@ app.use('/utilisateurs', utilisateursRoutes);
 app.use('/tranches', tranchesRoutes);
 app.use('/ingredients', ingredientsRoutes);
 app.use('/achats', achatsRoutes);
+app.use('/devis', devisRoutes);
 
 // fonction utilitaire, si il y en a plusieurs, créer un fichier util.js
 function customConsoleLog(message) {
@@ -80,39 +82,7 @@ function customConsoleLog(message) {
 }
 export { customConsoleLog };
 
-// devis
-app.get("/devis", (req, res) => {
-    const q = "SELECT * FROM devis WHERE id_utilisateur = 1 ORDER BY id DESC"
-    db.query(q, (err, devis) => {
-        if (err) return res.json(err)
 
-        const devisIds = devis.map((devis) => devis.id);
-        const q2 = "SELECT * FROM devis_produits dp JOIN produits p ON dp.id_produit=p.id_produit WHERE id_devis IN (?)";
-        db.query(q2, [devisIds], (err, devisProduits) => {
-            if (err) return res.json(err);
-
-            const devisMap = new Map();
-
-            devis.forEach((devis) => {
-                devisMap.set(devis.id, {
-                    ...devis,
-                    devis_produits: [],
-                });
-            });
-
-            devisProduits.forEach((devisProduit) => {
-                const devisId = devisProduit.id_devis;
-                if (devisMap.has(devisId)) {
-                    devisMap.get(devisId).devis_produits.push(devisProduit);
-                }
-            });
-
-            const result = Array.from(devisMap.values());
-
-            return res.json(result);
-        });
-    })
-})
 
 
 

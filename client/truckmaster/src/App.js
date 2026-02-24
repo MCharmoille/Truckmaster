@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom"
 import Accueil from "./components/Accueil";
 import Commandes from "./components/Commandes";
-import Devis from "./components/Devis";
+import Documents from "./components/Documents";
 import NouvelleCommande from "./components/NouvelleCommande";
 import Resume from "./components/Resume";
 import PenseBete from "./components/PenseBete";
@@ -38,7 +38,7 @@ function App() {
                 <Route path="/commandes" element={<Commandes />} />
                 <Route path="/add" element={<NouvelleCommande />} />
                 <Route path="/add/:commandeId" element={<NouvelleCommande />} />
-                <Route path="/devis" element={<Devis />} />
+                <Route path="/documents" element={<Documents />} />
                 <Route path="/resume" element={<Resume />} />
                 <Route path="/statistiques" element={<Statistiques />} />
                 <Route path="/pensebete" element={<PenseBete />} />
