@@ -65,31 +65,48 @@ const Statistiques = () => {
 
     // KPIs (calculated on fetched data which is already filtered by API)
     const totalCa = data.reduce((acc, curr) => acc + getTotalForMonth(curr.paiements), 0);
-    const averageCa = data.length > 0 ? (totalCa / data.length).toFixed(0) : 0;
+    const averageCa = data.length > 0 ? (totalCa / data.length) : 0;
     const maxMonth = data.reduce((max, curr) => {
         const val = getTotalForMonth(curr.paiements);
         return val > max ? val : max;
     }, 0);
 
-    const totalAchats = achatsData.reduce((acc, curr) => acc + curr.total_achats, 0);
+    const totalAchats = achatsData.reduce((acc, curr) => acc + Number(curr.total_achats), 0);
     const getAchatsForMonth = (mois) => {
         const found = achatsData.find(a => a.mois === mois);
-        return found ? found.total_achats : 0;
+        return found ? Number(found.total_achats) : 0;
     };
+
+    // Global max for consistent scaling between sales and purchases
+    const globalMax = Math.max(maxMonth, ...achatsData.map(a => Number(a.total_achats)), 1);
+
+    // Merge datasets to include all months with activity
+    const allMonths = Array.from(new Set([
+        ...data.map(d => d.mois),
+        ...achatsData.map(a => a.mois)
+    ])).sort((a, b) => moment(a).diff(moment(b)));
+
+    const combinedData = allMonths.map(mois => {
+        const salesEntry = data.find(d => d.mois === mois);
+        const purchaseEntry = achatsData.find(a => a.mois === mois);
+        return {
+            mois,
+            paiements: salesEntry ? salesEntry.paiements : [],
+            total_achats: purchaseEntry ? Number(purchaseEntry.total_achats) : 0
+        };
+    });
 
     return (
         <div className="w-full min-h-screen bg-slate-900 p-6 md:p-12 pb-32">
 
             {/* Header & Controls */}
             <div className="flex flex-col xl:flex-row justify-between items-center mb-10 gap-6">
-
                 <div className='flex items-center gap-4'>
                     <h1 className="text-4xl font-bold text-white">Statistiques</h1>
                 </div>
 
                 {/* Filters Container */}
                 <div className="flex flex-col md:flex-row gap-4 items-center">
-
                     {/* Time Range Presets */}
                     <div className="flex bg-slate-800 p-1.5 rounded-xl border border-slate-700">
                         {[3, 6, 12, 24].map(range => (
@@ -127,7 +144,6 @@ const Statistiques = () => {
 
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-
                 <div className="bg-slate-800 rounded-3xl p-6 border border-slate-700/50 shadow-xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                         <DollarSign className="w-20 h-20 text-white" />
@@ -139,7 +155,6 @@ const Statistiques = () => {
                     </p>
                 </div>
 
-                {/* Average */}
                 <div className="bg-slate-800 rounded-3xl p-6 border border-slate-700/50 shadow-xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                         <Calendar className="w-20 h-20 text-white" />
@@ -149,7 +164,6 @@ const Statistiques = () => {
                     <p className="text-slate-500 text-sm mt-4">Un indicateur de stabilité</p>
                 </div>
 
-                {/* Best Month */}
                 <div className="bg-slate-800 rounded-3xl p-6 border border-slate-700/50 shadow-xl relative overflow-hidden group">
                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                         <Trophy className="w-20 h-20 text-white" />
@@ -159,7 +173,6 @@ const Statistiques = () => {
                     <p className="text-slate-500 text-sm mt-4">Record de la période</p>
                 </div>
 
-                {/* Total Achats */}
                 <div className="bg-slate-800 rounded-3xl p-6 border border-slate-700/50 shadow-xl relative overflow-hidden group md:col-span-3 lg:col-span-1">
                     <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                         <ShoppingBag className="w-20 h-20 text-white" />
@@ -168,51 +181,62 @@ const Statistiques = () => {
                     <h3 className="text-5xl font-extrabold text-emerald-400">{totalAchats.toLocaleString('fr-FR')} €</h3>
                     <p className="text-slate-500 text-sm mt-4">Dépenses totales sur la période</p>
                 </div>
-
             </div>
 
             {/* Chart Section */}
             <div className="bg-slate-800/50 rounded-3xl p-8 border border-slate-700/50 mb-12 backdrop-blur-sm overflow-hidden">
-                <h3 className="text-2xl font-bold text-white mb-8">Évolution du CA</h3>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                    <h3 className="text-2xl font-bold text-white">Évolution du CA</h3>
 
-                {/* Scrollable Container */}
+                    {/* Legend */}
+                    <div className="flex flex-wrap gap-4 bg-slate-900/50 px-4 py-2 rounded-xl border border-slate-700">
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded bg-cyan-500"></div>
+                            <span className="text-xs text-slate-300">Ventes</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded bg-emerald-500"></div>
+                            <span className="text-xs text-slate-300">Achats</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded bg-yellow-400"></div>
+                            <span className="text-xs text-slate-300">Record Ventes</span>
+                        </div>
+                    </div>
+                </div>
+
                 <div className="overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-800/50">
-                    <div className="h-64 flex items-end gap-3 md:gap-4 min-w-max px-2" style={{ minWidth: `${data.length * 80}px` }}>
-                        {data.map((d, index) => {
+                    <div className="h-64 flex items-end gap-3 md:gap-4 min-w-max px-2" style={{ minWidth: `${combinedData.length * 80}px` }}>
+                        {combinedData.map((d, index) => {
                             const total = getTotalForMonth(d.paiements);
-                            const heightPercent = maxMonth > 0 ? (total / maxMonth) * 100 : 0;
+                            const heightPercent = (total / globalMax) * 100;
                             const isMax = total === maxMonth && maxMonth > 0;
+                            const achats = d.total_achats;
+                            const achatsHeightPercent = (achats / globalMax) * 100;
 
                             return (
                                 <div key={index} className="w-16 md:w-20 flex flex-col items-center group relative h-full justify-end">
-                                    {/* Value Tooltip (visible on hover) */}
                                     <div className="absolute -top-16 bg-slate-900 border border-slate-600 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap font-mono flex flex-col gap-1">
-                                        <span className="text-cyan-400">Ventes: {total} €</span>
-                                        <span className="text-emerald-400">Achats: {getAchatsForMonth(d.mois)} €</span>
+                                        <span className="text-cyan-400">Ventes: {total.toLocaleString('fr-FR')} €</span>
+                                        <span className="text-emerald-400">Achats: {achats.toLocaleString('fr-FR')} €</span>
                                     </div>
 
-                                    {/* Bar Container for stacking comparison */}
-                                    <div className="w-full flex items-end justify-center gap-1 h-full">
-                                        {/* Sales Bar */}
+                                    <div className="w-full flex items-end justify-center gap-1.5 h-full">
                                         <div
-                                            className={`w-1/2 rounded-t-lg transition-all duration-700 ease-out 
+                                            className={`w-1/2 rounded-t-md transition-all duration-700 ease-out 
                                                 ${isMax
-                                                    ? 'bg-gradient-to-t from-yellow-600 to-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.3)]'
-                                                    : 'bg-gradient-to-t from-cyan-900 to-cyan-500 opacity-80 hover:opacity-100'
+                                                    ? 'bg-gradient-to-t from-yellow-600 to-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.2)]'
+                                                    : 'bg-gradient-to-t from-cyan-900 to-cyan-500 opacity-80 group-hover:opacity-100'
                                                 }
                                             `}
-                                            style={{ height: `${heightPercent}%` }}
-                                        ></div>
+                                            style={{ height: `${Math.max(heightPercent, 2)}%` }}></div>
 
-                                        {/* Purchases Bar */}
                                         <div
-                                            className="w-1/2 rounded-t-lg bg-gradient-to-t from-emerald-900 to-emerald-500 opacity-80 hover:opacity-100 transition-all duration-700 ease-out"
-                                            style={{ height: `${maxMonth > 0 ? (getAchatsForMonth(d.mois) / maxMonth) * 100 : 0}%` }}
-                                        ></div>
+                                            className="w-1/2 rounded-t-md bg-gradient-to-t from-emerald-900 to-emerald-500 opacity-80 group-hover:opacity-100 transition-all duration-700 ease-out"
+                                            style={{ height: `${Math.max(achatsHeightPercent, 2)}%` }}></div>
                                     </div>
 
-                                    {/* Label */}
-                                    <p className="text-slate-400 text-xs md:text-sm mt-3 font-medium rotate-0 truncate w-full text-center">
+                                    <p className="text-slate-400 text-[10px] md:text-sm mt-3 font-medium rotate-0 truncate w-full text-center">
                                         {moment(d.mois, 'YYYY-MM').format('MMM YY').toUpperCase()}
                                     </p>
                                 </div>
@@ -222,25 +246,30 @@ const Statistiques = () => {
                 </div>
             </div>
 
-            {/* Monthly Details Grid */}
             <h3 className="text-2xl font-bold text-white mb-6">Détails Mensuels</h3>
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
-                {data.slice().reverse().map((monthData, index) => (
+                {combinedData.slice().reverse().map((monthData, index) => (
                     <div key={index} className='bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-slate-600 transition-colors'>
                         <div className="flex justify-between items-start mb-4 border-b border-slate-700 pb-3">
                             <h3 className="text-xl font-bold text-white capitalize">
                                 {moment(monthData.mois, 'YYYY-MM').format('MMMM YYYY')}
                             </h3>
                             <span className="text-emerald-400 font-bold bg-emerald-900/30 px-3 py-1 rounded-full text-sm">
-                                {getTotalForMonth(monthData.paiements)} €
+                                {getTotalForMonth(monthData.paiements).toLocaleString('fr-FR')} €
                             </span>
                         </div>
 
                         <ul className="space-y-2">
+                            {monthData.total_achats > 0 && (
+                                <li className="flex justify-between text-emerald-400 text-sm font-bold border-b border-slate-700/50 pb-1 mb-1">
+                                    <span>Total Achats</span>
+                                    <span className="font-mono">{monthData.total_achats.toLocaleString('fr-FR')} €</span>
+                                </li>
+                            )}
                             {monthData.paiements.map((paiement) => (
                                 <li key={paiement.id} className="flex justify-between text-slate-300 text-sm">
                                     <span>{paiement.nom}</span>
-                                    <span className="font-mono text-slate-400">{paiement.valeur} €</span>
+                                    <span className="font-mono text-slate-400">{paiement.valeur.toLocaleString('fr-FR')} €</span>
                                 </li>
                             ))}
                         </ul>
@@ -259,7 +288,6 @@ const Statistiques = () => {
                     Inclure les non payés
                 </label>
             </div>
-
         </div>
     );
 };
