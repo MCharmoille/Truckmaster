@@ -5,7 +5,6 @@ import Commandes from "./components/Commandes";
 import Documents from "./components/Documents";
 import NouvelleCommande from "./components/NouvelleCommande";
 import Resume from "./components/Resume";
-import PenseBete from "./components/PenseBete";
 import Parametres from "./components/Parametres";
 import Statistiques from "./components/Statistiques";
 import Connexion from "./components/Connexion";
@@ -41,7 +40,6 @@ function App() {
                 <Route path="/documents" element={<Documents />} />
                 <Route path="/resume" element={<Resume />} />
                 <Route path="/statistiques" element={<Statistiques />} />
-                <Route path="/pensebete" element={<PenseBete />} />
                 <Route path="/produits" element={<Produits />} />
                 <Route path="/produit/:id" element={<Produit />} />
                 <Route path="/achats" element={<Achats />} />

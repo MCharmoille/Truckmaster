@@ -38,7 +38,8 @@ const Documents = () => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const res = await axios.get(`${process.env.REACT_APP_API_URL}utilisateurs/1`);
+                const userId = localStorage.getItem('userId') || 1;
+                const res = await axios.get(`${process.env.REACT_APP_API_URL}utilisateurs/${userId}`);
                 setCurrentUser(res.data);
             } catch (err) {
                 console.error("Error fetching user data:", err);
@@ -129,7 +130,7 @@ const Documents = () => {
                             </div>
                             <h3 className="text-2xl font-bold text-white mb-2">{type.name}</h3>
                             <p className="text-slate-400 text-lg">
-                                {type.enabled ? `Générer les documents de ${type.name.toLowerCase()}.` : 'Bientôt disponible.'}
+                                {type.enabled ? `Générer les documents liés aux ${type.name.toLowerCase()}.` : 'Bientôt disponible.'}
                             </p>
 
                             {!type.enabled && (

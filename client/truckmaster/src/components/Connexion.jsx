@@ -19,16 +19,17 @@ const Connexion = ({ onLogin }) => {
         password: password
       });
 
-      if (!response.data) {
-        setError("Identifiants incorrects. Veuillez réessayer.");
+      if (!response.data.success) {
+        setError(response.data.message || "Identifiants incorrects.");
       } else {
         localStorage.setItem('authToken', response.data.token);
         localStorage.setItem('user', response.data.username);
+        localStorage.setItem('userId', response.data.userId);
         onLogin();
       }
     } catch (err) {
       console.error(err);
-      setError("Une erreur est survenue lors de la connexion.");
+      setError("Une erreur réseau ou serveur est survenue.");
     } finally {
       setIsLoading(false);
     }

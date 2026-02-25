@@ -1,6 +1,5 @@
 import React from 'react';
 import { Page, Text, View, Document, StyleSheet, Font, Image } from '@react-pdf/renderer';
-import logo from '../../img/logo.jpg';
 import moment from 'moment';
 
 // Register fonts
@@ -87,7 +86,14 @@ const DevisPDF = ({ devis, user }) => {
         <Document>
             <Page size="A4" style={styles.page}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <Image src={logo} style={styles.logo} />
+                    {user?.logo ? (
+                        <Image
+                            src={`${(process.env.REACT_APP_API_URL || '').replace(/\/$/, '')}/uploads/${user.logo}`}
+                            style={styles.logo}
+                        />
+                    ) : (
+                        <View style={styles.logo} />
+                    )}
                     <View style={{ alignItems: 'flex-end' }}>
                         <Text style={{ ...styles.infoText, fontSize: 12, fontWeight: "bold" }}>{user?.nom}</Text>
                         <Text style={styles.infoText}>{user?.adresse}</Text>

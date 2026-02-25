@@ -16,8 +16,8 @@ const Parametres = ({ isLoggedIn, setIsLoggedIn }) => {
   const [AddSoirOpen, setAddSoirOpen] = useState(false);
 
   // Collapse states
-  const [isDatesExpanded, setIsDatesExpanded] = useState(true);
-  const [isSlotsExpanded, setIsSlotsExpanded] = useState(true);
+  const [isDatesExpanded, setIsDatesExpanded] = useState(false);
+  const [isSlotsExpanded, setIsSlotsExpanded] = useState(false);
 
   // Pagination state
   const [datesLimit, setDatesLimit] = useState(5);
@@ -25,6 +25,21 @@ const Parametres = ({ isLoggedIn, setIsLoggedIn }) => {
   // Controlled inputs for new tranches
   const [tempMidiTranche, setTempMidiTranche] = useState("");
   const [tempSoirTranche, setTempSoirTranche] = useState("");
+
+  // Company Data State
+  const [userData, setUserData] = useState({
+    nom: '',
+    adresse: '',
+    adresse_suite: '',
+    tel: '',
+    mail: '',
+    siret: '',
+    logo: ''
+  });
+  const [isCompanyExpanded, setIsCompanyExpanded] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [logoFile, setLogoFile] = useState(null);
+  const userId = localStorage.getItem('userId') || 1;
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
@@ -55,9 +70,19 @@ const Parametres = ({ isLoggedIn, setIsLoggedIn }) => {
     }
   }
 
+  const getUserData = async () => {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}utilisateurs/${userId}`);
+      setUserData(res.data);
+    } catch (err) {
+      console.log("Erreur lors de la récupération des données utilisateur:", err);
+    }
+  }
+
   useEffect(() => {
     getDates();
     getTranches();
+    getUserData();
   }, []);
 
   const addDate = async (date) => {
@@ -114,6 +139,44 @@ const Parametres = ({ isLoggedIn, setIsLoggedIn }) => {
       getDates();
     } catch (error) {
       console.error("Une erreur s'est produite lors de la requête POST :", error);
+    }
+  };
+
+  const handleUserChange = (e) => {
+    const { name, value } = e.target;
+    setUserData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const saveUserData = async () => {
+    try {
+      await axios.put(`${process.env.REACT_APP_API_URL}utilisateurs/${userId}`, userData);
+      alert("Informations enregistrées avec succès !");
+    } catch (err) {
+      console.error("Erreur lors de la sauvegarde des informations:", err);
+      alert("Erreur lors de la sauvegarde.");
+    }
+  };
+
+  const handleLogoUpload = async () => {
+    if (!logoFile) return;
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('logo', logoFile);
+
+    try {
+      const res = await axios.post(`${process.env.REACT_APP_API_URL}utilisateurs/${userId}/logo`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      const newLogo = res.data.filename;
+      setUserData(prev => ({ ...prev, logo: newLogo }));
+      // Save the new logo filename in the user record
+      await axios.put(`${process.env.REACT_APP_API_URL}utilisateurs/${userId}`, { ...userData, logo: newLogo });
+      setLogoFile(null);
+    } catch (err) {
+      console.error("Erreur upload logo:", err);
+      alert("Erreur lors de l'envoi du logo.");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -340,6 +403,150 @@ const Parametres = ({ isLoggedIn, setIsLoggedIn }) => {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* Informations Personnelles Section */}
+      <section className="bg-slate-800/30 rounded-3xl border border-slate-700/50 overflow-hidden shadow-xl">
+        <div
+          className="flex items-center justify-between p-6 cursor-pointer hover:bg-slate-700/20 transition-colors"
+          onClick={() => setIsCompanyExpanded(!isCompanyExpanded)}
+        >
+          <h2 className="text-2xl font-bold flex items-center gap-3">
+            <span className="w-2 h-8 bg-purple-500 rounded-full"></span>
+            Informations Personnelles
+          </h2>
+          <span className={`text-2xl transition-transform duration-300 ${isCompanyExpanded ? 'rotate-180' : ''}`}>
+            ▼
+          </span>
+        </div>
+
+        {isCompanyExpanded && (
+          <div className="p-6 border-t border-slate-700/50 animate-fade-in space-y-8">
+            {/* Logo Upload Section */}
+            <div className="bg-slate-900/40 p-6 rounded-3xl border border-slate-700/50">
+              <h3 className="text-xl font-bold mb-6 flex items-center gap-2">🖼️ Logo de l'entreprise</h3>
+              <div className="flex flex-col md:flex-row items-center gap-8">
+                <div className="w-32 h-32 bg-slate-800 rounded-2xl border-2 border-dashed border-slate-700 flex items-center justify-center overflow-hidden">
+                  {userData.logo ? (
+                    <img
+                      src={`${(process.env.REACT_APP_API_URL || '').replace(/\/$/, '')}/uploads/${userData.logo}`}
+                      alt="Logo Empresa"
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <span className="text-slate-500 text-xs text-center px-2">Aucun logo configuré</span>
+                  )}
+                </div>
+                <div className="flex-1 space-y-4">
+                  <p className="text-sm text-slate-400">Recommandé : Format carré ou paysage, fond transparent (PNG).</p>
+                  <div className="flex flex-wrap gap-4">
+                    <input
+                      type="file"
+                      id="logo-upload"
+                      className="hidden"
+                      onChange={(e) => setLogoFile(e.target.files[0])}
+                      accept="image/*"
+                    />
+                    <label
+                      htmlFor="logo-upload"
+                      className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-xl cursor-pointer transition-all font-bold border border-slate-700"
+                    >
+                      {logoFile ? logoFile.name : "Choisir une image"}
+                    </label>
+                    {logoFile && (
+                      <button
+                        onClick={handleLogoUpload}
+                        disabled={uploading}
+                        className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl transition-all shadow-lg shadow-emerald-500/20 font-bold disabled:opacity-50"
+                      >
+                        {uploading ? "Envoi..." : "Mettre à jour le logo"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Form Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-slate-400 font-bold text-sm ml-1">Nom de l'entreprise</label>
+                <input
+                  type="text"
+                  name="nom"
+                  value={userData.nom || ''}
+                  onChange={handleUserChange}
+                  className="w-full bg-slate-900/50 border border-slate-700 rounded-2xl p-4 text-white focus:border-purple-500 outline-none transition-all"
+                  placeholder="Ex: Truckmaster"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-slate-400 font-bold text-sm ml-1">SIRET</label>
+                <input
+                  type="text"
+                  name="siret"
+                  value={userData.siret || ''}
+                  onChange={handleUserChange}
+                  className="w-full bg-slate-900/50 border border-slate-700 rounded-2xl p-4 text-white focus:border-purple-500 outline-none transition-all"
+                  placeholder="Votre SIRET"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-slate-400 font-bold text-sm ml-1">Adresse</label>
+                <input
+                  type="text"
+                  name="adresse"
+                  value={userData.adresse || ''}
+                  onChange={handleUserChange}
+                  className="w-full bg-slate-900/50 border border-slate-700 rounded-2xl p-4 text-white focus:border-purple-500 outline-none transition-all"
+                  placeholder="Adresse principale"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-slate-400 font-bold text-sm ml-1">Complément d'adresse</label>
+                <input
+                  type="text"
+                  name="adresse_suite"
+                  value={userData.adresse_suite || ''}
+                  onChange={handleUserChange}
+                  className="w-full bg-slate-900/50 border border-slate-700 rounded-2xl p-4 text-white focus:border-purple-500 outline-none transition-all"
+                  placeholder="Code postal, ville, etc."
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-slate-400 font-bold text-sm ml-1">Numéro de téléphone</label>
+                <input
+                  type="text"
+                  name="tel"
+                  value={userData.tel || ''}
+                  onChange={handleUserChange}
+                  className="w-full bg-slate-900/50 border border-slate-700 rounded-2xl p-4 text-white focus:border-purple-500 outline-none transition-all"
+                  placeholder="Ex: 06 00 00 00 00"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-slate-400 font-bold text-sm ml-1">Courriel</label>
+                <input
+                  type="email"
+                  name="mail"
+                  value={userData.mail || ''}
+                  onChange={handleUserChange}
+                  className="w-full bg-slate-900/50 border border-slate-700 rounded-2xl p-4 text-white focus:border-purple-500 outline-none transition-all"
+                  placeholder="contact@exemple.fr"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-4">
+              <button
+                onClick={saveUserData}
+                className="bg-purple-600 hover:bg-purple-500 text-white px-8 py-4 rounded-2xl transition-all shadow-xl shadow-purple-500/20 font-black text-lg"
+              >
+                💾 ENREGISTRER LES MODIFICATIONS
+              </button>
             </div>
           </div>
         )}
