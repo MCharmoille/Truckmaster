@@ -33,6 +33,9 @@ if (process.env.NODE_ENV === 'dev') {
 }
 
 // 2. Body parsing and static files
+if (!fs.existsSync('uploads')) {
+    fs.mkdirSync('uploads');
+}
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 

@@ -75,7 +75,7 @@ const Commandes = () => {
     setSelectedDate({ ...selectedDate, [filterName]: newValue });
 
     try {
-      await axios.post(process.env.REACT_APP_API_URL + "dates/updateCb", { id_date: selectedDate.id_date, cb: [filterName], checked: newValue });
+      await axios.post(process.env.REACT_APP_API_URL + "dates/updateCb", { id_date: selectedDate.id_date, cb: filterName, checked: newValue });
     } catch (error) {
       console.error("Une erreur s'est produite lors de la requête POST :", error);
     }

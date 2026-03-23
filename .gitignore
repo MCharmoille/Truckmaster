@@ -5,3 +5,6 @@ client/truckmaster/node_modules/
 server/node_modules/
 /server/node_modules
 server/.env
+
+# Uploads
+/server/uploads
