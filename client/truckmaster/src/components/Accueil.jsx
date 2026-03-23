@@ -14,7 +14,7 @@ function App() {
           <div className="flex items-center gap-6">
             <img className='w-28 h-auto drop-shadow-lg' src={logo} alt="Truckmaster Logo" />
             <div>
-              <h2 className="text-4xl font-bold text-white">Bonjour !</h2>
+              <h2 className="text-4xl font-bold text-white">Bonjour {localStorage.getItem('user') || ''} !</h2>
               <p className="text-slate-400 text-lg">Prêt pour le service ?</p>
             </div>
           </div>

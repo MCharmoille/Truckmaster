@@ -1,9 +1,9 @@
 import { db, customConsoleLog, moment } from '../index.js';
 
-class Produit {
-  static async getDates() {
+class Date {
+  static async getDates(id_utilisateur) {
     return new Promise((resolve, reject) => {
-      db.query('SELECT * FROM dates_travailles ORDER BY jour ASC', (err, results) => {
+      db.query('SELECT * FROM dates_travailles WHERE id_utilisateur = ? ORDER BY jour ASC', [id_utilisateur], (err, results) => {
         if (err) {
           reject(err);
         } else {
@@ -19,9 +19,9 @@ class Produit {
     });
   }
 
-  static async getDate(date) {
+  static async getDate(date, id_utilisateur) {
     return new Promise((resolve, reject) => {
-      db.query('SELECT * FROM dates_travailles WHERE jour LIKE "'+date+'"', (err, results) => {
+      db.query('SELECT * FROM dates_travailles WHERE jour = ? AND id_utilisateur = ?', [date, id_utilisateur], (err, results) => {
         if (err) {
           reject(err);
         } else {
@@ -31,38 +31,43 @@ class Produit {
     });
   }
 
-  static async addDate(req, res) {
+  static async addDate(data, id_utilisateur) {
     return new Promise((resolve, reject) => {
-      var query = "INSERT INTO dates_travailles (jour, cb_midi, cb_soir) VALUES ('"+moment(req.body.jour).format('YYYY-MM-DD')+"', "+req.body.cb_midi+", "+req.body.cb_soir+")";
+      var query = "INSERT INTO dates_travailles (jour, cb_midi, cb_soir, id_utilisateur) VALUES (?, ?, ?, ?)";
+      const values = [moment(data.jour).format('YYYY-MM-DD'), data.cb_midi, data.cb_soir, id_utilisateur];
 
-      db.query(query, (err) =>{
-        if(err) reject(err)
+      db.query(query, values, (err) => {
+        if (err) reject(err)
         resolve(true);
       });
     });
   }
 
-  static async updateCb(req, res) {
+  static async updateCb(data, id_utilisateur) {
     return new Promise((resolve, reject) => {
-      var query = "UPDATE dates_travailles SET "+req.body.cb+" = "+req.body.checked+" WHERE id_date = "+req.body.id_date;
+      // Whitelist columns to prevent injection
+      const allowedColumns = ['cb_midi', 'cb_soir'];
+      if (!allowedColumns.includes(data.cb)) return reject(new Error("Colonne non autorisée"));
 
-      db.query(query, (err) =>{
-        if(err) reject(err)
+      var query = `UPDATE dates_travailles SET ${data.cb} = ? WHERE id_date = ? AND id_utilisateur = ?`;
+      const values = [data.checked, data.id_date, id_utilisateur];
+
+      db.query(query, values, (err) => {
+        if (err) reject(err)
         resolve(true);
       });
     });
   }
 
-  static async deleteDate(req, res) {
+  static async deleteDate(data, id_utilisateur) {
     return new Promise((resolve, reject) => {
-      var query = "DELETE FROM dates_travailles WHERE id_date = "+req.body.id_date;
-
-      db.query(query, (err) =>{
-        if(err) reject(err)
+      var query = "DELETE FROM dates_travailles WHERE id_date = ? AND id_utilisateur = ?";
+      db.query(query, [data.id_date, id_utilisateur], (err) => {
+        if (err) reject(err)
         resolve(true);
       });
     });
   }
 }
 
-export default Produit;
+export default Date;

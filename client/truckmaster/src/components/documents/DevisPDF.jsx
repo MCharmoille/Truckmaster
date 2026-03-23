@@ -114,7 +114,7 @@ const DevisPDF = ({ devis, user }) => {
                         <Text style={styles.infoText}>{devis.adresse_suite}</Text>
                     </View>
                     <View style={{ alignItems: 'flex-end' }}>
-                        <Text style={{ ...styles.infoText, fontSize: 14, fontWeight: 'bold' }}>DEVIS N° {devis.id.toString().padStart(4, '0')}</Text>
+                        <Text style={{ ...styles.infoText, fontSize: 14, fontWeight: 'bold' }}>DEVIS N° {(devis.id_public || devis.id).toString().padStart(4, '0')}</Text>
                         <Text style={styles.infoText}>Date : {formatDate(devis.date_commande)}</Text>
                     </View>
                 </View>
@@ -132,7 +132,7 @@ const DevisPDF = ({ devis, user }) => {
                             <Text style={{ width: "15%", textAlign: 'center' }}>{produit.quantite}</Text>
                             <Text style={{ width: "15%", textAlign: 'right' }}>{formatCurrency(produit.prix)} €</Text>
                             <Text style={{ width: "15%", textAlign: 'right' }}>
-                                {formatCurrency(produit.quantite != null ? (produit.quantite * produit.prix) : produit.prix)} €
+                                {formatCurrency(produit.quantite != null && produit.quantite !== '' ? (produit.quantite * produit.prix) : produit.prix)} €
                             </Text>
                         </View>
                     ))}
@@ -142,7 +142,7 @@ const DevisPDF = ({ devis, user }) => {
                     <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginBottom: 2 }}>
                         <Text style={{ fontWeight: 'bold', fontSize: 12 }}>TOTAL TTC : </Text>
                         <Text style={{ fontWeight: 'bold', fontSize: 12, border: '1pt solid #000', padding: 5, minWidth: 120, textAlign: 'right' }}>
-                            {formatCurrency(devis.devis_produits ? devis.devis_produits.reduce((acc, p) => acc + (p.quantite ? p.quantite * p.prix : p.prix), 0) : 0)} €
+                            {formatCurrency(devis.devis_produits ? devis.devis_produits.reduce((acc, p) => acc + (p.quantite != null && p.quantite !== '' ? p.quantite * Number(p.prix) : Number(p.prix)), 0) : 0)} €
                         </Text>
                     </View>
                 </View>

@@ -1,10 +1,10 @@
 import { db, customConsoleLog } from '../index.js';
 
 class Devis {
-    static async getAll() {
+    static async getAll(id_utilisateur) {
         return new Promise((resolve, reject) => {
-            const q = "SELECT *, date_creation as date_commande FROM devis WHERE id_utilisateur = 1 ORDER BY id DESC";
-            db.query(q, (err, devis) => {
+            const q = "SELECT *, date_creation as date_commande FROM devis WHERE id_utilisateur = ? ORDER BY id DESC";
+            db.query(q, [id_utilisateur], (err, devis) => {
                 if (err) return reject(err);
                 if (devis.length === 0) return resolve([]);
 
@@ -30,9 +30,9 @@ class Devis {
         });
     }
 
-    static async getById(id) {
+    static async getById(id, id_utilisateur) {
         return new Promise((resolve, reject) => {
-            db.query("SELECT *, date_creation as date_commande FROM devis WHERE id = ?", [id], (err, devis) => {
+            db.query("SELECT *, date_creation as date_commande FROM devis WHERE id = ? AND id_utilisateur = ?", [id, id_utilisateur], (err, devis) => {
                 if (err) return reject(err);
                 if (devis.length === 0) return resolve(null);
 
@@ -46,36 +46,46 @@ class Devis {
         });
     }
 
-    static async create(data) {
+    static async create(data, id_utilisateur) {
         return new Promise((resolve, reject) => {
             const { nom, adresse, adresse_suite, date_commande, produits } = data;
-            const q = "INSERT INTO devis (nom, adresse, adresse_suite, date_creation, id_utilisateur) VALUES (?, ?, ?, ?, 1)";
-            db.query(q, [nom, adresse, adresse_suite, date_commande], (err, result) => {
+            
+            db.query("SELECT IFNULL(MAX(id_public), 0) + 1 AS nextId FROM devis WHERE id_utilisateur = ?", [id_utilisateur], (err, maxRes) => {
                 if (err) return reject(err);
-                const devisId = result.insertId;
+                
+                const nextIdPublic = maxRes[0].nextId;
 
-                if (produits && produits.length > 0) {
-                    const values = produits.map(p => [devisId, p.id_produit, p.quantite, p.prix]);
-                    db.query("INSERT INTO devis_produits (id_devis, id_produit, quantite, prix) VALUES ?", [values], (err) => {
-                        if (err) return reject(err);
+                const q = "INSERT INTO devis (nom, adresse, adresse_suite, date_creation, id_utilisateur, id_public) VALUES (?, ?, ?, ?, ?, ?)";
+                db.query(q, [nom, adresse, adresse_suite, date_commande, id_utilisateur, nextIdPublic], (err, result) => {
+                    if (err) return reject(err);
+                    const devisId = result.insertId;
+
+                    if (produits && produits.length > 0) {
+                        const values = produits.map(p => [devisId, p.id_produit, p.quantite, p.prix]);
+                        db.query("INSERT INTO devis_produits (id_devis, id_produit, quantite, prix) VALUES ?", [values], (err) => {
+                            if (err) return reject(err);
+                            resolve({ id: devisId });
+                        });
+                    } else {
                         resolve({ id: devisId });
-                    });
-                } else {
-                    resolve({ id: devisId });
-                }
+                    }
+                });
             });
         });
     }
 
-    static async update(id, data) {
+    static async update(id, data, id_utilisateur) {
         return new Promise((resolve, reject) => {
             const { nom, adresse, adresse_suite, date_commande, produits } = data;
-            const q = "UPDATE devis SET nom = ?, adresse = ?, adresse_suite = ?, date_creation = ? WHERE id = ?";
+            const q = "UPDATE devis SET nom = ?, adresse = ?, adresse_suite = ?, date_creation = ? WHERE id = ? AND id_utilisateur = ?";
+
             db.beginTransaction(err => {
                 if (err) return reject(err);
 
-                db.query(q, [nom, adresse, adresse_suite, date_commande, id], (err) => {
+                db.query(q, [nom, adresse, adresse_suite, date_commande, id, id_utilisateur], (err, result) => {
                     if (err) return db.rollback(() => reject(err));
+
+                    if (result.affectedRows === 0) return db.rollback(() => reject(new Error("Devis introuvable ou non autorisé")));
 
                     db.query("DELETE FROM devis_produits WHERE id_devis = ?", [id], (err) => {
                         if (err) return db.rollback(() => reject(err));
@@ -101,17 +111,24 @@ class Devis {
         });
     }
 
-    static async delete(id) {
+    static async delete(id, id_utilisateur) {
         return new Promise((resolve, reject) => {
             db.beginTransaction(err => {
                 if (err) return reject(err);
-                db.query("DELETE FROM devis_produits WHERE id_devis = ?", [id], (err) => {
+
+                // First check ownership
+                db.query("SELECT id FROM devis WHERE id = ? AND id_utilisateur = ?", [id, id_utilisateur], (err, results) => {
                     if (err) return db.rollback(() => reject(err));
-                    db.query("DELETE FROM devis WHERE id = ?", [id], (err) => {
+                    if (results.length === 0) return db.rollback(() => reject(new Error("Devis introuvable ou non autorisé")));
+
+                    db.query("DELETE FROM devis_produits WHERE id_devis = ?", [id], (err) => {
                         if (err) return db.rollback(() => reject(err));
-                        db.commit(err => {
+                        db.query("DELETE FROM devis WHERE id = ? AND id_utilisateur = ?", [id, id_utilisateur], (err) => {
                             if (err) return db.rollback(() => reject(err));
-                            resolve(true);
+                            db.commit(err => {
+                                if (err) return db.rollback(() => reject(err));
+                                resolve(true);
+                            });
                         });
                     });
                 });

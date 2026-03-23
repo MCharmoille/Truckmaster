@@ -1,9 +1,9 @@
 import { db, customConsoleLog } from '../index.js';
 
-class Produit {
-  static async getTranches() {
+class Tranche {
+  static async getTranches(id_utilisateur) {
     return new Promise((resolve, reject) => {
-      db.query('SELECT * FROM tranches_horaires ORDER BY is_midi DESC, tranche ASC', (err, results) => {
+      db.query('SELECT * FROM tranches_horaires WHERE id_utilisateur = ? ORDER BY is_midi DESC, tranche ASC', [id_utilisateur], (err, results) => {
         if (err) {
           reject(err);
         } else {
@@ -13,27 +13,26 @@ class Produit {
     });
   }
 
-  static async addTranche(req, res) {
+  static async addTranche(data, id_utilisateur) {
     return new Promise((resolve, reject) => {
-      var query = "INSERT INTO tranches_horaires (tranche, is_midi) VALUES ('"+req.body.tranche+"', "+req.body.is_midi+")";
-      console.log(query);
-      db.query(query, (err) =>{
-        if(err) reject(err)
+      var query = "INSERT INTO tranches_horaires (tranche, is_midi, id_utilisateur) VALUES (?, ?, ?)";
+      const values = [data.tranche, data.is_midi, id_utilisateur];
+      db.query(query, values, (err) => {
+        if (err) reject(err)
         resolve(true);
       });
     });
   }
 
-  static async deleteTranche(req, res) {
+  static async deleteTranche(data, id_utilisateur) {
     return new Promise((resolve, reject) => {
-      var query = "DELETE FROM tranches_horaires WHERE id_tranche = "+req.body.id_tranche;
-      
-      db.query(query, (err) =>{
-        if(err) reject(err)
+      var query = "DELETE FROM tranches_horaires WHERE id_tranche = ? AND id_utilisateur = ?";
+      db.query(query, [data.id_tranche, id_utilisateur], (err) => {
+        if (err) reject(err)
         resolve(true);
       });
     });
   }
 }
 
-export default Produit;
+export default Tranche;

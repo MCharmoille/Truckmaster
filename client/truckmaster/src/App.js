@@ -13,12 +13,28 @@ import Produit from "./components/Produit";
 import Achats from "./components/Achats";
 import { Home, List, Plus, Utensils, Settings } from 'lucide-react';
 
+import axios from 'axios';
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
+    // Configuration globale d'axios pour inclure le userId et le token
+    axios.interceptors.request.use((config) => {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        config.headers['x-user-id'] = userId;
+      }
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+      }
+      return config;
+    }, (error) => {
+      return Promise.reject(error);
+    });
+
     const storedToken = localStorage.getItem('authToken');
-    // TO DO : protéger toutes les requêtes http axios en vérifiant et incluant le token
     if (storedToken) {
       setIsLoggedIn(true);
     }

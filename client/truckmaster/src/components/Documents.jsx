@@ -93,6 +93,7 @@ const Documents = () => {
 
     const filteredDevis = selectedType === 'devis' ? data.filter(d =>
         d.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (d.id_public && d.id_public.toString().includes(searchQuery)) ||
         d.id.toString().includes(searchQuery)
     ) : [];
 
@@ -203,7 +204,7 @@ const Documents = () => {
                                     >
                                         <div>
                                             <p className="text-slate-500 text-xs font-black uppercase tracking-widest mb-1">
-                                                N° {devis.id.toString().padStart(4, '0')} — {moment(devis.date_commande).format('DD/MM/YYYY')}
+                                                N° {(devis.id_public || devis.id).toString().padStart(4, '0')} — {moment(devis.date_commande).format('DD/MM/YYYY')}
                                             </p>
                                             <h4 className="text-lg font-bold text-white group-hover:text-purple-400 transition-colors">
                                                 {devis.nom}
@@ -241,7 +242,7 @@ const Documents = () => {
                         {selectedDevis && (
                             <PDFDownloadLink
                                 document={<DevisPDF devis={selectedDevis} user={currentUser} />}
-                                fileName={`DEVIS_${selectedDevis.id.toString().padStart(4, '0')}_${selectedDevis.nom.replace(/\s+/g, '_')}.pdf`}
+                                fileName={`DEVIS_${(selectedDevis.id_public || selectedDevis.id).toString().padStart(4, '0')}_${selectedDevis.nom.replace(/\s+/g, '_')}.pdf`}
                             >
                                 {({ loading: pdfLoading }) => (
                                     <button

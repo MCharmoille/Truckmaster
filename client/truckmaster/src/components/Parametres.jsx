@@ -43,6 +43,8 @@ const Parametres = ({ isLoggedIn, setIsLoggedIn }) => {
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('user');
     setIsLoggedIn(false);
     navigate("/");
   };
@@ -135,7 +137,7 @@ const Parametres = ({ isLoggedIn, setIsLoggedIn }) => {
 
   const checkCb = async (date, event) => {
     try {
-      await axios.post(process.env.REACT_APP_API_URL + "dates/updateCb", { id_date: date.id_date, cb: [event.target.name], checked: event.target.checked });
+      await axios.post(process.env.REACT_APP_API_URL + "dates/updateCb", { id_date: date.id_date, cb: event.target.name, checked: event.target.checked });
       getDates();
     } catch (error) {
       console.error("Une erreur s'est produite lors de la requête POST :", error);

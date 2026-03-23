@@ -93,7 +93,12 @@ const DevisModal = ({ isOpen, onClose, devis, onSave }) => {
 
     const updateProduit = (index, field, value) => {
         const newProduits = [...formData.produits];
-        newProduits[index][field] = field === 'quantite' ? parseInt(value) || 0 : parseFloat(value) || 0;
+        if (field === 'quantite') {
+            newProduits[index][field] = value === '' ? null : parseInt(value);
+            if (isNaN(newProduits[index][field]) && value !== '') newProduits[index][field] = 0;
+        } else {
+            newProduits[index][field] = parseFloat(value) || 0;
+        }
         setFormData(prev => ({ ...prev, produits: newProduits }));
     };
 
@@ -108,7 +113,7 @@ const DevisModal = ({ isOpen, onClose, devis, onSave }) => {
             <div className="bg-slate-800 w-full max-w-4xl max-h-[90vh] rounded-[2.5rem] border border-slate-700 shadow-2xl overflow-hidden flex flex-col">
                 <div className="p-6 border-b border-slate-700 flex justify-between items-center bg-slate-800">
                     <h2 className="text-2xl font-black text-white">
-                        {devis ? `Modifier Devis N° ${devis.id}` : 'Nouveau Devis'}
+                        {devis ? `Modifier Devis N° ${devis.id_public || devis.id}` : 'Nouveau Devis'}
                     </h2>
                     <button onClick={onClose} className="p-2 hover:bg-slate-700 rounded-xl transition-colors text-slate-400 hover:text-white">
                         <X className="w-6 h-6" />
@@ -195,7 +200,7 @@ const DevisModal = ({ isOpen, onClose, devis, onSave }) => {
                                         <input
                                             type="number"
                                             className="w-full bg-slate-800 border-2 border-slate-700 rounded-xl px-3 py-1 text-white focus:border-purple-500 outline-none text-center font-bold"
-                                            value={item.quantite}
+                                            value={item.quantite !== null && item.quantite !== undefined ? item.quantite : ''}
                                             onChange={e => updateProduit(index, 'quantite', e.target.value)}
                                         />
                                     </div>
@@ -215,7 +220,7 @@ const DevisModal = ({ isOpen, onClose, devis, onSave }) => {
                                     <div className="w-32 text-right">
                                         <p className="text-[10px] text-slate-500 font-black uppercase mb-1">Total</p>
                                         <p className="text-white font-black">
-                                            {(item.quantite * item.prix).toFixed(2)}€
+                                            {((item.quantite != null && item.quantite !== '') ? item.quantite * Number(item.prix) : Number(item.prix)).toFixed(2)}€
                                         </p>
                                     </div>
                                     <button
@@ -240,7 +245,7 @@ const DevisModal = ({ isOpen, onClose, devis, onSave }) => {
                     <div className="text-left">
                         <p className="text-[10px] text-slate-500 font-black uppercase tracking-widest">Total Devis (TTC)</p>
                         <p className="text-3xl font-black text-white">
-                            {formData.produits.reduce((acc, p) => acc + (p.quantite * p.prix), 0).toFixed(2)}€
+                            {formData.produits.reduce((acc, p) => acc + ((p.quantite != null && p.quantite !== '') ? p.quantite * Number(p.prix) : Number(p.prix)), 0).toFixed(2)}€
                         </p>
                     </div>
                     <div className="flex gap-4">

@@ -13,7 +13,7 @@ export const scanReceipt = async (req, res) => {
         }
 
         // 0. Vérifier le quota
-        const id_utilisateur = 1;
+        const id_utilisateur = req.headers['x-user-id'] || 1;
         customConsoleLog(`[IA Scan] Début de l'analyse pour l'utilisateur ${id_utilisateur}`);
 
         const userResults = await new Promise((resolve, reject) => {
@@ -34,7 +34,7 @@ export const scanReceipt = async (req, res) => {
 
         // 1. Récupérer les noms existants pour aider l'IA
         customConsoleLog(`[IA Scan] Récupération du contexte des produits...`);
-        const existingNames = await Achat.getUniqueNames();
+        const existingNames = await Achat.getUniqueNames(id_utilisateur);
         const namesContext = existingNames.length > 0
             ? `Voici une liste de nos articles existants pour t'aider à corriger les noms abrégés : ${existingNames.join(', ')}.`
             : "";

@@ -1,44 +1,20 @@
 import { db, customConsoleLog } from '../index.js';
 
 class Ingredient {
-  static async getIngredients() {
+  static async getIngredients(id_utilisateur) {
     return new Promise((resolve, reject) => {
-      db.query('SELECT * FROM ingredients', async (err, ingredients) => {
+      db.query('SELECT * FROM ingredients WHERE id_utilisateur = ?', [id_utilisateur], async (err, ingredients) => {
         if (err) return reject(err);
         resolve(ingredients);
       });
     });
   }
 
-  //   static async save(id_produit, data) {
-  //     return new Promise((resolve, reject) => {
-  //       if (!id_produit || !data || Object.keys(data).length === 0) {
-  //         reject(new Error('L\'ID du produit et les données sont requis.'));
-  //         return;
-  //       }
-
-  //       const fields = Object.keys(data).map(key => `${key} = ?`).join(', ');
-  //       const values = Object.values(data);
-  //       values.push(id_produit);
-
-  //       const q = `UPDATE produits SET ${fields} WHERE id_produit = ?`;
-
-  //       db.query(db.format(q, values), (err, result) => {
-  //         if (err) {
-  //           reject(new Error('Erreur lors de la mise à jour du produit: ' + err.message));
-  //         } else if (result.affectedRows === 0) {
-  //           reject(new Error('Aucun produit trouvé avec cet ID.'));
-  //         } else {
-  //           resolve('Produit mis à jour avec succès.');
-  //         }
-  //       });
-  //     });
-  //   }
-  static async create(nom) {
+  static async create(nom, id_utilisateur) {
     return new Promise((resolve, reject) => {
-      db.query('INSERT INTO ingredients (nom) VALUES (?)', [nom], (err, result) => {
+      db.query('INSERT INTO ingredients (nom, id_utilisateur) VALUES (?, ?)', [nom, id_utilisateur], (err, result) => {
         if (err) return reject(err);
-        resolve({ id_ingredient: result.insertId, nom: nom });
+        resolve({ id_ingredient: result.insertId, nom: nom, id_utilisateur: id_utilisateur });
       });
     });
   }

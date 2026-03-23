@@ -1,8 +1,11 @@
 import Achat from '../models/Achat.js';
 
+const getUserId = (req) => req.headers['x-user-id'] || 1;
+
 export const getAchats = async (req, res) => {
     try {
-        const achats = await Achat.getAchats(req.query);
+        const userId = getUserId(req);
+        const achats = await Achat.getAchats(req.query, userId);
         res.status(200).json(achats);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -11,7 +14,8 @@ export const getAchats = async (req, res) => {
 
 export const createAchat = async (req, res) => {
     try {
-        const achat = await Achat.create(req.body);
+        const userId = getUserId(req);
+        const achat = await Achat.create(req.body, userId);
         res.status(201).json(achat);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -20,8 +24,9 @@ export const createAchat = async (req, res) => {
 
 export const updateAchat = async (req, res) => {
     try {
+        const userId = getUserId(req);
         const { id } = req.params;
-        await Achat.update(id, req.body);
+        await Achat.update(id, req.body, userId);
         res.status(200).json({ id_achat: id, ...req.body });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -30,8 +35,9 @@ export const updateAchat = async (req, res) => {
 
 export const deleteAchat = async (req, res) => {
     try {
+        const userId = getUserId(req);
         const { id } = req.params;
-        await Achat.delete(id);
+        await Achat.delete(id, userId);
         res.status(200).json({ message: "Achat supprimé avec succès" });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -40,9 +46,20 @@ export const deleteAchat = async (req, res) => {
 
 export const getStatistiquesAchats = async (req, res) => {
     try {
+        const userId = getUserId(req);
         const { startDate, endDate } = req.query;
-        const stats = await Achat.getStatistiques(startDate, endDate);
+        const stats = await Achat.getStatistiques(startDate, endDate, userId);
         res.status(200).json(stats);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const getUniqueNames = async (req, res) => {
+    try {
+        const userId = getUserId(req);
+        const names = await Achat.getUniqueNames(userId);
+        res.status(200).json(names);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

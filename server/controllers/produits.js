@@ -1,8 +1,11 @@
 import Produit from '../models/Produit.js';
 
+const getUserId = (req) => req.headers['x-user-id'] || 1;
+
 export const getProduits = async (req, res) => {
     try {
-        const produits = await Produit.getProduits();
+        const userId = getUserId(req);
+        const produits = await Produit.getProduits(userId);
         res.status(200).json(produits);
     } catch (error) {
         res.status(404).json({ message: error.message });
@@ -11,8 +14,9 @@ export const getProduits = async (req, res) => {
 
 export const getProduit = async (req, res) => {
     try {
+        const userId = getUserId(req);
         const withStats = req.query.stats === 'true';
-        const recette = await Produit.getProduit(req.query.id_produit, withStats);
+        const recette = await Produit.getProduit(req.query.id_produit, userId, withStats);
         res.status(200).json(recette);
     } catch (error) {
         res.status(404).json({ message: error.message });
@@ -21,7 +25,8 @@ export const getProduit = async (req, res) => {
 
 export const getProduitsAffiches = async (req, res) => {
     try {
-        const produits = await Produit.getProduitsAffiches();
+        const userId = getUserId(req);
+        const produits = await Produit.getProduitsAffiches(userId);
         res.status(200).json(produits);
     } catch (error) {
         res.status(404).json({ message: error.message });
@@ -37,37 +42,11 @@ export const getTypes = async (req, res) => {
     }
 }
 
-export const getIngredientsparDate = async (req, res) => {
-    try {
-        const ingredients = await Produit.getIngredientsparDate(req.params.date);
-        res.status(200).json(ingredients);
-    } catch (error) {
-        res.status(404).json({ message: error.message });
-    }
-}
-
-export const checkIngredient = async (req, res) => {
-    try {
-        const ing = await Produit.checkIngredient(req, res);
-        res.status(200).json(ing);
-    } catch (error) {
-        res.status(404).json({ message: error.message });
-    }
-}
-
-export const stockIngredient = async (req, res) => {
-    try {
-        const ing = await Produit.stockIngredient(req, res);
-        res.status(200).json(ing);
-    } catch (error) {
-        res.status(404).json({ message: error.message });
-    }
-}
-
 export const save = async (req, res) => {
     try {
-        const ing = await Produit.save(req.params.id, req.body);
-        res.status(200).json(ing);
+        const userId = getUserId(req);
+        const result = await Produit.save(req.params.id, userId, req.body);
+        res.status(200).json(result);
     } catch (error) {
         res.status(404).json({ message: error.message });
     }
@@ -75,7 +54,8 @@ export const save = async (req, res) => {
 
 export const createProduit = async (req, res) => {
     try {
-        const result = await Produit.create();
+        const userId = getUserId(req);
+        const result = await Produit.create(userId);
         res.status(201).json(result);
     } catch (error) {
         res.status(404).json({ message: error.message });
