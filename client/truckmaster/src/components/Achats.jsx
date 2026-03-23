@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import moment from 'moment';
-import { ShoppingBag, Plus, Edit2, Trash2, X, Check, Euro, Calendar, Package, Camera, Loader2, ListPlus } from 'lucide-react';
+import { ShoppingBag, Plus, Edit2, Trash2, X, Check, Euro, Calendar, Package, Camera, Loader2, ListPlus, ChevronDown, ChevronUp, FileText } from 'lucide-react';
 
 const Achats = () => {
     const [achats, setAchats] = useState([]);
@@ -22,6 +22,11 @@ const Achats = () => {
         limit: 20
     });
     const [hasMore, setHasMore] = useState(true);
+    const [expandedFactures, setExpandedFactures] = useState({});
+
+    const toggleFacture = (id) => {
+        setExpandedFactures(prev => ({ ...prev, [id]: !prev[id] }));
+    };
 
     useEffect(() => {
         fetchAchats();
@@ -94,13 +99,10 @@ const Achats = () => {
 
     const handleConfirmScan = async () => {
         try {
-            // On enregistre tous les articles scannés d'un coup
-            await Promise.all(scannedItems.map(item =>
-                axios.post(`${process.env.REACT_APP_API_URL}achats`, {
-                    ...item,
-                    date_achat: moment().format('YYYY-MM-DD')
-                })
-            ));
+            await axios.post(`${process.env.REACT_APP_API_URL}achats/factures`, {
+                date: moment().format('YYYY-MM-DD'),
+                items: scannedItems
+            });
             setScannedItems([]);
             fetchAchats();
         } catch (error) {
@@ -140,8 +142,35 @@ const Achats = () => {
         }
     };
 
+    const processedAchats = React.useMemo(() => {
+        const grouped = [];
+        const facturesSeen = new Set();
+
+        achats.forEach(achat => {
+            if (achat.id_facture) {
+                if (!facturesSeen.has(achat.id_facture)) {
+                    const factureItems = achats.filter(a => a.id_facture === achat.id_facture);
+                    const total = factureItems.reduce((sum, item) => sum + Number(item.prix), 0);
+                    
+                    grouped.push({
+                        type: 'facture',
+                        id: achat.id_facture,
+                        numero: achat.facture_numero,
+                        date: achat.facture_date,
+                        items: factureItems,
+                        total: total
+                    });
+                    facturesSeen.add(achat.id_facture);
+                }
+            } else {
+                grouped.push({ type: 'solo', ...achat });
+            }
+        });
+        return grouped;
+    }, [achats]);
+
     return (
-        <div className="w-full min-h-screen bg-slate-900 p-4 md:p-8 animate-fade-in">
+        <div className="w-full min-h-screen bg-slate-900 p-4 md:p-8 animate-fade-in text-white">
             <div className="max-w-4xl mx-auto">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
@@ -150,29 +179,31 @@ const Achats = () => {
                             <ShoppingBag className="w-8 h-8 text-emerald-400" />
                         </div>
                         <div>
-                            <h1 className="text-3xl font-bold text-white">Achats</h1>
+                            <h1 className="text-3xl font-bold">Achats</h1>
                             <p className="text-slate-400">Gérez vos dépenses et fournitures</p>
                         </div>
                     </div>
-                    <button
-                        onClick={() => {
-                            setShowForm(!showForm);
-                            if (showForm) setEditingAchat(null);
-                        }}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all shadow-lg ${showForm
-                            ? 'bg-slate-700 text-white hover:bg-slate-600'
-                            : 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-emerald-500/20'
-                            }`}
-                    >
-                        {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-                        {showForm ? 'Annuler' : 'Nouvel Achat'}
-                    </button>
+                    <div className="flex gap-3">
+                         <button
+                            onClick={() => {
+                                setShowForm(!showForm);
+                                if (showForm) setEditingAchat(null);
+                            }}
+                            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all shadow-lg ${showForm
+                                ? 'bg-slate-700 text-white hover:bg-slate-600'
+                                : 'bg-emerald-600 text-white hover:bg-emerald-500 shadow-emerald-500/20'
+                                }`}
+                        >
+                            {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+                            {showForm ? 'Annuler' : 'Nouvel Achat'}
+                        </button>
 
-                    <label className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-500 transition-all cursor-pointer shadow-lg shadow-indigo-500/20">
-                        {isScanning ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
-                        {isScanning ? 'Analyse...' : 'Scanner Ticket'}
-                        <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handleScan} disabled={isScanning} />
-                    </label>
+                        <label className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-500 transition-all cursor-pointer shadow-lg shadow-indigo-500/20">
+                            {isScanning ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
+                            {isScanning ? 'Analyse...' : 'Scanner Ticket'}
+                            <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handleScan} disabled={isScanning} />
+                        </label>
+                    </div>
                 </div>
 
                 {/* Filters Section */}
@@ -270,7 +301,7 @@ const Achats = () => {
                                 className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-indigo-500/30"
                             >
                                 <Check className="w-5 h-5" />
-                                Enregistrer les {scannedItems.length} articles
+                                Enregistrer la facture
                             </button>
                         </div>
                     </div>
@@ -366,82 +397,105 @@ const Achats = () => {
                 )}
 
                 {/* List Section */}
-                <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden shadow-xl">
-                    <div className="p-6 border-b border-slate-700 flex justify-between items-center">
-                        <h2 className="text-xl font-bold text-white">Historique des achats</h2>
-                        <span className="text-sm bg-slate-900 text-slate-400 px-3 py-1 rounded-full border border-slate-700">
-                            {achats.length} achat{achats.length > 1 ? 's' : ''}
+                <div className="space-y-4 pb-20">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-xl font-bold">Historique des achats</h2>
+                        <span className="text-sm bg-slate-800 text-slate-400 px-3 py-1 rounded-full border border-slate-700">
+                            {achats.length} article{achats.length > 1 ? 's' : ''}
                         </span>
                     </div>
 
                     {isLoading ? (
                         <div className="p-12 flex justify-center items-center">
-                            <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
+                            <Loader2 className="w-10 h-10 border-emerald-500 animate-spin" />
                         </div>
-                    ) : achats.length > 0 ? (
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left">
-                                <thead className="bg-slate-900/50 text-slate-400 text-sm font-medium uppercase tracking-wider">
-                                    <tr>
-                                        <th className="px-6 py-4">Article</th>
-                                        <th className="px-6 py-4">Date</th>
-                                        <th className="px-6 py-4">Quantité</th>
-                                        <th className="px-6 py-4">Prix</th>
-                                        <th className="px-6 py-4 text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-700/50">
-                                    {achats.map((achat) => (
-                                        <tr key={achat.id_achat} className="hover:bg-slate-700/30 transition-colors group">
-                                            <td className="px-6 py-4">
-                                                <p className="text-white font-bold group-hover:text-emerald-400 transition-colors">{achat.nom}</p>
-                                            </td>
-                                            <td className="px-6 py-4 text-slate-300">
-                                                {moment(achat.date_achat).format('DD MMM YYYY')}
-                                            </td>
-                                            <td className="px-6 py-4 text-slate-400">
-                                                {achat.quantite}
-                                            </td>
-                                            <td className="px-6 py-4">
-                                                <span className="text-emerald-400 font-mono font-bold">{achat.prix} €</span>
-                                            </td>
-                                            <td className="px-6 py-4 text-right">
-                                                <div className="flex justify-end gap-2">
-                                                    <button
-                                                        onClick={() => handleEdit(achat)}
-                                                        className="p-2 text-slate-500 hover:text-white hover:bg-slate-600 rounded-lg transition-all"
-                                                    >
-                                                        <Edit2 className="w-4 h-4" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(achat.id_achat)}
-                                                        className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
+                    ) : processedAchats.length > 0 ? (
+                        processedAchats.map((entry, index) => (
+                            <div key={entry.type === 'facture' ? `f-${entry.id}` : `s-${entry.id_achat}`} className="animate-slide-up" style={{ animationDelay: `${index * 0.05}s` }}>
+                                {entry.type === 'facture' ? (
+                                    <div className="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden shadow-lg transition-all">
+                                        <div 
+                                            onClick={() => toggleFacture(entry.id)}
+                                            className="p-4 md:p-6 flex items-center justify-between cursor-pointer hover:bg-slate-700/50 transition-colors"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="h-12 w-12 bg-indigo-500/20 rounded-xl flex items-center justify-center">
+                                                    <FileText className="w-6 h-6 text-indigo-400" />
                                                 </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                                <div>
+                                                    <h3 className="text-lg font-bold">FACTURE N° {entry.numero.toString().padStart(4, '0')}</h3>
+                                                    <p className="text-slate-400 text-sm">{moment(entry.date).format('DD MMMM YYYY')}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-6">
+                                                <div className="text-right hidden sm:block">
+                                                    <span className="text-2xl font-black text-emerald-400">{entry.total.toFixed(2)} €</span>
+                                                    <p className="text-xs text-slate-500">{entry.items.length} articles</p>
+                                                </div>
+                                                {expandedFactures[entry.id] ? <ChevronUp className="w-6 h-6 text-slate-500" /> : <ChevronDown className="w-6 h-6 text-slate-500" />}
+                                            </div>
+                                        </div>
 
-                            {hasMore && (
-                                <div className="p-4 bg-slate-900/30 flex justify-center border-t border-slate-700/50">
-                                    <button
-                                        onClick={() => setFilters({ ...filters, limit: filters.limit + 20 })}
-                                        className="text-sm text-emerald-400 hover:text-emerald-300 font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition-all"
-                                    >
-                                        <Plus className="w-4 h-4" />
-                                        Afficher plus d'achats
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                                        {expandedFactures[entry.id] && (
+                                            <div className="border-t border-slate-700 bg-slate-900/50 p-4">
+                                                <div className="space-y-2">
+                                                    {entry.items.map((item) => (
+                                                        <div key={item.id_achat} className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-800 transition-colors group">
+                                                            <div className="flex gap-4 items-center">
+                                                                <span className="text-slate-500 font-mono text-sm">{item.quantite}x</span>
+                                                                <span className="font-medium">{item.nom}</span>
+                                                            </div>
+                                                            <div className="flex items-center gap-4">
+                                                                <span className="text-emerald-400 font-bold">{Number(item.prix).toFixed(2)} €</span>
+                                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                    <button onClick={() => handleEdit(item)} className="p-1.5 text-slate-500 hover:text-white bg-slate-700 rounded-lg"><Edit2 className="w-3.5 h-3.5" /></button>
+                                                                    <button onClick={() => handleDelete(item.id_achat)} className="p-1.5 text-slate-500 hover:text-red-400 bg-slate-700 rounded-lg"><Trash2 className="w-3.5 h-3.5" /></button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="bg-slate-800/40 hover:bg-slate-800 rounded-2xl border border-slate-700 p-4 md:p-6 flex items-center justify-between transition-all group shadow-sm">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-12 w-12 bg-emerald-500/10 rounded-xl flex items-center justify-center">
+                                                <Package className="w-6 h-6 text-emerald-500/60" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-lg font-bold group-hover:text-emerald-400 transition-colors">{entry.nom}</h3>
+                                                <p className="text-slate-400 text-sm">{moment(entry.date_achat).format('DD MMMM YYYY')} • {entry.quantite} unité(s)</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <span className="text-xl font-bold text-emerald-400">{Number(entry.prix).toFixed(2)} €</span>
+                                            <div className="flex gap-2">
+                                                <button onClick={() => handleEdit(entry)} className="p-2 text-slate-500 hover:text-white hover:bg-slate-700 rounded-xl transition-all"><Edit2 className="w-4 h-4" /></button>
+                                                <button onClick={() => handleDelete(entry.id_achat)} className="p-2 text-slate-500 hover:text-red-400 hover:bg-slate-700 rounded-xl transition-all"><Trash2 className="w-4 h-4" /></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ))
                     ) : (
-                        <div className="p-12 text-center">
+                        <div className="p-20 text-center bg-slate-800/20 rounded-3xl border-2 border-dashed border-slate-700">
                             <ShoppingBag className="w-16 h-16 text-slate-700 mx-auto mb-4" />
                             <p className="text-slate-500 text-lg">Aucun achat enregistré pour le moment.</p>
+                        </div>
+                    )}
+
+                    {hasMore && (
+                        <div className="pt-8 flex justify-center">
+                            <button
+                                onClick={() => setFilters({ ...filters, limit: filters.limit + 20 })}
+                                className="text-emerald-400 hover:text-emerald-300 font-bold py-3 px-8 rounded-2xl border-2 border-emerald-500/20 hover:border-emerald-500/40 flex items-center gap-2 transition-all bg-emerald-500/5"
+                            >
+                                <Plus className="w-5 h-5" />
+                                Charger plus d'achats
+                            </button>
                         </div>
                     )}
                 </div>

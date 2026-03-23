@@ -1,4 +1,5 @@
 import Achat from '../models/Achat.js';
+import FactureAchat from '../models/FactureAchat.js';
 
 const getUserId = (req) => req.headers['x-user-id'] || 1;
 
@@ -7,6 +8,29 @@ export const getAchats = async (req, res) => {
         const userId = getUserId(req);
         const achats = await Achat.getAchats(req.query, userId);
         res.status(200).json(achats);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const createFacture = async (req, res) => {
+    try {
+        const userId = getUserId(req);
+        const { date, items } = req.body;
+
+        // 1. Get next id_public
+        const nextIdPublic = await FactureAchat.getNextIdPublic(userId);
+
+        // 2. Create the facture
+        const facture = await FactureAchat.create({ date, id_public: nextIdPublic }, userId);
+        const id_facture = facture.id;
+
+        // 3. Create all associated items
+        const createdItems = await Promise.all(items.map(item => 
+            Achat.create({ ...item, date_achat: date, id_facture }, userId)
+        ));
+
+        res.status(201).json({ facture, items: createdItems });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

@@ -3,7 +3,11 @@ import { db, customConsoleLog } from '../index.js';
 class Achat {
     static async getAchats(filters = {}, id_utilisateur) {
         return new Promise((resolve, reject) => {
-            let q = 'SELECT * FROM achats WHERE id_utilisateur = ?';
+            let q = `
+                SELECT a.*, f.id_public as facture_numero, f.date as facture_date 
+                FROM achats a 
+                LEFT JOIN factures_achats f ON a.id_facture = f.id 
+                WHERE a.id_utilisateur = ?`;
             let params = [id_utilisateur];
 
             if (filters.startDate) {
@@ -31,8 +35,8 @@ class Achat {
 
     static async create(data, id_utilisateur) {
         return new Promise((resolve, reject) => {
-            const q = "INSERT INTO achats (nom, quantite, prix, date_achat, id_utilisateur) VALUES (?, ?, ?, ?, ?)";
-            const values = [data.nom, data.quantite, data.prix, data.date_achat, id_utilisateur];
+            const q = "INSERT INTO achats (nom, quantite, prix, date_achat, id_utilisateur, id_facture) VALUES (?, ?, ?, ?, ?, ?)";
+            const values = [data.nom, data.quantite, data.prix, data.date_achat, id_utilisateur, data.id_facture || null];
             db.query(q, values, (err, result) => {
                 if (err) return reject(err);
                 resolve({ id_achat: result.insertId, ...data, id_utilisateur });
