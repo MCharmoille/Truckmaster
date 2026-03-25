@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import DatePicker from 'react-datepicker';
@@ -53,7 +53,7 @@ const Parametres = ({ isLoggedIn, setIsLoggedIn }) => {
     return moment(date).format('dddd D MMMM');
   };
 
-  const getDates = async () => {
+  const getDates = useCallback(async () => {
     try {
       const res = await axios.get(`${process.env.REACT_APP_API_URL}dates`);
       // Keeping all dates in state, we'll slice them in the render
@@ -61,31 +61,31 @@ const Parametres = ({ isLoggedIn, setIsLoggedIn }) => {
     } catch (err) {
       console.log(err);
     }
-  }
+  }, []);
 
-  const getTranches = async () => {
+  const getTranches = useCallback(async () => {
     try {
       const res = await axios.get(`${process.env.REACT_APP_API_URL}tranches`);
       setTranches(res.data);
     } catch (err) {
       console.log(err);
     }
-  }
+  }, []);
 
-  const getUserData = async () => {
+  const getUserData = useCallback(async () => {
     try {
       const res = await axios.get(`${process.env.REACT_APP_API_URL}utilisateurs/${userId}`);
       setUserData(res.data);
     } catch (err) {
       console.log("Erreur lors de la récupération des données utilisateur:", err);
     }
-  }
+  }, [userId]);
 
   useEffect(() => {
     getDates();
     getTranches();
     getUserData();
-  }, []);
+  }, [getDates, getTranches, getUserData]);
 
   const addDate = async (date) => {
     try {

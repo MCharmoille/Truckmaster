@@ -48,13 +48,7 @@ const Documents = () => {
         fetchUser();
     }, []);
 
-    useEffect(() => {
-        if (selectedType) {
-            fetchData();
-        }
-    }, [selectedType, month, year]);
-
-    const fetchData = async () => {
+    const fetchData = React.useCallback(async () => {
         setLoading(true);
         try {
             if (selectedType === 'ventes') {
@@ -78,7 +72,13 @@ const Documents = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [selectedType, month, year]);
+
+    useEffect(() => {
+        if (selectedType) {
+            fetchData();
+        }
+    }, [selectedType, fetchData]);
 
     const handleDelete = async (id) => {
         if (window.confirm("Voulez-vous vraiment supprimer ce devis ?")) {

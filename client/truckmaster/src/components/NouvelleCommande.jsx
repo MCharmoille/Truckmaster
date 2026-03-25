@@ -30,7 +30,6 @@ const NouvelleCommande = () => {
     const [dates, setDates] = useState([]);
     const [visibleDatesCount, setVisibleDatesCount] = useState(5);
     const [tranches, setTranches] = useState([]);
-    const [types, setTypes] = useState([]);
     const [isMidiSoir, setIsMidiSoir] = useState({ "midi": 1, "soir": 1 });
     const [produitsAffiches, setproduitsAffiches] = useState([]);
     const [produitsCommandes, setProduitsCommandes] = useState([]);
@@ -56,9 +55,6 @@ const NouvelleCommande = () => {
                 setDates(datesRes.data.reverse());
                 setIsMidiSoir({ "midi": datesRes.data[0].cb_midi, "soir": datesRes.data[0].cb_soir });
                 setTranches(tranchesRes.data);
-
-                // Keep all types for grouped display
-                setTypes(typesRes.data);
                 setproduitsAffiches(produitsRes.data);
             } catch (err) {
                 console.error("Erreur lors de l'initialisation :", err);

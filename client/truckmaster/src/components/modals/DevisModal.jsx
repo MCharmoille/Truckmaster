@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Plus, Trash2, Save, Loader2, Search } from 'lucide-react';
+import { X, Trash2, Save, Loader2, Search } from 'lucide-react';
 import axios from 'axios';
 import moment from 'moment';
 

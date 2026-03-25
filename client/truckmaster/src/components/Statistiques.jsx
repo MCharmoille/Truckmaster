@@ -13,7 +13,6 @@ const Statistiques = () => {
     const [achatsData, setAchatsData] = useState([]);
     const [inclureOffert, setInclureOffer] = useState(false);
     const [inclureNonPaye, setInclureNonPaye] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
 
     moment.locale('fr');
 
@@ -24,28 +23,25 @@ const Statistiques = () => {
 
     useEffect(() => {
         const fetchStatistiques = async () => {
-            setIsLoading(true);
             try {
-                // Ensure we send full date strings (start of month / end of month)
                 const s = moment(startDate).startOf('month').format('YYYY-MM-DD');
                 const e = moment(endDate).endOf('month').format('YYYY-MM-DD');
 
-                const res = await axios.get(`${process.env.REACT_APP_API_URL}commandes/statistiques`, {
-                    params: { startDate: s, endDate: e }
-                });
-
-                const resAchats = await axios.get(`${process.env.REACT_APP_API_URL}achats/statistiques`, {
-                    params: { startDate: s, endDate: e }
-                });
+                const [res, resAchats] = await Promise.all([
+                    axios.get(`${process.env.REACT_APP_API_URL}commandes/statistiques`, {
+                        params: { startDate: s, endDate: e }
+                    }),
+                    axios.get(`${process.env.REACT_APP_API_URL}achats/statistiques`, {
+                        params: { startDate: s, endDate: e }
+                    })
+                ]);
 
                 // Sort data by date
                 const sortedData = res.data.statistiques.sort((a, b) => moment(a.mois).diff(moment(b.mois)));
                 setData(sortedData);
                 setAchatsData(resAchats.data);
-                setIsLoading(false);
             } catch (err) {
                 console.log(err);
-                setIsLoading(false);
             }
         };
         fetchStatistiques();
@@ -72,10 +68,6 @@ const Statistiques = () => {
     }, 0);
 
     const totalAchats = achatsData.reduce((acc, curr) => acc + Number(curr.total_achats), 0);
-    const getAchatsForMonth = (mois) => {
-        const found = achatsData.find(a => a.mois === mois);
-        return found ? Number(found.total_achats) : 0;
-    };
 
     // Global max for consistent scaling between sales and purchases
     const globalMax = Math.max(maxMonth, ...achatsData.map(a => Number(a.total_achats)), 1);

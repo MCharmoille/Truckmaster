@@ -28,11 +28,7 @@ const Achats = () => {
         setExpandedFactures(prev => ({ ...prev, [id]: !prev[id] }));
     };
 
-    useEffect(() => {
-        fetchAchats();
-    }, [filters.startDate, filters.endDate, filters.limit]);
-
-    const fetchAchats = async () => {
+    const fetchAchats = React.useCallback(async () => {
         setIsLoading(true);
         try {
             const res = await axios.get(`${process.env.REACT_APP_API_URL}achats`, {
@@ -45,7 +41,11 @@ const Achats = () => {
             console.error("Erreur lors de la récupération des achats:", error);
             setIsLoading(false);
         }
-    };
+    }, [filters]);
+
+    useEffect(() => {
+        fetchAchats();
+    }, [fetchAchats]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
