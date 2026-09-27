@@ -1,4 +1,5 @@
 import Utilisateur from '../models/Utilisateur.js';
+import { getUserId } from '../middleware/auth.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -17,7 +18,7 @@ export const login = async (req, res) => {
 
 export const getUser = async (req, res) => {
     try {
-        const user = await Utilisateur.getById(req.params.id);
+        const user = await Utilisateur.getById(getUserId(req));
         res.status(200).json(user);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -26,10 +27,10 @@ export const getUser = async (req, res) => {
 
 export const updateUser = async (req, res) => {
     try {
-        const currentData = await Utilisateur.getById(req.params.id);
+        const userId = getUserId(req);
+        const currentData = await Utilisateur.getById(userId);
         const newLogo = req.body.logo;
 
-        // If a new logo is defined and different from the old one, delete the old file
         if (newLogo && currentData && currentData.logo && currentData.logo !== newLogo) {
             const oldPath = path.join('uploads', currentData.logo);
             if (fs.existsSync(oldPath)) {
@@ -39,7 +40,7 @@ export const updateUser = async (req, res) => {
             }
         }
 
-        const result = await Utilisateur.update(req.params.id, req.body);
+        const result = await Utilisateur.update(userId, req.body);
         res.status(200).json(result);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -51,7 +52,6 @@ export const uploadLogo = async (req, res) => {
         if (!req.file) {
             return res.status(400).json({ message: "No file uploaded" });
         }
-        // Just return the filename, the frontend will update the user data with PUT /:id
         res.status(200).json({ filename: req.file.filename });
     } catch (error) {
         res.status(500).json({ message: error.message });

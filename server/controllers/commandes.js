@@ -1,6 +1,5 @@
 import Commande from '../models/Commande.js';
-
-const getUserId = (req) => req.headers['x-user-id'] || 1;
+import { getUserId } from '../middleware/auth.js';
 
 export const getCommandeparDate = async (req, res) => {
     try {

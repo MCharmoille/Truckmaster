@@ -1,10 +1,11 @@
 import axios from 'axios';
 import Achat from '../models/Achat.js';
-import { db, customConsoleLog } from '../index.js';
+import { db } from '../lib/db.js';
+import { customConsoleLog } from '../lib/logger.js';
+import { getUserId } from '../middleware/auth.js';
 
 export const scanReceipt = async (req, res) => {
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
 
     try {
         if (!req.file) {
@@ -12,8 +13,12 @@ export const scanReceipt = async (req, res) => {
             return res.status(400).json({ message: "Aucune image reçue par le serveur." });
         }
 
-        // 0. Vérifier le quota
-        const id_utilisateur = req.headers['x-user-id'] || 1;
+        if (!GEMINI_API_KEY) {
+            customConsoleLog(`[IA Scan] GEMINI_API_KEY absente.`);
+            return res.status(503).json({ message: "Service IA indisponible." });
+        }
+
+        const id_utilisateur = getUserId(req);
         customConsoleLog(`[IA Scan] Début de l'analyse pour l'utilisateur ${id_utilisateur}`);
 
         const userResults = await new Promise((resolve, reject) => {
@@ -32,17 +37,15 @@ export const scanReceipt = async (req, res) => {
             return res.status(403).json({ message: "Quota IA mensuel atteint (50/50). Revenez le mois prochain !" });
         }
 
-        // 1. Récupérer les noms existants pour aider l'IA
         customConsoleLog(`[IA Scan] Récupération du contexte des produits...`);
         const existingNames = await Achat.getUniqueNames(id_utilisateur);
         const namesContext = existingNames.length > 0
             ? `Voici une liste de nos articles existants pour t'aider à corriger les noms abrégés : ${existingNames.join(', ')}.`
             : "";
 
-        // 2. Préparer l'image pour Gemini (base64)
         const imageBase64 = req.file.buffer.toString('base64');
+        const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
 
-        // 3. Appeler Gemini
         const prompt = `
             Tu es un assistant comptable pour un Food Truck nommé Truckmaster. 
             Analyse cette photo de ticket de caisse et extrait tous les articles achetés.
@@ -74,7 +77,6 @@ export const scanReceipt = async (req, res) => {
         customConsoleLog(`[IA Scan] Réponse reçue de Gemini, parsing...`);
         let resultText = response.data.candidates[0].content.parts[0].text;
 
-        // Nettoyage au cas où l'IA inclut des blocs de code markdown ```json ... ```
         const jsonMatch = resultText.match(/\[[\s\S]*\]/);
         if (jsonMatch) {
             resultText = jsonMatch[0];
@@ -94,7 +96,6 @@ export const scanReceipt = async (req, res) => {
             return res.status(200).json([]);
         }
 
-        // 4. Incrémenter le quota
         customConsoleLog(`[IA Scan] Incrémentation du quota...`);
         await new Promise((resolve, reject) => {
             db.query('UPDATE utilisateurs SET ai_usage_monthly = ai_usage_monthly + 1 WHERE id = ?', [id_utilisateur], (err) => {
@@ -116,14 +117,12 @@ export const scanReceipt = async (req, res) => {
 
         if (error.response?.status === 429) {
             return res.status(429).json({
-                message: `Limite quota dépassée (Google) : ${googleMessage || "Réessayez dans une minute."}`,
-                details: errorDetail
+                message: "Limite quota dépassée. Réessayez dans une minute.",
             });
         }
 
         res.status(500).json({
-            message: googleMessage ? `Erreur Google : ${googleMessage}` : "Erreur lors de l'analyse du ticket par l'IA",
-            details: errorDetail
+            message: googleMessage ? "Erreur lors de l'analyse du ticket par l'IA" : "Erreur lors de l'analyse du ticket par l'IA",
         });
     }
 };

@@ -1,4 +1,6 @@
-import { db, customConsoleLog, moment } from '../index.js';
+import moment from 'moment';
+import { db } from '../lib/db.js';
+import { customConsoleLog } from '../lib/logger.js';
 
 class Date {
   static async getDates(id_utilisateur) {

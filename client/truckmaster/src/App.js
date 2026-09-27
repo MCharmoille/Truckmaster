@@ -19,12 +19,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    // Configuration globale d'axios pour inclure le userId et le token
-    axios.interceptors.request.use((config) => {
-      const userId = localStorage.getItem('userId');
-      if (userId) {
-        config.headers['x-user-id'] = userId;
-      }
+    const requestId = axios.interceptors.request.use((config) => {
       const token = localStorage.getItem('authToken');
       if (token) {
         config.headers['Authorization'] = `Bearer ${token}`;
@@ -34,10 +29,28 @@ function App() {
       return Promise.reject(error);
     });
 
+    const responseId = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401) {
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('user');
+          localStorage.removeItem('userId');
+          setIsLoggedIn(false);
+        }
+        return Promise.reject(error);
+      }
+    );
+
     const storedToken = localStorage.getItem('authToken');
     if (storedToken) {
       setIsLoggedIn(true);
     }
+
+    return () => {
+      axios.interceptors.request.eject(requestId);
+      axios.interceptors.response.eject(responseId);
+    };
   }, []);
 
   return (

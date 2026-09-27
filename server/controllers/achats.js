@@ -1,7 +1,6 @@
 import Achat from '../models/Achat.js';
 import FactureAchat from '../models/FactureAchat.js';
-
-const getUserId = (req) => req.headers['x-user-id'] || 1;
+import { getUserId } from '../middleware/auth.js';
 
 export const getAchats = async (req, res) => {
     try {

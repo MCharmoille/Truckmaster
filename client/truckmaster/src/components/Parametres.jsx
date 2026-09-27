@@ -39,7 +39,7 @@ const Parametres = ({ isLoggedIn, setIsLoggedIn }) => {
   const [isCompanyExpanded, setIsCompanyExpanded] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [logoFile, setLogoFile] = useState(null);
-  const userId = localStorage.getItem('userId') || 1;
+  const userId = localStorage.getItem('userId');
 
   const handleLogout = () => {
     localStorage.removeItem('authToken');
@@ -73,6 +73,7 @@ const Parametres = ({ isLoggedIn, setIsLoggedIn }) => {
   }, []);
 
   const getUserData = useCallback(async () => {
+    if (!userId) return;
     try {
       const res = await axios.get(`${process.env.REACT_APP_API_URL}utilisateurs/${userId}`);
       setUserData(res.data);

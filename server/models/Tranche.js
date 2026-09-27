@@ -1,4 +1,5 @@
-import { db, customConsoleLog } from '../index.js';
+import { db } from '../lib/db.js';
+import { customConsoleLog } from '../lib/logger.js';
 
 class Tranche {
   static async getTranches(id_utilisateur) {

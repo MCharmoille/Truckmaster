@@ -1,6 +1,5 @@
 import Devis from '../models/Devis.js';
-
-const getUserId = (req) => req.headers['x-user-id'] || 1;
+import { getUserId } from '../middleware/auth.js';
 
 export const getDevis = async (req, res) => {
     try {

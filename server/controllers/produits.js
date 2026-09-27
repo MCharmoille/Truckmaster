@@ -1,6 +1,5 @@
 import Produit from '../models/Produit.js';
-
-const getUserId = (req) => req.headers['x-user-id'] || 1;
+import { getUserId } from '../middleware/auth.js';
 
 export const getProduits = async (req, res) => {
     try {

@@ -1,6 +1,12 @@
-import { db, customConsoleLog } from '../index.js';
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import { db } from '../lib/db.js';
+import { verifyPassword } from '../lib/password.js';
+import { signUserToken } from '../middleware/auth.js';
+
+export function sanitizeUser(row) {
+  if (!row) return row;
+  const { motdepasse, ...safe } = row;
+  return safe;
+}
 
 class Utilisateur {
   static async login(req) {
@@ -14,14 +20,14 @@ class Utilisateur {
           return resolve(null);
         }
 
-        const isPasswordCorrect = await bcrypt.compare(req.body.password, user[0].motdepasse);
+        const isPasswordCorrect = await verifyPassword(req.body.password, user[0].motdepasse);
         if (!isPasswordCorrect) {
           return resolve(null);
         }
 
         var username = user[0].nom;
         var userId = user[0].id;
-        const token = jwt.sign({ username, userId }, 'tempsecretkey');
+        const token = signUserToken({ username, userId });
         resolve({ token, username, userId });
       });
     });
@@ -29,9 +35,10 @@ class Utilisateur {
 
   static async getById(id) {
     return new Promise((resolve, reject) => {
-      db.query("SELECT * FROM utilisateurs WHERE id = ?", [id], (err, user) => {
+      const query = "SELECT id, identifiant, nom, logo, adresse, adresse_suite, tel, mail, siret, ai_usage_monthly FROM utilisateurs WHERE id = ?";
+      db.query(query, [id], (err, user) => {
         if (err) return reject(err);
-        resolve(user[0]);
+        resolve(sanitizeUser(user[0]));
       });
     });
   }

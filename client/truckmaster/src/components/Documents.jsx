@@ -38,7 +38,8 @@ const Documents = () => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const userId = localStorage.getItem('userId') || 1;
+                const userId = localStorage.getItem('userId');
+                if (!userId) return;
                 const res = await axios.get(`${process.env.REACT_APP_API_URL}utilisateurs/${userId}`);
                 setCurrentUser(res.data);
             } catch (err) {

@@ -1,6 +1,6 @@
 import Ingredient from '../models/Ingredient.js';
-
-const getUserId = (req) => req.headers['x-user-id'] || 1;
+import { getUserId } from '../middleware/auth.js';
+import { customConsoleLog } from '../lib/logger.js';
 
 export const getIngredients = async (req, res) => {
     try {
@@ -19,7 +19,7 @@ export const createIngredient = async (req, res) => {
         const newIngredient = await Ingredient.create(nom, userId);
         res.status(201).json(newIngredient);
     } catch (error) {
-        import('../index.js').then(m => m.customConsoleLog("Erreur création ingrédient: " + error.message));
+        customConsoleLog("Erreur création ingrédient: " + error.message);
         res.status(400).json({ message: error.message });
     }
 }

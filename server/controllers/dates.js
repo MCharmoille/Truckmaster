@@ -1,6 +1,5 @@
 import Date from '../models/Date.js';
-
-const getUserId = (req) => req.headers['x-user-id'] || 1;
+import { getUserId } from '../middleware/auth.js';
 
 export const getDates = async (req, res) => {
     try {

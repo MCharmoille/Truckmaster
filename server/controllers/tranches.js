@@ -1,6 +1,5 @@
 import Tranche from '../models/Tranche.js';
-
-const getUserId = (req) => req.headers['x-user-id'] || 1;
+import { getUserId } from '../middleware/auth.js';
 
 export const getTranches = async (req, res) => {
     try {

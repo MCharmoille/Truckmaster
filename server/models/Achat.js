@@ -1,4 +1,5 @@
-import { db, customConsoleLog } from '../index.js';
+import { db } from '../lib/db.js';
+import { customConsoleLog } from '../lib/logger.js';
 
 class Achat {
     static async getAchats(filters = {}, id_utilisateur) {
