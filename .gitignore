@@ -1,6 +1,10 @@
 # React (client)
 client/node_modules/
 
+# Vite (client_new)
+client_new/node_modules/
+client_new/dist/
+
 # Node.js (server)
 server/node_modules/
 /server/node_modules
