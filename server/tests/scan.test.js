@@ -8,6 +8,10 @@ process.env.JWT_SECRET = TEST_SECRET;
 
 vi.mock('../lib/db.js', () => ({
     db: { query: vi.fn() },
+    query: (target, sql, params) => new Promise((resolve, reject) => {
+        target.query(sql, params, (err, result) => (err ? reject(err) : resolve(result)));
+    }),
+    withTransaction: vi.fn(),
 }));
 
 vi.mock('axios', () => ({
@@ -24,6 +28,12 @@ import { db } from '../lib/db.js';
 import axios from 'axios';
 import { requireAuth } from '../middleware/auth.js';
 import achatsRoutes from '../routes/achats.js';
+import { quotaDecision } from '../controllers/ai.js';
+import { toSqlDateTime } from '../lib/date.js';
+
+function quotaReachedRow() {
+    return [{ ai_usage_monthly: 50, ai_next_reset: '2099-01-01T00:00:00' }];
+}
 
 function tokenFor(userId) {
     return jwt.sign({ username: 'tester', userId }, TEST_SECRET, { expiresIn: '7d' });
@@ -61,7 +71,7 @@ describe('POST /achats/scan', () => {
 
     it('returns 403 when quota is reached and does not call Gemini', async () => {
         db.query.mockImplementation((sql, params, cb) => {
-            cb(null, [{ ai_usage_monthly: 50 }]);
+            cb(null, quotaReachedRow());
         });
 
         const res = await request(app)
@@ -80,7 +90,7 @@ describe('POST /achats/scan', () => {
         let seenIds = [];
         db.query.mockImplementation((sql, params, cb) => {
             seenIds.push(params[0]);
-            cb(null, [{ ai_usage_monthly: 50 }]);
+            cb(null, quotaReachedRow());
         });
 
         await request(app)
@@ -94,6 +104,59 @@ describe('POST /achats/scan', () => {
 
         expect(seenIds).toContain(7);
         expect(seenIds).not.toContain(1);
+        expect(axios.post).not.toHaveBeenCalled();
+    });
+
+    it('resets the counter when the renewal date has passed and stores the next one', async () => {
+        const row = { ai_usage_monthly: 50, ai_next_reset: '2026-01-15T08:30:00' };
+        const updates = [];
+        db.query.mockImplementation((sql, params, cb) => {
+            if (String(sql).includes('UPDATE')) {
+                updates.push(params);
+                cb(null, { affectedRows: 1 });
+                return;
+            }
+            cb(null, [row]);
+        });
+        axios.post.mockResolvedValue({
+            data: {
+                candidates: [{
+                    content: { parts: [{ text: '[{"nom":"Pain","quantite":1,"prix":2}]' }] },
+                }],
+            },
+        });
+
+        const res = await request(app)
+            .post('/achats/scan')
+            .set('Authorization', `Bearer ${tokenFor(3)}`)
+            .attach('image', Buffer.from('fake-image'), {
+                filename: 'ticket.jpg',
+                contentType: 'image/jpeg',
+            });
+
+        expect(res.status).toBe(200);
+        expect(axios.post).toHaveBeenCalled();
+        const decision = quotaDecision(row);
+        expect(updates).toEqual([[1, toSqlDateTime(decision.nextReset), 3]]);
+    });
+
+    it('returns 500 when the quota month column is missing and does not call Gemini', async () => {
+        db.query.mockImplementation((sql, params, cb) => {
+            const err = new Error("Unknown column 'ai_usage_month'");
+            err.code = 'ER_BAD_FIELD_ERROR';
+            cb(err);
+        });
+
+        const res = await request(app)
+            .post('/achats/scan')
+            .set('Authorization', `Bearer ${tokenFor(3)}`)
+            .attach('image', Buffer.from('fake-image'), {
+                filename: 'ticket.jpg',
+                contentType: 'image/jpeg',
+            });
+
+        expect(res.status).toBe(500);
+        expect(res.body.message).toMatch(/compteur de scans/);
         expect(axios.post).not.toHaveBeenCalled();
     });
 });

@@ -1,0 +1,37 @@
+Plan GeckoFT : Vite, déménagement, rebranding
+Objectif : remplacer le client Create React App par une base Vite propre baptisée GeckoFT, y déplacer les écrans existants sans les réécrire, puis faire le rebranding sur cette base.
+
+Principes
+
+Même dépôt, une branche geckoft. Le serveur et la base ne changent pas.
+On déplace le code existant, on ne le réécrit pas : les règles métier restent intactes.
+On ne déménage pas et on ne repeint pas en même temps. Le rebranding commence seulement quand la migration est en prod.
+Truckmaster reste en prod pendant tout le chantier, et la branche reste courte pour ne pas corriger les bugs deux fois.
+1. Création de GeckoFT : le socle Vite (environ ½ journée)
+Nouveau projet Vite + React à la place de client/, avec package.json au nom de geckoft.
+Uniquement les paquets réellement utilisés : react, react-dom, react-router-dom, axios, lucide-react, moment, react-datepicker, date-fns, @react-pdf/renderer, plus Tailwind, PostCSS, vite-plugin-pwa et Vitest.
+Disparaissent : react-scripts et ses overrides, react-pdf, save, web-vitals, les tests CRA et le plugin Babel.
+Les fichiers .env passent à VITE_API_URL, et index.html va à la racine du client.
+Terminé quand l’app vide démarre et que le build de production passe.
+2. Socle applicatif
+Une instance axios unique, api, avec l’adresse de l’API, le jeton et la déconnexion automatique sur 401. Elle remplace les 56 process.env.REACT_APP_API_URL.
+Navigation, barre du bas et écran de connexion.
+Terminé quand on se connecte et on navigue entre des écrans vides.
+3. Déménagement : la caisse
+Tableau des commandes, calendrier, nouvelle commande, modales (customisation, sauces, boissons, confirmation), encaissement.
+Terminé quand un service complet fonctionne exactement comme avant : créer, modifier, supprimer, encaisser.
+4. Déménagement : le back-office
+Accueil, résumé, carte et produits, ingrédients, achats et scan IA, statistiques, documents et les trois PDF, devis, paramètres.
+Terminé quand chaque écran et chaque PDF donne le même résultat qu’en prod.
+5. Bascule
+Recette complète sur tablette et sur PC, build de production, déploiement.
+Suppression des derniers restes de CRA, fusion de la branche.
+Durée des étapes 1 à 5 : une à deux journées.
+6. Rebranding (chantier séparé, à étaler)
+La charte, avant le code : logo gecko, typographie, palette par rôle (fond, surface, principale, accent, succès, danger, couleurs des paiements). Contraste pensé pour le plein soleil.
+Les couleurs en thème : des noms de rôle dans tailwind.config.js, à partir de variables CSS (bg-surface, bg-primary…).
+Des composants communs : bouton, modale, carte.
+Migration écran par écran : environ 900 classes de couleur codées en dur à remplacer. Le back-office est adapté au PC au passage.
+Le nom GeckoFT partout : titres, manifest, icônes, favicon, PDF, prompt du scan IA.
+Hors périmètre de ce plan
+Le nouveau domaine et les sous-domaines (app, api), les pages publiques, la page d’accueil, Capacitor, et le passage de moment à date-fns.

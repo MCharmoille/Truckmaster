@@ -1,0 +1,149 @@
+P2 — Qualité / maintenabilité
+
+
+
+lock du bouton Valider 
+
+Extraire getUserId / auth, mappings paiements, PDF styles.
+
+
+
+Configurer boissons / sauces / actions POS en base (type, flag ouvre_modal, couleur) au lieu d’IDs magiques.
+
+
+
+Unifier moment ou date-fns.
+
+
+
+Sortir de CRA (Vite) quand tu toucheras au build ; PWA installable (tablette en kiosque).
+
+
+
+Schéma SQL versionné (migrations) + .env.example.
+
+
+
+Tests ciblés : login, création commande, isolation tenant, résumé du jour.
+
+
+
+Corriger Resume.jsx : data est un objet, data.length est trompeur.
+
+
+
+Aligner versions affichées (Accueil 1.6.2 vs Connexion 1.5.2).
+
+
+
+Accessibilité minimale : focus trap des modales, état actif de la nav, lang="fr".
+
+P3 — UX déjà amorcée
+
+
+
+
+
+Indicateur de route active sur la barre du bas.
+
+
+
+Écran prise de commande plus lisible en portrait téléphone (ticket w-72 fixe).
+
+
+
+Activer ou retirer le tuile Factures (aujourd’hui enabled: false).
+
+
+
+Conversion devis → commande (données déjà proches).
+
+
+
+Nouvelles fonctionnalités (valeur food truck)
+
+Idées classées par impact terrain, en s’appuyant sur ce qui existe déjà (recettes, jours, devis, achats).
+
+Caisse / service
+
+
+
+
+
+Statuts de commande : prise → en prep → prêt → servi (écran cuisine / 2e tablette).
+
+
+
+Clôture de caisse : fond de caisse, Z de caisse, écart espèces vs théorique.
+
+
+
+Impression ticket (ESC/POS Bluetooth / USB) — le PDF n’est pas un ticket de service.
+
+
+
+Notes / allergènes sur la ligne (les mods existent ; les allergènes non).
+
+
+
+Menu du jour : n’afficher que certains produits selon le jour (le display est déjà là, pas le calendrier de carte).
+
+Ops / stock (gros levier : la table recette est inutilisée pour ça)
+
+
+
+
+
+Liste de prep : à partir des commandes du jour × recettes → quantités pain, fromage, sauces…
+
+
+
+Stock simple : décrément à la vente ou à l’achat scanné ; alerte rupture.
+
+
+
+Lieux / événements : lier un jour travaillé à un emplacement (marché, festival) pour stats par spot.
+
+Compta / admin (le trou le plus visible)
+
+
+
+
+
+Factures de vente (tuile déjà prévue) + conversion devis → facture, numérotation, mentions légales.
+
+
+
+Export CSV / FEC léger pour l’expert-comptable.
+
+
+
+Rôles : patron vs employé (encaisser sans voir stats / documents).
+
+Client final
+
+
+
+
+
+File d’attente / n° de commande affiché, ou QR « commande prête ».
+
+
+
+Précommande (le devis est un premier pas, pas un tunnel client).
+
+Produit / technique
+
+
+
+
+
+PWA kiosque + mode hors-ligne (IndexedDB, sync au retour réseau) — le plus différenciant pour un food truck.
+
+
+
+Temps réel (WebSocket) si deux tablettes encaissent le même service.
+
+
+
+Inscription self-service + onboarding carte (aujourd’hui tout est taillé pour des IDs de ton catalogue).

@@ -1,8 +1,29 @@
 import axios from 'axios';
 import Achat from '../models/Achat.js';
-import { db } from '../lib/db.js';
+import { db, query } from '../lib/db.js';
 import { customConsoleLog } from '../lib/logger.js';
 import { getUserId } from '../middleware/auth.js';
+import { addMonths, nextMonthlyOccurrence, parseDateTime, toFrenchDate, toSqlDateTime } from '../lib/date.js';
+
+export const AI_MONTHLY_LIMIT = 50;
+
+export function quotaDecision(user, now = new Date()) {
+    const stored = parseDateTime(user?.ai_next_reset);
+    const due = !stored || stored <= now;
+    const count = due ? 0 : Number(user.ai_usage_monthly) || 0;
+
+    let nextReset = stored;
+    if (due) {
+        nextReset = stored ? nextMonthlyOccurrence(stored, now) : addMonths(now, 1);
+    }
+
+    return {
+        blocked: count >= AI_MONTHLY_LIMIT,
+        count,
+        due,
+        nextReset,
+    };
+}
 
 export const scanReceipt = async (req, res) => {
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -21,20 +42,18 @@ export const scanReceipt = async (req, res) => {
         const id_utilisateur = getUserId(req);
         customConsoleLog(`[IA Scan] Début de l'analyse pour l'utilisateur ${id_utilisateur}`);
 
-        const userResults = await new Promise((resolve, reject) => {
-            db.query('SELECT ai_usage_monthly FROM utilisateurs WHERE id = ?', [id_utilisateur], (err, rows) => {
-                if (err) {
-                    customConsoleLog(`[IA Scan] Erreur quota DB: ${err.message}`);
-                    return reject(err);
-                }
-                resolve(rows);
-            });
-        });
+        const userResults = await query(
+            db,
+            'SELECT ai_usage_monthly, ai_next_reset FROM utilisateurs WHERE id = ?',
+            [id_utilisateur]
+        );
 
-        const user = userResults[0];
-        if (user && user.ai_usage_monthly >= 50) {
+        const decision = quotaDecision(userResults[0]);
+        if (decision.blocked) {
             customConsoleLog(`[IA Scan] Quota atteint pour l'utilisateur ${id_utilisateur}`);
-            return res.status(403).json({ message: "Quota IA mensuel atteint (50/50). Revenez le mois prochain !" });
+            return res.status(403).json({
+                message: `Quota IA atteint (50/50). Prochain renouvellement le ${toFrenchDate(decision.nextReset)}.`,
+            });
         }
 
         customConsoleLog(`[IA Scan] Récupération du contexte des produits...`);
@@ -97,20 +116,21 @@ export const scanReceipt = async (req, res) => {
         }
 
         customConsoleLog(`[IA Scan] Incrémentation du quota...`);
-        await new Promise((resolve, reject) => {
-            db.query('UPDATE utilisateurs SET ai_usage_monthly = ai_usage_monthly + 1 WHERE id = ?', [id_utilisateur], (err) => {
-                if (err) {
-                    customConsoleLog(`[IA Scan] Erreur incrément quota DB: ${err.message}`);
-                    return reject(err);
-                }
-                resolve();
-            });
-        });
+        await query(
+            db,
+            'UPDATE utilisateurs SET ai_usage_monthly = ?, ai_next_reset = ? WHERE id = ?',
+            [decision.count + 1, toSqlDateTime(decision.nextReset), id_utilisateur]
+        );
 
         customConsoleLog(`[IA Scan] Scan IA terminé avec succès pour user ${id_utilisateur} : ${extractedItems.length} articles trouvés`);
 
         res.status(200).json(extractedItems);
     } catch (error) {
+        if (error.code === 'ER_BAD_FIELD_ERROR') {
+            customConsoleLog("[IA Scan] Colonne ai_next_reset absente sur utilisateurs.");
+            return res.status(500).json({ message: "Le compteur de scans n'est pas à jour. Prévenez l'administrateur." });
+        }
+
         const errorDetail = error.response?.data || error.message;
         const googleMessage = error.response?.data?.error?.message;
         customConsoleLog(`[IA Scan] Erreur CRITIQUE : ${JSON.stringify(errorDetail, null, 2)}`);

@@ -1,4 +1,4 @@
-import { db } from '../lib/db.js';
+import { db, query, withTransaction } from '../lib/db.js';
 import { customConsoleLog } from '../lib/logger.js';
 
 class Produit {
@@ -99,118 +99,66 @@ class Produit {
   }
 
   static async save(id_produit, id_utilisateur, data) {
-    return new Promise((resolve, reject) => {
-      if (!id_produit || !data || Object.keys(data).length === 0) {
-        reject(new Error('L\'ID du produit et les données sont requis.'));
-        return;
+    if (!id_produit || !data || Object.keys(data).length === 0) {
+      throw new Error('L\'ID du produit et les données sont requis.');
+    }
+    id_produit *= 1;
+
+    const { recette, ...champs } = data;
+
+    const allowedFields = ['nom', 'prix_produit', 'id_type', 'display', 'archive'];
+    const filteredData = {};
+    Object.keys(champs).forEach(key => {
+      if (allowedFields.includes(key)) {
+        filteredData[key] = champs[key];
       }
-      id_produit *= 1;
+    });
 
-      if (data.recette) {
-        var recette = data.recette;
-        delete data.recette;
+    const fields = Object.keys(filteredData).map(key => `${key} = ?`).join(', ');
+    const values = [...Object.values(filteredData), id_produit, id_utilisateur];
+
+    return withTransaction(async (conn) => {
+      let found;
+      try {
+        if (fields) {
+          const result = await query(conn, `UPDATE produits SET ${fields} WHERE id_produit = ? AND id_utilisateur = ?`, values);
+          found = result.affectedRows > 0;
+        } else {
+          const rows = await query(conn, 'SELECT id_produit FROM produits WHERE id_produit = ? AND id_utilisateur = ?', [id_produit, id_utilisateur]);
+          found = rows.length > 0;
+        }
+      } catch (err) {
+        customConsoleLog("Erreur SQL update produit: " + err.message);
+        throw new Error('Erreur lors de la mise à jour du produit: ' + err.message);
       }
 
-      const allowedFields = ['nom', 'prix_produit', 'id_type', 'display', 'archive'];
-      const filteredData = {};
-      Object.keys(data).forEach(key => {
-        if (allowedFields.includes(key)) {
-          filteredData[key] = data[key];
-        }
-      });
+      if (!found) {
+        throw new Error("Produit introuvable ou non autorisé");
+      }
 
-      const fields = Object.keys(filteredData).map(key => `${key} = ?`).join(', ');
-      const values = Object.values(filteredData);
+      if (!(recette && Array.isArray(recette))) {
+        return 'Produit mis à jour avec succès.';
+      }
 
-      // Verification that the product belongs to the user
-      values.push(id_produit);
-      values.push(id_utilisateur);
+      try {
+        await query(conn, 'DELETE FROM recette WHERE id_produit = ?', [id_produit]);
+      } catch (err) {
+        throw new Error('Erreur lors de la suppression des anciennes recettes: ' + err.message);
+      }
 
-      const q = `UPDATE produits SET ${fields} WHERE id_produit = ? AND id_utilisateur = ?`;
+      const recetteValues = recette.map(item => [id_produit, item.id_ingredient, item.qte]);
+      if (recetteValues.length === 0) {
+        return 'Produit mis à jour (recette vidée).';
+      }
 
-      db.beginTransaction((err) => {
-        if (err) {
-          reject(new Error('Erreur lors du début de la transaction: ' + err.message));
-          return;
-        }
+      try {
+        await query(conn, 'INSERT INTO recette (id_produit, id_ingredient, qte) VALUES ?', [recetteValues]);
+      } catch (err) {
+        customConsoleLog("Erreur SQL insert recette: " + err.message);
+        throw new Error('Erreur lors de l\'insertion des nouvelles recettes: ' + err.message);
+      }
 
-        db.query(db.format(q, values), (err, result) => {
-          if (err) {
-            customConsoleLog("Erreur SQL update produit: " + err.message);
-            db.rollback(() => {
-              reject(new Error('Erreur lors de la mise à jour du produit: ' + err.message));
-            });
-            return;
-          }
-
-          if (result.affectedRows === 0) {
-            db.rollback(() => {
-              reject(new Error("Produit introuvable ou non autorisé"));
-            });
-            return;
-          }
-
-          if (recette && Array.isArray(recette)) {
-            const deleteQuery = `DELETE FROM recette WHERE id_produit = ?`;
-            db.query(db.format(deleteQuery, [id_produit]), (err) => {
-              if (err) {
-                db.rollback(() => {
-                  reject(new Error('Erreur lors de la suppression des anciennes recettes: ' + err.message));
-                });
-                return;
-              }
-
-              const insertQuery = `INSERT INTO recette (id_produit, id_ingredient, qte) VALUES ?`;
-              const recetteValues = recette.map(item => [id_produit, item.id_ingredient, item.qte]);
-
-              if (recetteValues.length === 0) {
-                db.commit((err) => {
-                  if (err) {
-                    db.rollback(() => {
-                      reject(new Error('Erreur lors du commit: ' + err.message));
-                    });
-                    return;
-                  }
-                  resolve('Produit mis à jour (recette vidée).');
-                });
-                return;
-              }
-
-              db.query(db.format(insertQuery, [recetteValues]), (err) => {
-                if (err) {
-                  customConsoleLog("Erreur SQL insert recette: " + err.message);
-                  db.rollback(() => {
-                    reject(new Error('Erreur lors de l\'insertion des nouvelles recettes: ' + err.message));
-                  });
-                  return;
-                }
-
-                db.commit((err) => {
-                  if (err) {
-                    db.rollback(() => {
-                      reject(new Error('Erreur lors du commit de la transaction: ' + err.message));
-                    });
-                    return;
-                  }
-
-                  resolve('Produit et recettes mis à jour avec succès.');
-                });
-              });
-            });
-          } else {
-            db.commit((err) => {
-              if (err) {
-                db.rollback(() => {
-                  reject(new Error('Erreur lors du commit de la transaction: ' + err.message));
-                });
-                return;
-              }
-
-              resolve('Produit mis à jour avec succès.');
-            });
-          }
-        });
-      });
+      return 'Produit et recettes mis à jour avec succès.';
     });
   }
 

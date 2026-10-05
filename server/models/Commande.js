@@ -1,82 +1,119 @@
-import { db } from '../lib/db.js';
+import { db, query, withTransaction } from '../lib/db.js';
 import { customConsoleLog } from '../lib/logger.js';
+import { dayRange, periodRange } from '../lib/date.js';
+
+export function assembleCommandes(commandes, lignes, modifications) {
+  const byCommande = new Map();
+  const assembled = commandes.map((commande) => {
+    const copy = { ...commande, total: 0, produits: [] };
+    byCommande.set(commande.id_commande, copy);
+    return copy;
+  });
+
+  const byLigne = new Map();
+  const nextTempId = new Map();
+
+  for (const ligne of lignes) {
+    const commande = byCommande.get(ligne.id_commande);
+    if (!commande) continue;
+
+    const tempId = nextTempId.get(ligne.id_commande) ?? 0;
+    nextTempId.set(ligne.id_commande, tempId + 1);
+
+    const produit = { ...ligne, tempId, modifications: [] };
+    commande.produits.push(produit);
+    commande.total += ligne.prix * ligne.qte;
+    byLigne.set(ligne.id_pc, produit);
+  }
+
+  for (const modification of modifications) {
+    const produit = byLigne.get(modification.id_pc);
+    if (produit) produit.modifications.push(modification);
+  }
+
+  return assembled;
+}
+
+async function chargerDetails(commandes) {
+  if (commandes.length === 0) return [];
+
+  const ids = commandes.map((commande) => commande.id_commande);
+  const lignes = await query(
+    db,
+    "SELECT * FROM produits_commandes pc JOIN produits p ON pc.id_produit=p.id_produit WHERE pc.id_commande IN (?)",
+    [ids]
+  );
+
+  const pcIds = lignes.map((ligne) => ligne.id_pc);
+  const modifications = pcIds.length === 0
+    ? []
+    : await query(
+      db,
+      "SELECT * FROM modifications m JOIN ingredients i ON m.id_ingredient=i.id_ingredient WHERE m.id_pc IN (?)",
+      [pcIds]
+    );
+
+  return assembleCommandes(commandes, lignes, modifications);
+}
+
+function supprimerLignes(conn, id_commande) {
+  return query(
+    conn,
+    "DELETE pc, m FROM produits_commandes pc LEFT JOIN modifications m ON pc.id_pc=m.id_pc WHERE id_commande = ?",
+    [id_commande]
+  );
+}
+
+async function insertLignes(conn, id_commande, produits) {
+  if (!produits || produits.length === 0) return;
+
+  for (const produit of produits) {
+    const hasModifications = produit.modifications && produit.modifications.length > 0;
+    const custom = (hasModifications || produit.custom === 1) ? 1 : 0;
+    const pc = await query(
+      conn,
+      "INSERT INTO produits_commandes(`id_commande`, `id_produit`, `qte`, `custom`, `prix`) VALUES (?)",
+      [[id_commande, produit.id_produit, produit.qte, custom, produit.prix]]
+    );
+
+    if (hasModifications) {
+      const values = produit.modifications.map((modification) => [
+        pc.insertId,
+        modification.id_ingredient,
+        modification.modificateur,
+      ]);
+      await query(
+        conn,
+        "INSERT INTO modifications(`id_pc`, `id_ingredient`, `modificateur`) VALUES ?",
+        [values]
+      );
+    }
+  }
+}
 
 class Commande {
-  static async getCommandeparDate(date, id_utilisateur) {
-    return new Promise((resolve, reject) => {
-      db.query(
-        "SELECT * FROM commandes WHERE date_commande LIKE ? AND id_utilisateur = ? ORDER BY date_commande ASC",
-        [`%${date}%`, id_utilisateur],
-        async (err, commandes) => {
-          if (err) reject(err);
-          for (let i = 0; i < commandes.length; i++) {
-            try {
-              commandes[i] = await this.getCommandeParId(commandes[i].id_commande, id_utilisateur);
-            } catch (error) {
-              reject(error);
-              return;
-            }
-          }
-          resolve(commandes);
-        }
-      );
-    });
+  static async getCommandeparDate(periode, id_utilisateur) {
+    const [start, end] = periodRange(periode);
+    const commandes = await query(
+      db,
+      "SELECT * FROM commandes WHERE date_commande >= ? AND date_commande < ? AND id_utilisateur = ? ORDER BY date_commande ASC",
+      [start, end, id_utilisateur]
+    );
+    return chargerDetails(commandes);
   }
 
   static async getCommandeParId(id_commande, id_utilisateur) {
-    return new Promise((resolve, reject) => {
-      db.query(
-        "SELECT * FROM commandes WHERE id_commande = ? AND id_utilisateur = ?",
-        [id_commande, id_utilisateur],
-        (err, commande) => {
-          if (err) reject(err)
+    const commandes = await query(
+      db,
+      "SELECT * FROM commandes WHERE id_commande = ? AND id_utilisateur = ?",
+      [id_commande, id_utilisateur]
+    );
+    if (commandes.length === 0) {
+      throw new Error("Aucune commande correspondant à l'id " + id_commande);
+    }
 
-          if (commande.length == 0) reject(new Error("Aucune commande correspondant à l'id " + id_commande));
-
-          commande = {
-            ...commande[0],
-            total: 0,
-            produits: []
-          };
-
-          const q2 = "SELECT * FROM produits_commandes pc JOIN produits p ON pc.id_produit=p.id_produit WHERE pc.id_commande = ?";
-          db.query(q2, [commande.id_commande], (err, produits_commandes) => {
-            if (err) reject(err);
-
-            var tempId = 0;
-
-            produits_commandes.forEach((produit_commande) => {
-              commande.total += (produit_commande.prix * produit_commande.qte);
-              commande.produits.push({
-                ...produit_commande,
-                tempId: tempId,
-                modifications: [],
-              });
-              tempId++;
-            });
-
-            if (produits_commandes.length === 0) return resolve(commande);
-
-            const pc_ids = produits_commandes.map((pc) => pc.id_pc);
-
-            const q3 = "SELECT * FROM modifications m JOIN ingredients i ON m.id_ingredient=i.id_ingredient WHERE m.id_pc IN (?)";
-            db.query(q3, [pc_ids], (err, modifications) => {
-              if (err) reject(err);
-
-              modifications.forEach((modification) => {
-                const id_pc = modification.id_pc;
-                const foundProduit = commande.produits.find((p) => p.id_pc === id_pc);
-                if (foundProduit) {
-                  foundProduit.modifications.push(modification);
-                }
-              });
-
-              return resolve(commande);
-            });
-          });
-        }
-      )
-    });
+    const [commande] = await chargerDetails(commandes);
+    return commande;
   }
 
   static async getResumeparDate(date, id_utilisateur) {
@@ -125,10 +162,10 @@ class Commande {
   }
 
   static async getStatistiques(startDate, endDate, id_utilisateur) {
-    return new Promise((resolve, reject) => {
-      if (!startDate) startDate = '2000-01-01';
-      if (!endDate) endDate = '2100-01-01';
+    const start = dayRange(startDate || '2000-01-01')[0];
+    const end = dayRange(endDate || '2099-12-31')[1];
 
+    return new Promise((resolve, reject) => {
       const q = `
             SELECT 
                 DATE_FORMAT(c.date_commande, '%Y-%m') as mois,
@@ -136,12 +173,12 @@ class Commande {
                 SUM(pc.prix * pc.qte) as total_ventes
             FROM commandes c
             LEFT JOIN produits_commandes pc ON c.id_commande = pc.id_commande
-            WHERE c.date_commande >= ? AND c.date_commande <= ? AND c.id_utilisateur = ?
+            WHERE c.date_commande >= ? AND c.date_commande < ? AND c.id_utilisateur = ?
             GROUP BY mois, c.moyen_paiement
             ORDER BY mois ASC
         `;
 
-      db.query(q, [startDate, endDate, id_utilisateur], (err, results) => {
+      db.query(q, [start, end, id_utilisateur], (err, results) => {
         if (err) return reject(err);
 
         const paiementsTemplate = [
@@ -176,131 +213,61 @@ class Commande {
   }
 
   static async addCommande(data, id_utilisateur) {
-    return new Promise((resolve, reject) => {
-      const q = "INSERT INTO commandes(`libelle`, `date_commande`, `id_utilisateur`) VALUES (?, ?, ?)";
-      const values = [data.libelle, data.date_commande, id_utilisateur];
-
-      db.query(q, values, (err, result) => {
-        if (err) return reject(err);
-
-        customConsoleLog("Une nouvelle commande a été ajoutée (id : " + result.insertId + ")");
-        const produits = data.produits;
-
-        if (produits && produits.length > 0) {
-          const promises = produits.map((produit) => {
-            return new Promise((resPC, rejPC) => {
-              const qPC = "INSERT INTO produits_commandes(`id_commande`, `id_produit`, `qte`, `custom`, `prix`) VALUES (?)";
-              const valuesPC = [
-                result.insertId,
-                produit.id_produit,
-                produit.qte,
-                ((produit.modifications && produit.modifications.length) > 0 || produit.custom === 1) ? 1 : 0,
-                produit.prix
-              ];
-
-              db.query(qPC, [valuesPC], (err, pc_data) => {
-                if (err) return rejPC(err);
-
-                if (produit.modifications && produit.modifications.length > 0) {
-                  const modifPromises = produit.modifications.map((modification) => {
-                    return new Promise((resModif, rejModif) => {
-                      const qModif = "INSERT INTO modifications(`id_pc`, `id_ingredient`, `modificateur`) VALUES (?)";
-                      const valuesModif = [pc_data.insertId, modification.id_ingredient, modification.modificateur];
-                      db.query(qModif, [valuesModif], (err) => {
-                        if (err) return rejModif(err);
-                        resModif();
-                      });
-                    });
-                  });
-                  Promise.all(modifPromises).then(resPC).catch(rejPC);
-                } else {
-                  resPC();
-                }
-              });
-            });
-          });
-          Promise.all(promises).then(() => resolve(true)).catch(reject);
-        } else {
-          resolve(true);
-        }
-      });
+    const id = await withTransaction(async (conn) => {
+      const result = await query(
+        conn,
+        "INSERT INTO commandes(`libelle`, `date_commande`, `id_utilisateur`) VALUES (?, ?, ?)",
+        [data.libelle, data.date_commande, id_utilisateur]
+      );
+      await insertLignes(conn, result.insertId, data.produits);
+      return result.insertId;
     });
+
+    customConsoleLog("Une nouvelle commande a été ajoutée (id : " + id + ")");
+    return true;
   }
 
   static async updateCommande(data, id_commande, id_utilisateur) {
-    return new Promise((resolve, reject) => {
-      const q = "UPDATE commandes SET libelle = ?, date_commande = ? WHERE id_commande = ? AND id_utilisateur = ?";
-      db.query(q, [data.libelle, data.date_commande, id_commande, id_utilisateur], (err, result) => {
-        if (err) return reject(err);
+    await withTransaction(async (conn) => {
+      const result = await query(
+        conn,
+        "UPDATE commandes SET libelle = ?, date_commande = ? WHERE id_commande = ? AND id_utilisateur = ?",
+        [data.libelle, data.date_commande, id_commande, id_utilisateur]
+      );
 
-        if (result.affectedRows === 0) return reject(new Error("Commande introuvable ou non autorisée"));
+      if (result.affectedRows === 0) {
+        throw new Error("Commande introuvable ou non autorisée");
+      }
 
-        customConsoleLog("La commande " + id_commande + " a été modifiée");
-
-        db.query("DELETE pc, m FROM produits_commandes pc LEFT JOIN modifications m ON pc.id_pc=m.id_pc WHERE id_commande = ?", [id_commande], (err) => {
-          if (err) return reject(err);
-
-          const produits = data.produits;
-          if (produits && produits.length > 0) {
-            const promises = produits.map((produit) => {
-              return new Promise((resPC, rejPC) => {
-                const qPC = "INSERT INTO produits_commandes(`id_commande`, `id_produit`, `qte`, `custom`, `prix`) VALUES (?)";
-                const valuesPC = [
-                  id_commande,
-                  produit.id_produit,
-                  produit.qte,
-                  ((produit.modifications && produit.modifications.length) > 0 || produit.custom === 1) ? 1 : 0,
-                  produit.prix
-                ];
-
-                db.query(qPC, [valuesPC], (err, pc_data) => {
-                  if (err) return rejPC(err);
-
-                  if (produit.modifications && produit.modifications.length > 0) {
-                    const modifPromises = produit.modifications.map((modification) => {
-                      return new Promise((resModif, rejModif) => {
-                        const qModif = "INSERT INTO modifications(`id_pc`, `id_ingredient`, `modificateur`) VALUES (?)";
-                        const valuesModif = [pc_data.insertId, modification.id_ingredient, modification.modificateur];
-                        db.query(qModif, [valuesModif], (err) => {
-                          if (err) return rejModif(err);
-                          resModif();
-                        });
-                      });
-                    });
-                    Promise.all(modifPromises).then(resPC).catch(rejPC);
-                  } else {
-                    resPC();
-                  }
-                });
-              });
-            });
-            Promise.all(promises).then(() => resolve(true)).catch(reject);
-          } else {
-            resolve(true);
-          }
-        });
-      });
+      await supprimerLignes(conn, id_commande);
+      await insertLignes(conn, id_commande, data.produits);
     });
+
+    customConsoleLog("La commande " + id_commande + " a été modifiée");
+    return true;
   }
 
   static async supprimerCommande(id_commande, id_utilisateur) {
-    return new Promise((resolve, reject) => {
-      // First check ownership
-      db.query("SELECT id_commande FROM commandes WHERE id_commande = ? AND id_utilisateur = ?", [id_commande, id_utilisateur], (err, results) => {
-        if (err) return reject(err);
-        if (results.length === 0) return reject(new Error("Commande introuvable ou non autorisée"));
+    await withTransaction(async (conn) => {
+      const results = await query(
+        conn,
+        "SELECT id_commande FROM commandes WHERE id_commande = ? AND id_utilisateur = ?",
+        [id_commande, id_utilisateur]
+      );
+      if (results.length === 0) {
+        throw new Error("Commande introuvable ou non autorisée");
+      }
 
-        db.query("DELETE pc, m FROM produits_commandes pc LEFT JOIN modifications m ON pc.id_pc=m.id_pc WHERE id_commande = ?", [id_commande], (err) => {
-          if (err) return reject(err);
-
-          db.query("DELETE FROM commandes WHERE id_commande = ? AND id_utilisateur = ?", [id_commande, id_utilisateur], (err) => {
-            if (err) return reject(err);
-            customConsoleLog("Suppression de la commande " + id_commande + " effectuée");
-            resolve(true);
-          });
-        });
-      });
+      await supprimerLignes(conn, id_commande);
+      await query(
+        conn,
+        "DELETE FROM commandes WHERE id_commande = ? AND id_utilisateur = ?",
+        [id_commande, id_utilisateur]
+      );
     });
+
+    customConsoleLog("Suppression de la commande " + id_commande + " effectuée");
+    return true;
   }
 
   static async paiementCommande(data, id_utilisateur) {

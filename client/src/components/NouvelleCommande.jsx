@@ -133,6 +133,7 @@ const NouvelleCommande = () => {
             navigate("/commandes");
         } catch (error) {
             console.error("Erreur lors de la validation :", error);
+            alert("La commande n'a pas pu être enregistrée. Réessayez.");
         }
     };
 
@@ -194,8 +195,13 @@ const NouvelleCommande = () => {
     const supprimerCommande = async (confirm) => {
         setshowConfirm(false);
         if (confirm) {
-            await axios.delete(process.env.REACT_APP_API_URL + "commandes/supprimer/" + commandeId);
-            navigate("/commandes");
+            try {
+                await axios.delete(process.env.REACT_APP_API_URL + "commandes/supprimer/" + commandeId);
+                navigate("/commandes");
+            } catch (error) {
+                console.error("Erreur lors de la suppression :", error);
+                alert("La commande n'a pas pu être supprimée. Réessayez.");
+            }
         }
     };
 

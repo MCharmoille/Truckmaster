@@ -1,5 +1,4 @@
-import { db } from '../lib/db.js';
-import { customConsoleLog } from '../lib/logger.js';
+import { db, query, withTransaction } from '../lib/db.js';
 
 class Devis {
     static async getAll(id_utilisateur) {
@@ -48,92 +47,62 @@ class Devis {
     }
 
     static async create(data, id_utilisateur) {
-        return new Promise((resolve, reject) => {
-            const { nom, adresse, adresse_suite, date_commande, produits } = data;
-            
-            db.query("SELECT IFNULL(MAX(id_public), 0) + 1 AS nextId FROM devis WHERE id_utilisateur = ?", [id_utilisateur], (err, maxRes) => {
-                if (err) return reject(err);
-                
-                const nextIdPublic = maxRes[0].nextId;
+        const { nom, adresse, adresse_suite, date_commande, produits } = data;
 
-                const q = "INSERT INTO devis (nom, adresse, adresse_suite, date_creation, id_utilisateur, id_public) VALUES (?, ?, ?, ?, ?, ?)";
-                db.query(q, [nom, adresse, adresse_suite, date_commande, id_utilisateur, nextIdPublic], (err, result) => {
-                    if (err) return reject(err);
-                    const devisId = result.insertId;
+        return withTransaction(async (conn) => {
+            const [next] = await query(
+                conn,
+                "SELECT IFNULL(MAX(id_public), 0) + 1 AS nextId FROM devis WHERE id_utilisateur = ? FOR UPDATE",
+                [id_utilisateur]
+            );
 
-                    if (produits && produits.length > 0) {
-                        const values = produits.map(p => [devisId, p.id_produit, p.quantite, p.prix]);
-                        db.query("INSERT INTO devis_produits (id_devis, id_produit, quantite, prix) VALUES ?", [values], (err) => {
-                            if (err) return reject(err);
-                            resolve({ id: devisId });
-                        });
-                    } else {
-                        resolve({ id: devisId });
-                    }
-                });
-            });
+            const result = await query(
+                conn,
+                "INSERT INTO devis (nom, adresse, adresse_suite, date_creation, id_utilisateur, id_public) VALUES (?, ?, ?, ?, ?, ?)",
+                [nom, adresse, adresse_suite, date_commande, id_utilisateur, next.nextId]
+            );
+            const devisId = result.insertId;
+
+            if (produits && produits.length > 0) {
+                const values = produits.map(p => [devisId, p.id_produit, p.quantite, p.prix]);
+                await query(conn, "INSERT INTO devis_produits (id_devis, id_produit, quantite, prix) VALUES ?", [values]);
+            }
+
+            return { id: devisId };
         });
     }
 
     static async update(id, data, id_utilisateur) {
-        return new Promise((resolve, reject) => {
-            const { nom, adresse, adresse_suite, date_commande, produits } = data;
-            const q = "UPDATE devis SET nom = ?, adresse = ?, adresse_suite = ?, date_creation = ? WHERE id = ? AND id_utilisateur = ?";
+        const { nom, adresse, adresse_suite, date_commande, produits } = data;
+        const q = "UPDATE devis SET nom = ?, adresse = ?, adresse_suite = ?, date_creation = ? WHERE id = ? AND id_utilisateur = ?";
 
-            db.beginTransaction(err => {
-                if (err) return reject(err);
+        return withTransaction(async (conn) => {
+            const result = await query(conn, q, [nom, adresse, adresse_suite, date_commande, id, id_utilisateur]);
+            if (result.affectedRows === 0) {
+                throw new Error("Devis introuvable ou non autorisé");
+            }
 
-                db.query(q, [nom, adresse, adresse_suite, date_commande, id, id_utilisateur], (err, result) => {
-                    if (err) return db.rollback(() => reject(err));
+            await query(conn, "DELETE FROM devis_produits WHERE id_devis = ?", [id]);
 
-                    if (result.affectedRows === 0) return db.rollback(() => reject(new Error("Devis introuvable ou non autorisé")));
+            if (produits && produits.length > 0) {
+                const values = produits.map(p => [id, p.id_produit, p.quantite, p.prix]);
+                await query(conn, "INSERT INTO devis_produits (id_devis, id_produit, quantite, prix) VALUES ?", [values]);
+            }
 
-                    db.query("DELETE FROM devis_produits WHERE id_devis = ?", [id], (err) => {
-                        if (err) return db.rollback(() => reject(err));
-
-                        if (produits && produits.length > 0) {
-                            const values = produits.map(p => [id, p.id_produit, p.quantite, p.prix]);
-                            db.query("INSERT INTO devis_produits (id_devis, id_produit, quantite, prix) VALUES ?", [values], (err) => {
-                                if (err) return db.rollback(() => reject(err));
-                                db.commit(err => {
-                                    if (err) return db.rollback(() => reject(err));
-                                    resolve(true);
-                                });
-                            });
-                        } else {
-                            db.commit(err => {
-                                if (err) return db.rollback(() => reject(err));
-                                resolve(true);
-                            });
-                        }
-                    });
-                });
-            });
+            return true;
         });
     }
 
     static async delete(id, id_utilisateur) {
-        return new Promise((resolve, reject) => {
-            db.beginTransaction(err => {
-                if (err) return reject(err);
+        return withTransaction(async (conn) => {
+            const results = await query(conn, "SELECT id FROM devis WHERE id = ? AND id_utilisateur = ?", [id, id_utilisateur]);
+            if (results.length === 0) {
+                throw new Error("Devis introuvable ou non autorisé");
+            }
 
-                // First check ownership
-                db.query("SELECT id FROM devis WHERE id = ? AND id_utilisateur = ?", [id, id_utilisateur], (err, results) => {
-                    if (err) return db.rollback(() => reject(err));
-                    if (results.length === 0) return db.rollback(() => reject(new Error("Devis introuvable ou non autorisé")));
-
-                    db.query("DELETE FROM devis_produits WHERE id_devis = ?", [id], (err) => {
-                        if (err) return db.rollback(() => reject(err));
-                        db.query("DELETE FROM devis WHERE id = ? AND id_utilisateur = ?", [id, id_utilisateur], (err) => {
-                            if (err) return db.rollback(() => reject(err));
-                            db.commit(err => {
-                                if (err) return db.rollback(() => reject(err));
-                                resolve(true);
-                            });
-                        });
-                    });
-                });
-            });
+            await query(conn, "DELETE FROM devis_produits WHERE id_devis = ?", [id]);
+            await query(conn, "DELETE FROM devis WHERE id = ? AND id_utilisateur = ?", [id, id_utilisateur]);
+            return true;
         });
     }
 }
