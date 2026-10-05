@@ -1,0 +1,41 @@
+Backlog GeckoFT
+
+Choses remarquées pendant le déménagement, à traiter plus tard.
+Pas les nouvelles fonctionnalités : elles restent dans plan/todos.txt.
+
+Connexion
+- Sur une fenêtre basse, le formulaire ne défile pas. La racine de l'app est en h-screen et overflow-hidden, et la page de connexion est en min-h-screen. Le bouton et le footer peuvent être coupés.
+- Une réponse d'erreur du serveur (par exemple 500) affiche le même texte qu'un serveur injoignable. Le message renvoyé par l'API n'est pas montré.
+- Le message d'erreur n'a pas role="alert" : un lecteur d'écran peut ne pas l'annoncer.
+- Pendant le chargement, le libellé du bouton est remplacé par le spinner, et le bouton n'a plus de nom accessible.
+- animate-fade-in-up et animate-shake ne sont pas définies. On les ajoutera seulement si un écran en a vraiment besoin.
+
+Navigation
+- Pas de page pour une adresse inconnue : la barre reste, le contenu est blanc. Le client actuel n'en a pas non plus. À créer, pas à recopier.
+- Quand la fiche produit arrivera, le lien Carte (/produits) ne s'allumera pas sur /produit/:id.
+- La zone de contenu a bottom-32 et pb-24. Les deux viennent de l'ancienne coque. À revoir seulement si on retouche cette mise en page.
+- p-4 et md:p-4 sont identiques.
+
+PWA
+- On garde le plugin. Il manque encore les icônes, donc l'app n'est pas installable.
+- Le manifeste généré est en lang="en". La page est en français.
+- En build ou en preview, le service worker peut garder en cache une ancienne version. En dev, il n'est pas servi.
+
+Nom et version
+- Le nom affiché vient de src/appName.js. Le numéro v1.7.0 est écrit en dur sur la connexion.
+- package.json est encore en 0.1.0. Le numéro affiché, v1.7.0, fait foi.
+- En copiant l'accueil, remplacer le V1.6.2 affiché par v1.7.0.
+- .env.production pointe encore vers https://truckmaster.ovh:8800/. C'est l'adresse du serveur actuel. Le nouveau domaine est hors de ce déménagement.
+
+Résumé
+- Au déménagement : les images de type passent par require(), qui ne compile pas sous Vite. Les remplacer par un import ou import.meta.glob, sans changer le rendu.
+- data est d'abord un tableau, puis l'objet renvoyé par l'API. data.length sert de test « pas encore chargé ». Le recopier tel quel, et noter le piège.
+
+Produit
+- Même require() pour les images de type, dans getTypeImage.
+
+Paramètres
+- L'import date-fns/locale/fr peut casser sous Vite. La forme qui tient est import { fr } from 'date-fns/locale', comme dans le calendrier. Ne pas fusionner moment et date-fns pour autant.
+
+Accueil
+- Au déménagement, aligner la version affichée sur v1.7.0.

@@ -32,19 +32,15 @@ Corriger Resume.jsx : data est un objet, data.length est trompeur.
 
 
 
-Aligner versions affichées (Accueil 1.6.2 vs Connexion 1.5.2).
+Aligner l'accueil sur v1.7.0 (il affiche encore V1.6.2).
 
 
 
-Accessibilité minimale : focus trap des modales, état actif de la nav, lang="fr".
+Accessibilité minimale : focus trap des modales.
 
 P3 — UX déjà amorcée
 
 
-
-
-
-Indicateur de route active sur la barre du bas.
 
 
 
