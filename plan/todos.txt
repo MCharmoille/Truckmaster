@@ -2,9 +2,7 @@ P2 — Qualité / maintenabilité
 
 
 
-lock du bouton Valider 
-
-Extraire getUserId / auth, mappings paiements, PDF styles.
+Extraire getUserId / auth et les styles PDF.
 
 
 
@@ -142,4 +140,66 @@ Temps réel (WebSocket) si deux tablettes encaissent le même service.
 
 
 
-Inscription self-service + onboarding carte (aujourd’hui tout est taillé pour des IDs de ton catalogue).
+Inscription self-service + onboarding carte (aujourd’hui tout est taillé pour des IDs de ton catalogue). Le slug du sous-domaine se choisit ici (Domaines, étape 2).
+
+Domaines et sous-domaines
+
+Une seule API, deux familles de routes, trois sites distincts. Le jeton ne couvre que les routes où requireAuth est posé. Les pages publiques ont leur propre GET, avec un SELECT limité.
+
+1. Après la bascule Vite (geckoft.txt étape 5), avant ou pendant le rebranding. Pas pendant le déménagement.
+
+
+
+DNS OVH : geckoft.com, www et app vers l’IP du VPS. Pas de wildcard à cette étape.
+
+
+
+Caddy devant Node. Node en HTTP sur localhost. Retirer le TLS et le certificat truckmaster.ovh de server/index.js.
+
+
+
+Certificat pour geckoft.com et app.geckoft.com. api.geckoft.com pointe vers Node. CORS et VITE_API_URL quittent truckmaster.ovh.
+
+
+
+geckoft.com sert la page de présentation, un HTML à part du build caisse. Le visuel peut attendre la charte.
+
+
+
+app.geckoft.com sert le build Vite de l’app. truckmaster.ovh redirige vers app.geckoft.com.
+
+
+
+Noms réservés, refusés comme slug plus tard : app, www, api, mail, admin.
+
+2. Avec l’inscription self-service
+
+
+
+Colonne slug unique sur le compte, choisie à l’inscription. Format [a-z0-9-]. Les noms réservés sont refusés.
+
+3. Vitrines xxxx.geckoft.com, une fois l’inscription en place (après le bloc Client final, pas avant)
+
+
+
+DNS wildcard *.geckoft.com vers la même IP. Certificat wildcard par défi DNS OVH, un seul certificat pour tous les food trucks.
+
+
+
+Caddy envoie *.geckoft.com vers un deuxième build Vite : la page publique seule, sans le bundle caisse ni son service worker.
+
+
+
+GET /public, sans jeton, lecture seule. Le food truck est déduit du Host, pas d’un id dans l’URL. Champs renvoyés : nom, menu affiché, prix public, texte, horaires. Ne pas réutiliser GET /produits.
+
+
+
+Horaires publics dans un champ dédié. Les tranches midi/soir restent celles de la caisse.
+
+
+
+Écran dans app.geckoft.com : slug, texte, horaires, produits visibles, interrupteur publié, lien de la page.
+
+
+
+Limite de débit sur /public.

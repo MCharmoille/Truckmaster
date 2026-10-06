@@ -39,3 +39,29 @@ Paramètres
 
 Accueil
 - Au déménagement, aligner la version affichée sur v1.7.0.
+
+Caisse
+- Le style sombre du calendrier vit dans .custom-datepicker. Recopié avec l'écran. Ne pas le réécrire avant le rebranding.
+- Les classes d'animation sans définition ont été retirées de la caisse. On les ramènera seulement si un écran en a vraiment besoin.
+
+Rebranding
+- La modale d'encaissement est en z-50, le même plan que la barre du bas.
+- Les modales n'ont pas le même cadre : fond cliquable, z-index, touche Échap, focus. À unifier au rebranding.
+- Les erreurs de la caisse passent par alert() ou la console. Elles n'ont pas de place dans la page. À traiter au rebranding.
+- Le ticket de la prise de commande est fixe en w-72. Peu lisible en portrait.
+- Le tableau des commandes est en trois colonnes dès le téléphone.
+- La zone de contenu a bottom-32 et pb-24. Le tableau des commandes ajoute pb-36.
+
+Refactor
+- Après un changement de sauce, réinitialiser la recette ne restaure pas l'ingrédient d'origine. La fenêtre sera reprise en grande partie.
+- Le drapeau « personnalisé » ne suit que le changement de prix. Recette et prix sont à redécouper.
+- Boissons : display === -1, action setModalBoissons, icône du produit 98, liste en dur. L'API force action à « modifier » et ne renvoie pas display -1, donc la fenêtre ne s'ouvre pas. À reprendre avec les sauces.
+- Refaire un tour de standardisation des noms : les fonctions gardent encore plusieurs styles (paiement_commande, CloseModalCustom, valider).
+
+À vérifier
+- Les cas « aucun jour travaillé » et « Créer aujourd'hui » n'ont pas été testés.
+
+Audit
+- Le calendrier fige la première fonction de changement de date. Aller du jour X au jour Y, puis revenir à X, peut laisser l'adresse sur Y. « + » et le rechargement suivent l'adresse.
+- /add et /add/:id affichent le même composant sans key. Après une commande ouverte, « + » peut garder ses lignes.
+- À l'ouverture d'une commande, l'heure peut être remplacée par la première tranche visible avant que les filtres midi/soir du bon jour soient connus. Enregistrer ensuite déplace la commande.
